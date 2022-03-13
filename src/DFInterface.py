@@ -33,7 +33,7 @@ def InsertInterface(el_left, el_right, u, v, acel):
     return u, v, acel
 
 def CohesiveLaw(jump_u,el_index):
-    """ Return the stress for interface element through a linear cohesive law. \n
+    """ Returns the stress for interface element through a linear cohesive law. \n
     Arguments:\n
     jump_u -- jump in the displacement between the DOFs at right and left sizes of the interface element;\n
     el_index -- cohesive element index.
@@ -49,6 +49,14 @@ def CohesiveLaw(jump_u,el_index):
     stress = max(stress,0.0)
 
     return stress
+
+def DamageParameter(el_index):
+    """Returns the damage parameter for an interface element.\n
+    """
+    if DFMesh.materials[el_index] == 1:
+        return min(1.0,DFMesh.delta_max[el_index]/DFMesh.delta_c)
+    else:
+        return 0.0
 
 def ForceInterface(u):
     """ Returns the force of interfaces (flambda).\n

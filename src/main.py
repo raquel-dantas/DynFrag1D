@@ -46,8 +46,9 @@ for n in range(DFMesh.n_steps):
             # Fracture happens: creat new interface element
             u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
             els_step = els_step + 1
-            # print(connect)/home/dantas/projects/first_assignment/cohesive_elem_imp _testplot.ipynb
-    
 
-print(stress_evl[:,DFMesh.n_steps-1])
-DFPlot.PlotStressByTime(DFMesh.n_steps, stress_evl)
+    D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
+    DFPlot.PlotByInterface(D)
+
+# print(stress_evl[:,DFMesh.n_steps-1])
+# DFPlot.PlotStressByTime(DFMesh.n_steps, stress_evl)
