@@ -64,6 +64,18 @@ def PlotStressByTime(n_steps, stress_evl):
 
     plt.show()
 
+
+def PlotScatter(x, y, labelx, labely, title):
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title(str(title))
+    plt.xlabel(str(labelx))
+    plt.ylabel(str(labely))
+    plt.scatter(x, y)
+    plt.show()
+
+
 def PlotByInterface(func):
     """Plot a vector of values that corresponds to each interface element of the mesh """
 
@@ -72,15 +84,14 @@ def PlotByInterface(func):
     n_int_elements = sum(1 for el in DFMesh.materials if el == 1)
     n_oneD_elements = sum(1 for el in DFMesh.materials if el == 0)
     h = DFMesh.L/n_oneD_elements
-    x = np.array([i*h for i in range(1, n_oneD_elements)])
+    x = np.array([i*h for i in range(0, n_oneD_elements + 1)])
     y = np.zeros(x.shape[0])
     for el in range(n_oneD_elements, len(DFMesh.materials)):
         if DFMesh.materials[el] == 1:
-            j = DFMesh.connect[el][0] - 1
+            j = DFMesh.connect[el][0]
             y[j] = func[el]
     # y = np.array([func[el] for el in range(n_oneD_elements, len(DFMesh.materials)) if DFMesh.materials[el] == 1])
-    plt.scatter(x,y)
-    plt.show()
+    PlotScatter(x,y,"x",labely,title)
 
 # Plot energy
 
