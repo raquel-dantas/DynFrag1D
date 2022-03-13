@@ -57,6 +57,9 @@ acel0 = np.zeros((n_dofs))
 # Load (p)
 p = np.zeros((n_steps+1, n_dofs))
 
+# Initialization of maximum jump u between two linear elements
+delta_max = np.zeros((n_el*2))
+
 # Time integration
 dt_crit = h/((E/rho)**0.5)
 dt = dt_crit*0.1  # (s)

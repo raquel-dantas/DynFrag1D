@@ -2,6 +2,7 @@ import numpy as np
 import DFMesh
 import DFFem
 
+
 def InsertInterface(el_left, el_right, u, v, acel):
     """ Insert a interface element. Updates: number of DOFs, connect list, materials ID, node ID, and vectors u, v e acel vector. \n
     Returns u, v and acel \n
@@ -31,14 +32,22 @@ def InsertInterface(el_left, el_right, u, v, acel):
 
     return u, v, acel
 
-def CohesiveLaw(jump_u):
+def CohesiveLaw(jump_u,el_index):
     """ Return the stress for interface element through a linear cohesive law. \n
     Arguments:\n
-    jump_u -- jump in the displacement between the DOFs at right and left sizes of the interface element
+    jump_u -- jump in the displacement between the DOFs at right and left sizes of the interface element;\n
+    el_index -- cohesive element index.
     """
-    stress = DFMesh.stress_c * (1.0 - jump_u/DFMesh.delta_c)
-    if stress < 0.0:
-        stress = 0.0
+    if DFMesh.delta_max[el_index] > jump_u:
+        Tmax = DFMesh.stress_c * (1.0 - DFMesh.delta_max[el_index]/DFMesh.delta_c)
+        stress = Tmax/DFMesh.delta_max[el_index] * jump_u
+    else:
+        stress = DFMesh.stress_c * (1.0 - jump_u/DFMesh.delta_c)
+        DFMesh.delta_max[el_index] = min(jump_u,DFMesh.delta_c)
+    
+    # After contact law implementation update this point in the code
+    stress = max(stress,0.0)
+
     return stress
 
 def ForceInterface(u):
@@ -51,7 +60,7 @@ def ForceInterface(u):
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 1:
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
-            flambda[DFMesh.connect[el][0]] = CohesiveLaw(jump_u) * DFMesh.A
+            flambda[DFMesh.connect[el][0]] = CohesiveLaw(jump_u,el) * DFMesh.A
             flambda[DFMesh.connect[el][1]] = -flambda[DFMesh.connect[el][0]]
 
     return flambda

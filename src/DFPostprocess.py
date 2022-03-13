@@ -43,7 +43,7 @@ def PostProcess(u):
             stress[el] = DFMesh.E * strain[el]
         elif DFMesh.materials[el] == 1:
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
-            stress[el] = DFInterface.CohesiveLaw(jump_u)
+            stress[el] = DFInterface.CohesiveLaw(jump_u,el)
 
     average = lambda el: (stress[el] + stress[el+1])/2.0 if DFMesh.connect[el][1] == DFMesh.connect[el+1][0] else 0       
        
