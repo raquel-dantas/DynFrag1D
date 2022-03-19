@@ -14,7 +14,7 @@ def Gl_index(elem_index, local_dof):
     return DFMesh.connect[elem_index][local_dof]
 
 # Boundary conditions
-def Apply_bc(K, F, elem_index):
+def Apply_bc(K, M, F, elem_index):
     phi = 1.0
     bignumber = 10.0**30
     dof = DFMesh.connect[elem_index][0]
@@ -22,7 +22,9 @@ def Apply_bc(K, F, elem_index):
     if bc_type == "dirichlet":
         K[dof, dof] += bignumber*phi*phi
         F[dof] += bignumber*float(value)*phi
-
+        M[dof, dof] += float("inf")
+    if bc_type == "velocity":
+        M[dof, dof] += float("inf")
 
 def Contribute_el(K, M, F, elem_index):
     """Computes the contribution of element in the global stiffness and mass matrices, and load vector.\n
@@ -60,7 +62,7 @@ def GlobalSystem():
         mat_id = DFMesh.materials[i_el]
         if mat_id == 0:
             Contribute_el(K, M, F, i_el)
-        elif mat_id == 2:
-            Apply_bc(K, F, i_el)
+        elif DFMesh.bc_dict.__contains__(mat_id):
+            Apply_bc(K, M, F, i_el)
 
     return K, M, F
