@@ -11,8 +11,7 @@ def InsertInterface(el_left, el_right, u, v, acel):
     el_right -- element immediatly at left side from the interface element;\n
     u -- displacement vector;\n
     v -- velocity vector;\n
-    acel -- aceleration vector.   
-    """
+    acel -- aceleration vector."""
 
     dof_broken = DFMesh.connect[el_left][1]
     # Update the connect list
@@ -32,12 +31,13 @@ def InsertInterface(el_left, el_right, u, v, acel):
 
     return u, v, acel
 
+
 def CohesiveLaw(jump_u,el_index):
     """ Returns the stress for interface element through a linear cohesive law. \n
     Arguments:\n
     jump_u -- jump in the displacement between the DOFs at right and left sizes of the interface element;\n
-    el_index -- cohesive element index.
-    """
+    el_index -- cohesive element index."""
+
     if DFMesh.delta_max[el_index] > jump_u:
         Tmax = DFMesh.stress_c * (1.0 - DFMesh.delta_max[el_index]/DFMesh.delta_c)
         stress = Tmax/DFMesh.delta_max[el_index] * jump_u
@@ -50,19 +50,21 @@ def CohesiveLaw(jump_u,el_index):
 
     return stress
 
+
 def DamageParameter(el_index):
-    """Returns the damage parameter for an interface element.\n
-    """
+    """Returns the damage parameter for an interface element.\n"""
+
     if DFMesh.materials[el_index] == 1:
         return min(1.0,DFMesh.delta_max[el_index]/DFMesh.delta_c)
     else:
         return 0.0
 
+
 def ForceInterface(u):
     """ Returns the force of interfaces (flambda).\n
     Arguments:\n
-    u -- displacemnt vector
-    """
+    u -- displacemnt vector."""
+
     n_dofs = u.shape[0]
     flambda = np.zeros(n_dofs)
     for el in range(len(DFMesh.materials)):
@@ -77,8 +79,7 @@ def ForceInterface(u):
 def ForceInt(u):
     """ Returns the internal force vector (ku + flambda)\n
     Arguments:\n
-    u -- displacemnt vector
-    """
+    u -- displacemnt vector."""
     
     # Element stiffness matrix
     h = DFMesh.L/DFMesh.n_el
@@ -94,6 +95,5 @@ def ForceInt(u):
             fint[i_gl] += fint_loc[i_loc]
 
     fint += ForceInterface(u)
-
 
     return fint

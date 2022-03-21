@@ -7,6 +7,7 @@ def Gl_index(elem_index, local_dof):
 
     return DFMesh.connect[elem_index][local_dof]
 
+
 def Apply_bc(K, M, F, elem_index):
     phi = 1.0
     bignumber = 10.0**30
@@ -18,6 +19,7 @@ def Apply_bc(K, M, F, elem_index):
         M[dof, dof] += float("inf")
     if bc_type == "velocity":
         M[dof, dof] += float("inf")
+
 
 def Contribute_el(K, M, F, elem_index):
     """Computes the contribution of element in the global stiffness and mass matrices, and load vector.\n
@@ -40,6 +42,7 @@ def Contribute_el(K, M, F, elem_index):
             j_gl = Gl_index(elem_index, j_loc)
             K[i_gl, j_gl] += k_elem[i_loc, j_loc]
             M[i_gl, j_gl] += m_elem[i_loc, j_loc]
+
 
 def GlobalSystem():
     """ Returns global stiffness and mass matrices, and global load vector."""
