@@ -1,36 +1,49 @@
+from matplotlib.pyplot import connect
 import numpy as np
 import DFMesh
 import DFInterface
 
-def Energy(K, M, u, v):
+def Energy(u, v):
     """Returns Kinetic, potential, and total energy.\n
     Arguments:\n
-    K -- global stiffness matrix;\n
-    M -- global mass matrix;\n
     u -- displacements vector;\n
-    v -- velocities vector.\n
-    """
-    # Kinetic energy
-    Ekin = 1.0/2.0*np.dot(np.matmul(M, v), v)
-    # Potential energy
-    Epot = 1.0/2.0*np.dot(np.matmul(K, u), u)
-    # Dissipated energy
-    # External energy
-    # Total
-    Etot = Ekin + Epot
+    v -- velocities vector."""
+
+    h = DFMesh.L/DFMesh.n_el
+    k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
+    m_elem = DFMesh.rho*DFMesh.A*h/6 * np.array([[2.0, 1.0], [1.0, 2.0]])
+
+    for el in range(DFMesh.n_el):
+        Epot = 0.0
+        Ekin = 0.0
+        uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
+        vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
+        Epot += 1.0/2.0*np.dot(np.matmul(k_elem, uloc), uloc)
+        Ekin += 1.0/2.0*np.dot(np.matmul(m_elem, vloc), vloc)
+        Etot = Ekin + Epot
+    
+    return Epot, Ekin, Etot
 
 
+def VarEnergy(Ekin, Epot, Etot):
+    """Returns the variation of energies between two consecutives time steps."""
 
-    return Ekin, Epot, Etot
+    varEkin = np.zeros((DFMesh.n_steps))
+    varEpot = np.zeros((DFMesh.n_steps))
+    varEtot = np.zeros((DFMesh.n_steps))
+    for n in range(DFMesh.n_steps - 1):
+        varEpot[n+1] = Epot[n+1] - Epot[n]
+        varEkin[n+1] = Ekin[n+1] - Ekin[n]
+        varEtot[n+1] = Etot[n+1] - Etot[n]
 
-# def EnergyBalance(Ekin,Epot,Etot):
-
+    return varEkin, varEpot, varEtot
+    
 
 def PostProcess(u):
-    """ Returns the strain, stress vectors, and the average stress vector between two consecutives line elements.\n
+    """ Returns the strain and stress vectors, and the average stress vector between two consecutives line elements.\n
     Arguments:\n
-    u -- displacemnt vector
-    """    
+    u -- displacemnt vector."""
+
     numel = len(DFMesh.materials)
     strain = np.zeros(numel)
     stress = np.zeros(numel)
@@ -51,10 +64,15 @@ def PostProcess(u):
 
     return strain, stress, average_stress
 
-def LogStress(time_step,stress_evl,current_stress):
-    n_steps = len(stress_evl[0])
-    numel = len(DFMesh.materials)
 
+def LogStress(time_step,stress_evl,current_stress):
+    """Returns a matrix that contains the stress for all elements (lin) at all time steps (cols).\n
+    Arguments:\n
+    time_step: current time step of the analysis;\n
+    stress_evl: current stress evolution matrix;\n
+    current_stress: the stress vector of the current time step."""
+
+    numel = len(DFMesh.materials)
     for el in range(numel):
         stress_evl[el,time_step] = current_stress[el]
 
