@@ -94,15 +94,14 @@ def PlotStressByTime(n_steps, stress_evl):
     plt.xlabel("Time (s)")
     plt.ylabel("Stress (Pa)")
 
-    x = np.linspace(0, n_steps, n_steps)
+    x = np.linspace(0, DFMesh.time_simulation, n_steps)
     for el in range(len(DFMesh.materials)):
-        # elem = retrieve_name(el)
         plt.plot(x, stress_evl[el], label=el)
     plt.legend()
     plt.show()
 
 
-def PlotEnergy(n_steps, Epot, Ekin, Etot):
+def PlotEnergy(n_steps, Epot, Ekin, Edis, Erev, Etot):
     """Plot energies values per time"""
 
     fig, axes = plt.subplots()
@@ -112,15 +111,17 @@ def PlotEnergy(n_steps, Epot, Ekin, Etot):
     plt.xlabel("Time (s)")
     plt.ylabel("Energy")
         
-    x = np.linspace(0, n_steps, n_steps)
+    x = np.linspace(0, DFMesh.time_simulation, n_steps)
     plt.plot(x, Epot, label='Epot')
     plt.plot(x, Ekin, label='Ekin')
+    plt.plot(x, Edis, label='Edis')
+    plt.plot(x, Erev, label='Erev')
     plt.plot(x, Etot, label='Etot')
     plt.legend()
     plt.show()
 
 
-def PlotVarEnergy(n_steps, varEpot, varEkin, varEtot):
+def PlotVarEnergy(n_steps, varEpot, varEkin, varEdis, varErev, varEtot):
     """Plot variation of energy per time"""
 
     fig, axes = plt.subplots()
@@ -130,9 +131,11 @@ def PlotVarEnergy(n_steps, varEpot, varEkin, varEtot):
     plt.xlabel(str("Time (s)"))
     plt.ylabel(str("Variation of energy"))
 
-    x = np.linspace(0, n_steps, n_steps)
+    x = np.linspace(0, DFMesh.time_simulation, n_steps)
     plt.plot(x, varEpot, label='varEpot')
     plt.plot(x, varEkin, label='varEkin')
+    plt.plot(x, varEdis, label='varEdis')
+    plt.plot(x, varErev, label='varErev')
     plt.plot(x, varEtot, label='varEtot')
     plt.legend()
     plt.show()
