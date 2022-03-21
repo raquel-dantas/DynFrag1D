@@ -12,9 +12,11 @@ import numpy as np
 u = DFMesh.u0
 v = DFMesh.v0
 acel = DFMesh.acel0
-E_kin = np.zeros((DFMesh.n_steps))
-E_pot = np.zeros((DFMesh.n_steps))
-E_tot = np.zeros((DFMesh.n_steps))
+
+Epot = np.zeros((DFMesh.n_steps))
+Ekin = np.zeros((DFMesh.n_steps))
+Etot = np.zeros((DFMesh.n_steps))
+
 els_step = DFMesh.n_el
 
 stress_evl = np.zeros((2*len(DFMesh.materials),DFMesh.n_steps))
@@ -22,8 +24,10 @@ stress_evl = np.zeros((2*len(DFMesh.materials),DFMesh.n_steps))
 
 for n in range(DFMesh.n_steps):
 
+    # Post process (stress, strain, energies)
     strain, stress, average_stress = DFPostprocess.PostProcess(u)
     stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
+    Ekin[n], Epot[n], Etot[n] = DFPostprocess.Energy(u, v)
 
     # Get K, M and F
     K, M, F = DFFem.GlobalSystem()
@@ -31,14 +35,10 @@ for n in range(DFMesh.n_steps):
 
     # Plots
     # DFPlot.PlotByDOF(v)
-    DFPlot.PlotByElement(stress)
+    # DFPlot.PlotByElement(stress)
 
     # u,v,acel returns a vector for u,v and acel at every dof at the n step
     u, v, acel = DFNewmark.Newmark_exp(K, M, DFMesh.C, u, v, acel, F, DFMesh.dt, DFMesh.gamma)
-    
-
-    # Energy balance
-    # E_kin[n], E_pot[n], E_tot[n] = DFPostprocess.Energy(K, M, u, v)
 
     # Check limit stress
     for el in range(DFMesh.n_el-1):
@@ -47,7 +47,15 @@ for n in range(DFMesh.n_steps):
             u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
             els_step = els_step + 1
     
+    # Damage parameter
     D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
     # DFPlot.PlotByInterface(D)
 
+
+# Variation of energy
+varEkin, varEpot, varEtot = DFPostprocess.VarEnergy(Ekin, Epot, Etot)
+
+# Plots
 DFPlot.PlotStressByTime(DFMesh.n_steps, stress_evl)
+DFPlot.PlotEnergy(DFMesh.n_steps, Epot, Ekin, Etot)
+DFPlot.PlotVarEnergy(DFMesh.n_steps, varEpot, varEkin, varEtot)
