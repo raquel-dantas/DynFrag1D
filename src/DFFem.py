@@ -2,18 +2,11 @@ import numpy as np
 import itertools
 import DFMesh
 
-# class DFMesh:
-#     DFMesh.L
-#     connect = list()
-
-
-
-
-# Global index of local DOF:
 def Gl_index(elem_index, local_dof):
+    """Returns the global index of a local dof."""
+
     return DFMesh.connect[elem_index][local_dof]
 
-# Boundary conditions
 def Apply_bc(K, M, F, elem_index):
     phi = 1.0
     bignumber = 10.0**30
@@ -34,10 +27,10 @@ def Contribute_el(K, M, F, elem_index):
     F -- Global load vector;\n
     elem_index -- element index"""
     
-    # Element stiffness matrix and element load vector
+    # Element stiffness and mass matrix, and element load vector
     h = DFMesh.L/DFMesh.n_el
     k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
-    m_elem = DFMesh.rho*DFMesh.A*h/2 * np.array([[1.0, 0.0], [0.0, 1.0]])
+    m_elem = DFMesh.rho*DFMesh.A*h/6 * np.array([[2.0, 1.0], [1.0, 2.0]])
     f_elem = np.array([0.0, 0.0])
     # Contribution to K, M and F
     for i_loc in range(2):
@@ -48,10 +41,9 @@ def Contribute_el(K, M, F, elem_index):
             K[i_gl, j_gl] += k_elem[i_loc, j_loc]
             M[i_gl, j_gl] += m_elem[i_loc, j_loc]
 
-# Global stiffness matrix and mass matrix
 def GlobalSystem():
-    """ Returns global stiffness and mass matrices, and global load vector.    
-    """
+    """ Returns global stiffness and mass matrices, and global load vector."""
+
     n_dofs = max(list(itertools.chain.from_iterable(DFMesh.connect))) + 1
     K = np.zeros((n_dofs, n_dofs))
     F = np.zeros((n_dofs))
