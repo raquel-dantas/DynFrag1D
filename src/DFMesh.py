@@ -4,8 +4,10 @@ import copy
 
 # Lenght of the bar (L)
 L = 50*10**-3  # (m)
+x0 = -L/2
+xf = L/2
 # Number of linear elements (n_el)
-n_el = 3
+n_el = 10
 # Lenght of each linear element (h)
 h = L/n_el
 
@@ -34,7 +36,7 @@ node_id.append([n_el]) # Applied velocity at right boundary
 connect = copy.deepcopy(node_id) 
 
 # Applied strain rate and veloctities
-strain_rate = 10.0**1  # (s-1)
+strain_rate = 10.0**3  # (s-1)
 vel = strain_rate*L/2
 
 # BC dictionary
@@ -61,12 +63,14 @@ rho = 75.0*10**3  # (kg/m3)
 
 # Time integration
 
-# Number of time steps (n_steps)
-n_steps = 85
+time_simulation = 4.0*10**-6
 # Critical time step
 dt_crit = h/((E/rho)**0.5)
 # Adopted time step
 dt = dt_crit*0.1  # (s)
+# Number of time steps (n_steps)
+n_steps = int(time_simulation/dt)
+print(n_steps)
 # Newmark explicity constants
 gamma = 0.5
 beta = 0.0
