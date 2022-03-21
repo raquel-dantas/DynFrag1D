@@ -4,8 +4,7 @@ import inspect
 import DFMesh
 import DFFem
 
-# Plot functions
-
+# Plot function
 def Plot(x, y, labelx, labely, title):
     fig, axes = plt.subplots()
     axes.grid(True, which='both')
@@ -16,11 +15,13 @@ def Plot(x, y, labelx, labely, title):
     plt.plot(x, y)
     plt.show()
 
+
 def retrieve_name(var):
     """Gets the name of the argument passed to it, as you coded it in your python script"""
 
     callers_local_vars = inspect.currentframe().f_back.f_back.f_locals.items()
     return [var_name for var_name, var_val in callers_local_vars if var_val is var]
+
 
 def PlotByDOF(func):
     """Plot a vector of values that corresponds to each DOF of the mesh"""
@@ -36,6 +37,7 @@ def PlotByDOF(func):
     y = y.flatten()
     Plot(x,y,"x",labely,title)
 
+
 def PlotByElement(func):
     """Plot a vector of values that corresponds to each element of the mesh """
 
@@ -50,21 +52,8 @@ def PlotByElement(func):
     y = y.flatten()
     Plot(x,y,"x",labely,title)
 
-def PlotStressByTime(n_steps, stress_evl):
-    """Plot the stress on the elements at each time step"""
 
-    fig, axes = plt.subplots()
-    axes.grid(True, which='both')
-    axes.axhline(y=0, color='k')
-
-    x = np.linspace(0, n_steps, n_steps)
-
-    for el in range(len(DFMesh.materials)):
-        plt.plot(x, stress_evl[el])
-
-    plt.show()
-
-
+# Plot points
 def PlotScatter(x, y, labelx, labely, title):
     fig, axes = plt.subplots()
     axes.grid(True, which='both')
@@ -90,35 +79,60 @@ def PlotByInterface(func):
         if DFMesh.materials[el] == 1:
             j = DFMesh.connect[el][0]
             y[j] = func[el]
-    # y = np.array([func[el] for el in range(n_oneD_elements, len(DFMesh.materials)) if DFMesh.materials[el] == 1])
     PlotScatter(x,y,"x",labely,title)
 
-# Plot energy
 
-def PlotEnergy(n_steps, E_kin, E_pot, labelx, labely, title):
+# Plot more than one function
+
+def PlotStressByTime(n_steps, stress_evl):
+    """Plot the stress on the elements at each time step"""
+
     fig, axes = plt.subplots()
     axes.grid(True, which='both')
     axes.axhline(y=0, color='k')
-    plt.title(str(title))
-    plt.xlabel(str(labelx))
-    plt.ylabel(str(labely))
+    plt.title("Stress evolution")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Stress (Pa)")
+
     x = np.linspace(0, n_steps, n_steps)
-    plt.plot(x, E_kin, label='E_kin')
-    plt.plot(x, E_pot, label='E_pot')
+    for el in range(len(DFMesh.materials)):
+        # elem = retrieve_name(el)
+        plt.plot(x, stress_evl[el], label=el)
     plt.legend()
     plt.show()
 
 
-def PlotEnergyTotal(n_steps, E_kin, E_pot, E_tot, labelx, labely, title):
+def PlotEnergy(n_steps, Epot, Ekin, Etot):
+    """Plot energies values per time"""
+
     fig, axes = plt.subplots()
     axes.grid(True, which='both')
     axes.axhline(y=0, color='k')
-    plt.title(str(title))
-    plt.xlabel(str(labelx))
-    plt.ylabel(str(labely))
+    plt.title("Energies")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Energy")
+        
     x = np.linspace(0, n_steps, n_steps)
-    plt.plot(x, E_kin, label='E_kin')
-    plt.plot(x, E_pot, label='E_pot')
-    plt.plot(x, E_tot, label='E_tot')
+    plt.plot(x, Epot, label='Epot')
+    plt.plot(x, Ekin, label='Ekin')
+    plt.plot(x, Etot, label='Etot')
+    plt.legend()
+    plt.show()
+
+
+def PlotVarEnergy(n_steps, varEpot, varEkin, varEtot):
+    """Plot variation of energy per time"""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title(str("Variation of energy"))
+    plt.xlabel(str("Time (s)"))
+    plt.ylabel(str("Variation of energy"))
+
+    x = np.linspace(0, n_steps, n_steps)
+    plt.plot(x, varEpot, label='varEpot')
+    plt.plot(x, varEkin, label='varEkin')
+    plt.plot(x, varEtot, label='varEtot')
     plt.legend()
     plt.show()
