@@ -7,7 +7,7 @@ L = 50*10**-3  # (m)
 x0 = -L/2
 xf = L/2
 # Number of linear elements (n_el)
-n_el = 10
+n_el = 5
 # Lenght of each linear element (h)
 h = L/n_el
 
@@ -19,7 +19,7 @@ h = L/n_el
 # 4 : Velocity applied left node
 # 5 : Velocity applied right node
 materials = [0] * n_el
-# materials.append(2) # Support
+# materials.append(2) 
 materials.append(4)
 materials.append(5)
 
@@ -27,6 +27,7 @@ materials.append(5)
 node_id = []
 for i in range(n_el):
     node_id.append([i, i+1])
+
 # Identify each node has apllied BCs
 # node_id.append([0]) # Support
 node_id.append([0]) # Applied velocity at left boundary
@@ -37,7 +38,8 @@ connect = copy.deepcopy(node_id)
 
 # Applied strain rate and veloctities
 strain_rate = 10.0**3  # (s-1)
-vel = strain_rate*L/2
+# vel = strain_rate*L/2 
+vel = strain_rate*L
 
 # BC dictionary
 bc_dict = {
@@ -51,26 +53,27 @@ n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1
 # Young's module 
 E = 275.0*10**9  # (Pa)
 # Cross sectional area
-A = 1*10**-3  # (unit area)
+A = 1*10**-3  # (m)
 # Fracture energy
 Gc = 100.0  # (N/m)
 # Limit stress
-stress_c = 300.0*10**5  # (Pa)
+stress_c = 300.0*10**6  # (Pa)
 # Limit fracture oppening
 delta_c = (2.0*Gc)/stress_c
 # Density
-rho = 75.0*10**3  # (kg/m3)
+rho = 2750.0  # (kg/m3)
 
 # Time integration
 
-time_simulation = 4.0*10**-6
+time_simulation = 5*10**-6 # (s)
 # Critical time step
 dt_crit = h/((E/rho)**0.5)
 # Adopted time step
 dt = dt_crit*0.1  # (s)
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
-print(n_steps)
+# print(dt)
+# print(n_steps)
 # Newmark explicity constants
 gamma = 0.5
 beta = 0.0
@@ -82,8 +85,19 @@ u0 = np.zeros((n_dofs))
 # Initial velocity (v0): velocity profile (vel) is a function v(x)
 n_points = n_dofs
 l = np.linspace(-L/2, L/2, n_points)
+# l = np.linspace(0, L, n_points)
 v0 = np.array([strain_rate*x for x in l])
 v0 = np.round(v0, 8)
+
+# Velocity in the boundary
+vbound = np.zeros((n_el, 2))
+for el in range(len(materials)):
+    if materials[el] == 4:
+        vbound[0] = [-vel,0]
+    elif materials[el] == 5:
+        vbound[n_el-1] = [0,vel]
+print(vbound)
+        
 # Initial acceleration (acel0)
 acel0 = np.zeros((n_dofs))
 # Inital load (p)
