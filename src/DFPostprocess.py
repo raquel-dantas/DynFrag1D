@@ -3,7 +3,7 @@ import numpy as np
 import DFMesh
 import DFInterface
 
-def Energy(u, v):
+def Energy(u, v, nstep):
     """Returns Kinetic, potential, and total energy.\n
     Arguments:\n
     u -- displacements vector;\n
@@ -16,50 +16,65 @@ def Energy(u, v):
 
     Epot = 0.0
     Ekin = 0.0
+    Eext = 0.0
+    Edis = 0.0
+    Erev = 0.0
+    time = nstep * DFMesh.dt
+
     for el in range(DFMesh.n_el):
         # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
         uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
         vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
         # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
-        Epot += 1.0/2.0*np.dot(np.matmul(k_elem, uloc), uloc)
+        Epot += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
         # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
-        Ekin += 1.0/2.0*np.dot(np.matmul(m_elem, vloc), vloc)
+        Ekin += (1.0/2.0*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
 
-    Edis = 0.0
-    Erev = 0.0
+        # Velocity on the boundary
+        voloc = DFMesh.vbound[el]
+        # External work
+        Eext += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), voloc))/DFMesh.A*time
+
+
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 1:
+
+            # d = DFInterface.DamageParameter(el)
+            # Edis += d**2*DFMesh.Gc
+
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
             Edis += 1.0/2.0*DFMesh.stress_c*DFMesh.delta_max[el]
+
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
             stress_coh = DFInterface.CohesiveLaw(jump_u,el)
+
             if jump_u < DFMesh.delta_max[el]:
                 # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
                 Erev += 1.0/2.0*stress_coh*jump_u
 
 
-    # Etot = Epot + Ekin + Edis + Erev
-    
-    return Epot, Ekin, Edis, Erev
+    return Epot, Ekin, Edis, Eext, Erev
 
 
-def VarEnergy(Ekin, Epot, Edis, Erev):
+def VarEnergy(Ekin, Epot, Edis, Eext, Erev):
     """Returns the variation of energies between two consecutives time steps."""
 
     varEkin = np.zeros((DFMesh.n_steps))
     varEpot = np.zeros((DFMesh.n_steps))
     varEdis = np.zeros((DFMesh.n_steps))
+    varEext = np.zeros((DFMesh.n_steps))
     varErev = np.zeros((DFMesh.n_steps))
     varEtot = np.zeros((DFMesh.n_steps))
     for n in range(DFMesh.n_steps - 1):
         varEpot[n+1] = Epot[n+1] - Epot[n]
         varEkin[n+1] = Ekin[n+1] - Ekin[n]
         varEdis[n+1] = Edis[n+1] - Edis[n]
+        varEext[n+1] = Eext[n+1] - Eext[n]
         varErev[n+1] = Erev[n+1] - Erev[n]
-        varEtot[n+1] = varEpot[n+1] + varEkin[n+1] + varEdis[n+1] + varErev[n+1]
+        varEtot[n+1] = varEpot[n+1] + varEkin[n+1] + varEdis[n+1] + varEext[n+1] + varErev[n+1]
 
-    return varEkin, varEpot, varEdis, varErev, varEtot
+    return varEkin, varEpot, varEdis, varEext, varErev, varEtot
     
 
 def PostProcess(u):

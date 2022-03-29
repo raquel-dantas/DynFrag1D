@@ -17,6 +17,7 @@ Epot = np.zeros((DFMesh.n_steps))
 Ekin = np.zeros((DFMesh.n_steps))
 Edis = np.zeros((DFMesh.n_steps))
 Erev = np.zeros((DFMesh.n_steps))
+Eext = np.zeros((DFMesh.n_steps))
 Etot = np.zeros((DFMesh.n_steps))
 
 els_step = DFMesh.n_el
@@ -29,14 +30,14 @@ for n in range(DFMesh.n_steps):
     # Post process (stress, strain, energies)
     strain, stress, average_stress = DFPostprocess.PostProcess(u)
     stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
-    Ekin[n], Epot[n], Edis[n], Erev[n], Etot[n] = DFPostprocess.Energy(u, v)
+    Epot[n], Ekin[n], Edis[n], Eext[n], Erev[n] = DFPostprocess.Energy(u, v, n)
 
     # Get K, M and F
     K, M, F = DFFem.GlobalSystem()
     DFMesh.C = np.resize(DFMesh.C,K.shape)
 
     # Plots
-    # DFPlot.PlotByDOF(v)
+    # DFPlot.PlotByDOF(u)
     # DFPlot.PlotByElement(stress)
 
     # u,v,acel returns a vector for u,v and acel at every dof at the n step
@@ -53,11 +54,9 @@ for n in range(DFMesh.n_steps):
     D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
     # DFPlot.PlotByInterface(D)
 
-
 # Variation of energy
-varEkin, varEpot, varEdis, varErev, varEtot = DFPostprocess.VarEnergy(Ekin, Epot, Edis, Erev, Etot)
-
+varEkin, varEpot, varEdis, varEext, varErev, varEtot = DFPostprocess.VarEnergy(Ekin, Epot, Edis, Eext, Erev)
 # Plots
-DFPlot.PlotStressByTime(DFMesh.n_steps, stress_evl)
-DFPlot.PlotEnergy(DFMesh.n_steps, Epot, Ekin, Edis, Erev, Etot)
-DFPlot.PlotVarEnergy(DFMesh.n_steps, varEpot, varEkin, varEdis, varErev, varEtot)
+# DFPlot.PlotStressByTime(stress_evl)
+DFPlot.PlotEnergy(Epot, Ekin, Edis, Eext, Erev)
+DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varEext, varErev, varEtot)
