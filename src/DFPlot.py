@@ -101,7 +101,7 @@ def PlotStressByTime(stress_evl):
     plt.show()
 
 
-def PlotEnergy(Epot, Ekin, Edis, Erev):
+def PlotEnergy(Epot, Ekin, Edis, Eext, Erev):
     """Plot energies values per time"""
 
     fig, axes = plt.subplots()
@@ -109,18 +109,19 @@ def PlotEnergy(Epot, Ekin, Edis, Erev):
     axes.axhline(y=0, color='k')
     plt.title("Energies")
     plt.xlabel("Time (s)")
-    plt.ylabel("Energy")
+    plt.ylabel("Energy  (N/m)")
         
     x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
     plt.plot(x, Epot, label='Epot')
     plt.plot(x, Ekin, label='Ekin')
     plt.plot(x, Edis, label='Edis')
+    plt.plot(x, Eext, label='Eext')
     plt.plot(x, Erev, label='Erev')
     plt.legend()
     plt.show()
 
 
-def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEtot):
+def PlotVarEnergy(varEpot, varEkin, varEdis, varEext, varErev, varEtot):
     """Plot variation of energy per time"""
 
     fig, axes = plt.subplots()
@@ -134,6 +135,7 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEtot):
     plt.plot(x, varEpot, label='varEpot')
     plt.plot(x, varEkin, label='varEkin')
     plt.plot(x, varEdis, label='varEdis')
+    plt.plot(x, varEext, label='varEext')
     plt.plot(x, varErev, label='varErev')
     plt.plot(x, varEtot, label='varEtot')
     plt.legend()
