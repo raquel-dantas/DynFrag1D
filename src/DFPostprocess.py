@@ -28,7 +28,7 @@ def Energy(u, v):
     Edis = 0.0
     Erev = 0.0
     for el in range(len(DFMesh.materials)):
-        if DFMesh.materials == 1:
+        if DFMesh.materials[el] == 1:
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
             Edis += 1.0/2.0*DFMesh.stress_c*DFMesh.delta_max[el]
             # jump_u returns the jump in the displacement between two consecutive linear elements 
@@ -39,12 +39,12 @@ def Energy(u, v):
                 Erev += 1.0/2.0*stress_coh*jump_u
 
 
-    Etot = Epot + Ekin + Edis + Erev
+    # Etot = Epot + Ekin + Edis + Erev
     
-    return Epot, Ekin, Edis, Erev, Etot
+    return Epot, Ekin, Edis, Erev
 
 
-def VarEnergy(Ekin, Epot, Edis, Erev, Etot):
+def VarEnergy(Ekin, Epot, Edis, Erev):
     """Returns the variation of energies between two consecutives time steps."""
 
     varEkin = np.zeros((DFMesh.n_steps))
@@ -57,7 +57,7 @@ def VarEnergy(Ekin, Epot, Edis, Erev, Etot):
         varEkin[n+1] = Ekin[n+1] - Ekin[n]
         varEdis[n+1] = Edis[n+1] - Edis[n]
         varErev[n+1] = Erev[n+1] - Erev[n]
-        varEtot[n+1] = Etot[n+1] - Etot[n]
+        varEtot[n+1] = varEpot[n+1] + varEkin[n+1] + varEdis[n+1] + varErev[n+1]
 
     return varEkin, varEpot, varEdis, varErev, varEtot
     
