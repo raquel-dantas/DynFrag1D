@@ -81,6 +81,21 @@ def PlotByInterface(func):
             y[j] = func[el]
     PlotScatter(x,y,"x",labely,title)
 
+def PlotAverageStressBar(average_stress_bar):
+    """Plot a vector of values that corresponds to the average stress between all elements at eacth time step in the analysis"""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title("Average stress bar")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Average Stress (Pa)")
+
+    x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
+    y = average_stress_bar
+    plt.plot(x, y)
+    plt.show()
+
 
 # Plot more than one function
 
