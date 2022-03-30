@@ -125,3 +125,17 @@ def LogStress(time_step,stress_evl,current_stress):
         stress_evl[el,time_step] = current_stress[el]
 
     return stress_evl
+
+def StressBar(current_stress, els_step):
+    """Returns the average stress at the whole bar at each time step.\n
+    Arguments:\n
+    current_stress: the stress vector of the current time step.\n
+    els_step: number of elements (linear + cohesive) at the current time step.\n"""
+    
+    sumstress = 0.0
+    numel = len(DFMesh.materials)
+    for el in range(numel):
+        sumstress += current_stress[el]
+    av_stress_bar = sumstress/els_step
+
+    return av_stress_bar
