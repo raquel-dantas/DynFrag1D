@@ -88,16 +88,6 @@ l = np.linspace(-L/2, L/2, n_points)
 # l = np.linspace(0, L, n_points)
 v0 = np.array([strain_rate*x for x in l])
 v0 = np.round(v0, 8)
-
-# Velocity in the boundary
-vbound = np.zeros((n_el, 2))
-for el in range(len(materials)):
-    if materials[el] == 4:
-        vbound[0] = [-vel,0]
-    elif materials[el] == 5:
-        vbound[n_el-1] = [0,vel]
-print(vbound)
-        
 # Initial acceleration (acel0)
 acel0 = np.zeros((n_dofs))
 # Inital load (p)
