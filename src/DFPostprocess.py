@@ -30,17 +30,8 @@ def Energy(u, v, nstep):
         # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
         Ekin += (1.0/2.0*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
 
-        # Velocity on the boundary
-        voloc = DFMesh.vbound[el]
-        # External work
-        Eext += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), voloc))/DFMesh.A*time
-
-
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 1:
-
-            # d = DFInterface.DamageParameter(el)
-            # Edis += d**2*DFMesh.Gc
 
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
             Edis += 1.0/2.0*DFMesh.stress_c*DFMesh.delta_max[el]
@@ -52,7 +43,24 @@ def Energy(u, v, nstep):
             if jump_u < DFMesh.delta_max[el]:
                 # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
                 Erev += 1.0/2.0*stress_coh*jump_u
-
+        
+        if DFMesh.materials[el] == 4:
+            # Velocity on the boundary
+            vo = np.array([-DFMesh.vel, 0])
+            # DOF of the applied material type 4
+            dofbc = 0
+            uloc = np.array([u[DFMesh.connect[dofbc][0]], u[DFMesh.connect[dofbc][1]]])
+            # External work
+            Eext += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), vo))/DFMesh.A*time
+        
+        if DFMesh.materials[el] == 5:
+            # Velocity on the boundary
+            vo = np.array([0, DFMesh.vel])
+            # DOF of the applied material type 4
+            dofbc = DFMesh.n_el - 1
+            uloc = np.array([u[DFMesh.connect[dofbc][0]], u[DFMesh.connect[dofbc][1]]])
+            # External work
+            Eext += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), vo))/DFMesh.A*time
 
     return Epot, Ekin, Edis, Eext, Erev
 
