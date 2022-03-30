@@ -23,13 +23,18 @@ Etot = np.zeros((DFMesh.n_steps))
 els_step = DFMesh.n_el
 
 stress_evl = np.zeros((2*len(DFMesh.materials),DFMesh.n_steps))
-
+av_stress_bar = np.zeros((DFMesh.n_steps))
 
 for n in range(DFMesh.n_steps):
 
     # Post process (stress, strain, energies)
     strain, stress, average_stress = DFPostprocess.PostProcess(u)
     stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
+    
+    
+    av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
+    
+    
     Epot[n], Ekin[n], Edis[n], Eext[n], Erev[n] = DFPostprocess.Energy(u, v, n)
 
     # Get K, M and F
@@ -56,7 +61,11 @@ for n in range(DFMesh.n_steps):
 
 # Variation of energy
 varEkin, varEpot, varEdis, varEext, varErev, varEtot = DFPostprocess.VarEnergy(Ekin, Epot, Edis, Eext, Erev)
+
+
 # Plots
 # DFPlot.PlotStressByTime(stress_evl)
+DFPlot.PlotAverageStressBar(av_stress_bar)
+
 DFPlot.PlotEnergy(Epot, Ekin, Edis, Eext, Erev)
 DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varEext, varErev, varEtot)
