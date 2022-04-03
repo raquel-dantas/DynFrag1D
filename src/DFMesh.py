@@ -38,8 +38,8 @@ connect = copy.deepcopy(node_id)
 
 # Applied strain rate and veloctities
 strain_rate = 10.0**3  # (s-1)
-# vel = strain_rate*L/2 
-vel = strain_rate*L
+vel = strain_rate*L/2 
+# vel = strain_rate*L
 
 # BC dictionary
 bc_dict = {
@@ -69,7 +69,7 @@ rho = 2750.0  # (kg/m3)
 # time_simulation = n_steps*dt # (s)
 
 # Time integration
-time_simulation = 2.0*10**-6 # (s)
+time_simulation = 4.0*10**-6 # (s)
 # Critical time step
 dt_crit = h/((E/rho)**0.5)
 # Adopted time step
@@ -92,6 +92,7 @@ l = np.linspace(-L/2, L/2, n_points)
 # l = np.linspace(0, L, n_points)
 v0 = np.array([strain_rate*x for x in l])
 v0 = np.round(v0, 8)
+
 # Initial acceleration (acel0)
 acel0 = np.zeros((n_dofs))
 # Inital load (p)

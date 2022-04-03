@@ -79,7 +79,7 @@ def ForceInterface(u):
 def ForceInt(u):
     """ Returns the internal force vector (ku + flambda)\n
     Arguments:\n
-    u -- displacemnt vector."""
+    u -- displacemnt vector for entire mesh."""
     
     # Element stiffness matrix
     h = DFMesh.L/DFMesh.n_el

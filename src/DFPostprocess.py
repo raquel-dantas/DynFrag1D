@@ -7,7 +7,8 @@ def Energy(u, v, nstep, work_previous_step):
     """Returns potential, kinetic, dissipated, reversible and external energies.\n
     Arguments:\n
     u -- displacements vector;\n
-    v -- velocities vector."""
+    v -- velocities vector;\n
+    work_previous_step -- external energy from the previous time step."""
 
     # Element siffness and mass matrix
     h = DFMesh.L/DFMesh.n_el
@@ -16,21 +17,25 @@ def Energy(u, v, nstep, work_previous_step):
 
     Epot = 0.0
     Ekin = 0.0
-    Eext = 0.0
     Edis = 0.0
     Erev = 0.0
+    Wext = work_previous_step 
     time = nstep * DFMesh.dt
 
-    for el in range(DFMesh.n_el):
-        # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
-        uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
-        vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
-        # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
-        Epot += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
-        # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
-        Ekin += (1.0/2.0*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
 
     for el in range(len(DFMesh.materials)):
+        # if el == 0 or el == DFMesh.n_el-1:
+        #     continue
+        if DFMesh.materials[el] == 0:
+            # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
+            uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
+            vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
+            # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
+            Epot += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
+            # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
+            Ekin += (1.0/2.0*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
+
+
         if DFMesh.materials[el] == 1:
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
             Edis += 1.0/2.0*DFMesh.stress_c*DFMesh.delta_max[el]
@@ -41,57 +46,43 @@ def Energy(u, v, nstep, work_previous_step):
                 # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
                 Erev += 1.0/2.0*stress_coh*jump_u
 
-        if DFMesh.materials[el] == 4:
+        if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
             # Velocity on the boundary
-            vo = np.array([-DFMesh.vel, 0])
-            # DOF of the applied material type 4
-            elbc = 0
+            if DFMesh.materials[el] == 4:
+                vo = np.array([-DFMesh.vel, 0])
+                elbc = 0
+            else:
+                vo = np.array([0, DFMesh.vel])
+                elbc = DFMesh.n_el - 1
             uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
             # External work
             f = -np.matmul(k_elem, uloc)
             if nstep > 0:
                 power = np.dot(f,vo)/DFMesh.A
                 work = power*DFMesh.dt
-                Eext += work_previous_step + work
-            else:
-                Eext += 0.0
+                Wext += work
 
-        elif DFMesh.materials[el] == 5:
-            # Velocity on the boundary
-            vo = np.array([0, DFMesh.vel])
-            # DOF of the applied material type 5
-            elbc = DFMesh.n_el - 1
-            uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
-            # External work
-            f = -np.matmul(k_elem, uloc)
-            if nstep > 0:
-                power = np.dot(f,vo)/DFMesh.A
-                work = power*DFMesh.dt
-                Eext += work_previous_step + work
-            else:
-                Eext += 0.0
-
-    return Epot, Ekin, Edis, Erev, Eext 
+    return Epot, Ekin, Edis, Erev, Wext 
 
 
-def VarEnergy(Ekin, Epot, Edis,Erev, Eext):
+def VarEnergy(Ekin, Epot, Edis,Erev, Wext):
     """Returns the variation of energies between two consecutives time steps."""
 
     varEkin = np.zeros((DFMesh.n_steps))
     varEpot = np.zeros((DFMesh.n_steps))
     varEdis = np.zeros((DFMesh.n_steps))
-    varEext = np.zeros((DFMesh.n_steps))
+    varWext = np.zeros((DFMesh.n_steps))
     varErev = np.zeros((DFMesh.n_steps))
     varEtot = np.zeros((DFMesh.n_steps))
-    for n in range(DFMesh.n_steps - 1):
-        varEpot[n+1] = Epot[n+1] - Epot[n]
-        varEkin[n+1] = Ekin[n+1] - Ekin[n]
-        varEdis[n+1] = Edis[n+1] - Edis[n]
-        varEext[n+1] = Eext[n+1] - Eext[n]
-        varErev[n+1] = Erev[n+1] - Erev[n]
-        varEtot[n+1] = varEpot[n+1] + varEkin[n+1] + varEdis[n+1] + varEext[n+1] + varErev[n+1]
+    for n in range(1,DFMesh.n_steps):
+        varEpot[n] = Epot[n] - Epot[n-1]
+        varEkin[n] = Ekin[n] - Ekin[n-1]
+        varEdis[n] = Edis[n] - Edis[n-1]
+        varWext[n] = Wext[n] - Wext[n-1]
+        varErev[n] = Erev[n] - Erev[n-1]
+        varEtot[n] = varEpot[n] + varEkin[n] + varEdis[n] + varWext[n] + varErev[n]
 
-    return varEkin, varEpot, varEdis, varEext, varErev, varEtot
+    return varEkin, varEpot, varEdis, varWext, varErev, varEtot
     
 
 def PostProcess(u):
