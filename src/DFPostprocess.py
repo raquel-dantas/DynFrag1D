@@ -3,8 +3,8 @@ import numpy as np
 import DFMesh
 import DFInterface
 
-def Energy(u, v, nstep):
-    """Returns Kinetic, potential, and total energy.\n
+def Energy(u, v, nstep, work_previous_step):
+    """Returns potential, kinetic, dissipated, reversible and external energies.\n
     Arguments:\n
     u -- displacements vector;\n
     v -- velocities vector."""
@@ -32,40 +32,49 @@ def Energy(u, v, nstep):
 
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 1:
-
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
             Edis += 1.0/2.0*DFMesh.stress_c*DFMesh.delta_max[el]
-
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
             stress_coh = DFInterface.CohesiveLaw(jump_u,el)
-
             if jump_u < DFMesh.delta_max[el]:
                 # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
                 Erev += 1.0/2.0*stress_coh*jump_u
-        
+
         if DFMesh.materials[el] == 4:
             # Velocity on the boundary
             vo = np.array([-DFMesh.vel, 0])
             # DOF of the applied material type 4
-            dofbc = 0
-            uloc = np.array([u[DFMesh.connect[dofbc][0]], u[DFMesh.connect[dofbc][1]]])
+            elbc = 0
+            uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
             # External work
-            Eext += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), vo))/DFMesh.A*time
-        
-        if DFMesh.materials[el] == 5:
+            f = -np.matmul(k_elem, uloc)
+            if nstep > 0:
+                power = np.dot(f,vo)/DFMesh.A
+                work = power*DFMesh.dt
+                Eext += work_previous_step + work
+            else:
+                Eext += 0.0
+
+        elif DFMesh.materials[el] == 5:
             # Velocity on the boundary
             vo = np.array([0, DFMesh.vel])
-            # DOF of the applied material type 4
-            dofbc = DFMesh.n_el - 1
-            uloc = np.array([u[DFMesh.connect[dofbc][0]], u[DFMesh.connect[dofbc][1]]])
+            # DOF of the applied material type 5
+            elbc = DFMesh.n_el - 1
+            uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
             # External work
-            Eext += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), vo))/DFMesh.A*time
+            f = -np.matmul(k_elem, uloc)
+            if nstep > 0:
+                power = np.dot(f,vo)/DFMesh.A
+                work = power*DFMesh.dt
+                Eext += work_previous_step + work
+            else:
+                Eext += 0.0
 
-    return Epot, Ekin, Edis, Eext, Erev
+    return Epot, Ekin, Edis, Erev, Eext 
 
 
-def VarEnergy(Ekin, Epot, Edis, Eext, Erev):
+def VarEnergy(Ekin, Epot, Edis,Erev, Eext):
     """Returns the variation of energies between two consecutives time steps."""
 
     varEkin = np.zeros((DFMesh.n_steps))
@@ -131,7 +140,7 @@ def StressBar(current_stress, els_step):
     Arguments:\n
     current_stress: the stress vector of the current time step.\n
     els_step: number of elements (linear + cohesive) at the current time step.\n"""
-    
+
     sumstress = 0.0
     numel = len(DFMesh.materials)
     for el in range(numel):

@@ -53,7 +53,7 @@ n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1
 # Young's module 
 E = 275.0*10**9  # (Pa)
 # Cross sectional area
-A = 1*10**-3  # (m)
+A = 1*10**-3  # (m2)
 # Fracture energy
 Gc = 100.0  # (N/m)
 # Limit stress
@@ -63,17 +63,21 @@ delta_c = (2.0*Gc)/stress_c
 # Density
 rho = 2750.0  # (kg/m3)
 
-# Time integration
+# n_steps = 100
+# dt_crit = h/((E/rho)**0.5)
+# dt = dt_crit*0.1  # (s)
+# time_simulation = n_steps*dt # (s)
 
-time_simulation = 5*10**-6 # (s)
+# Time integration
+time_simulation = 2.0*10**-6 # (s)
 # Critical time step
 dt_crit = h/((E/rho)**0.5)
 # Adopted time step
 dt = dt_crit*0.1  # (s)
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
-# print(dt)
-# print(n_steps)
+print(dt)
+print(n_steps)
 # Newmark explicity constants
 gamma = 0.5
 beta = 0.0
