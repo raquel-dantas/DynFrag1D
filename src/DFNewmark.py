@@ -9,11 +9,10 @@ def Newmark_exp(K, M, C, u, v, acel, p_next, dt, gamma):
     # Degrees of freedom
     dofs = K.shape[0]
     
-    up = np.zeros((dofs))
-    vp = np.zeros((dofs))
     u_next = np.zeros((dofs))
     acel_next = np.zeros((dofs))
     v_next = np.zeros((dofs))
+    
     u_next = u + dt*v + ((1.0/2.0)*dt**2)*acel
 
     # Solution of the linear problem:
