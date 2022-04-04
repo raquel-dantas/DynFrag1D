@@ -7,7 +7,7 @@ L = 50*10**-3  # (m)
 x0 = -L/2
 xf = L/2
 # Number of linear elements (n_el)
-n_el = 5
+n_el = 10
 # Lenght of each linear element (h)
 h = L/n_el
 

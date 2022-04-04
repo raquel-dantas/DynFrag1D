@@ -3,7 +3,7 @@ import numpy as np
 import DFMesh
 import DFInterface
 
-def Energy(u, v, nstep, work_previous_step):
+def Energy(u, v, nstep):
     """Returns potential, kinetic, dissipated, reversible and external energies.\n
     Arguments:\n
     u -- displacements vector;\n
@@ -19,19 +19,19 @@ def Energy(u, v, nstep, work_previous_step):
     Ekin = 0.0
     Edis = 0.0
     Erev = 0.0
-    Wext = work_previous_step 
+    Wext = 0.0
+
     time = nstep * DFMesh.dt
 
-
     for el in range(len(DFMesh.materials)):
-        # if el == 0 or el == DFMesh.n_el-1:
-        #     continue
         if DFMesh.materials[el] == 0:
             # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
             uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
             vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
+            
             # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
             Epot += (1.0/2.0*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
+
             # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
             Ekin += (1.0/2.0*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
 
@@ -57,10 +57,10 @@ def Energy(u, v, nstep, work_previous_step):
             uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
             # External work
             f = -np.matmul(k_elem, uloc)
-            if nstep > 0:
-                power = np.dot(f,vo)/DFMesh.A
-                work = power*DFMesh.dt
-                Wext += work
+            stress_bound = f/DFMesh.A*time
+            power = np.dot(stress_bound,vo)
+            work = 0.5*power
+            Wext += work
 
     return Epot, Ekin, Edis, Erev, Wext 
 

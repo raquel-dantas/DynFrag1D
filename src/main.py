@@ -35,21 +35,18 @@ for n in range(DFMesh.n_steps):
     
     av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
     
+    Epot[n], Ekin[n], Edis[n], Erev[n], Wext[n] = DFPostprocess.Energy(u, v, n)
     
-    Epot[n], Ekin[n], Edis[n], Erev[n], Wext[n] = DFPostprocess.Energy(u, v, n, work)
-    work = Wext[n]
-
     # Get K, M and F
     K, M, F = DFFem.GlobalSystem()
     DFMesh.C = np.resize(DFMesh.C,K.shape)
 
     # Plots
-    # DFPlot.PlotByDOF(v)
+    DFPlot.PlotByDOF(u)
     # DFPlot.PlotByElement(stress)
 
     # u,v,acel returns a vector for u,v and acel at every dof at the n step
     u, v, acel = DFNewmark.Newmark_exp(K, M, DFMesh.C, u, v, acel, F, DFMesh.dt, DFMesh.gamma)
-
     # Check limit stress
     for el in range(DFMesh.n_el-1):
         if average_stress[el] > DFMesh.stress_c:
@@ -63,9 +60,9 @@ for n in range(DFMesh.n_steps):
 
 # Variation of energy
 varEkin, varEpot, varEdis, varWext, varErev, varEtot = DFPostprocess.VarEnergy(Ekin, Epot, Edis, Erev, Wext)
+
 # Plots
 # DFPlot.PlotStressByTime(stress_evl)
 # DFPlot.PlotAverageStressBar(av_stress_bar)
-
-# DFPlot.PlotEnergy(Epot, Ekin, Edis, Wext, Erev)
+DFPlot.PlotEnergy(Epot, Ekin, Edis, Wext, Erev)
 DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varWext, varErev, varEtot)

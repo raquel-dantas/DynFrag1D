@@ -150,7 +150,7 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varWext, varErev, varEtot):
     plt.plot(x, varEpot, label='varEpot')
     plt.plot(x, varEkin, label='varEkin')
     plt.plot(x, varEdis, label='varEdis')
-    plt.plot(x, -varWext, label='varWext')
+    plt.plot(x, varWext, label='varWext')
     # plt.plot(x, varErev, label='varErev')
     plt.plot(x, varEtot, label='varEtot')
     plt.legend()
