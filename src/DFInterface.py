@@ -37,15 +37,18 @@ def CohesiveLaw(jump_u,el_index):
     Arguments:\n
     jump_u -- jump in the displacement between the DOFs at right and left sizes of the interface element;\n
     el_index -- cohesive element index."""
-
     if DFMesh.delta_max[el_index] > jump_u:
         Tmax = DFMesh.stress_c * (1.0 - DFMesh.delta_max[el_index]/DFMesh.delta_c)
         stress = Tmax/DFMesh.delta_max[el_index] * jump_u
     else:
         stress = DFMesh.stress_c * (1.0 - jump_u/DFMesh.delta_c)
         DFMesh.delta_max[el_index] = min(jump_u,DFMesh.delta_c)
-    
-    # After contact law implementation update this point in the code
+    if jump_u < 0.0:
+        # alpha = 10.0**15
+        alpha = 0.0
+        stress = alpha*jump_u
+
+    # # After contact law implementation update this point in the code
     stress = max(stress,0.0)
 
     return stress

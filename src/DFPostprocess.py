@@ -44,7 +44,11 @@ def Energy(u, v, nstep):
             stress_coh = DFInterface.CohesiveLaw(jump_u,el)
             if jump_u < DFMesh.delta_max[el]:
                 # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
-                Erev += 1.0/2.0*stress_coh*jump_u
+                Erev += 0.5*stress_coh*jump_u
+            # Contact
+            # if jump_u < 0:
+            #     alpha = 10.0**15
+            #     Econ += 0.5*alpha*jump_u**2
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
             # Velocity on the boundary
