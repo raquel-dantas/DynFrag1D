@@ -3,7 +3,9 @@ import numpy as np
 import DFMesh
 import DFInterface
 
-def Energy(u, v, nstep):
+
+
+def Energy(up, u, v, nstep, work_previous_step):
     """Returns potential, kinetic, dissipated, reversible and external energies.\n
     Arguments:\n
     u -- displacements vector;\n
@@ -15,14 +17,18 @@ def Energy(u, v, nstep):
     k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
     m_elem = DFMesh.rho*DFMesh.A*h/6 * np.array([[2.0, 1.0], [1.0, 2.0]])
 
+    # Epot = ep
+    # Ekin = ek
     Epot = 0.0
     Ekin = 0.0
     Edis = 0.0
     Erev = 0.0
     Econ = 0.0
-    Wext = 0.0
+    # Wext = 0.0
+    Wext = work_previous_step
 
-    time = nstep * DFMesh.dt
+    # time = nstep * DFMesh.dt
+    time = DFMesh.dt
 
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 0:
@@ -61,10 +67,13 @@ def Energy(u, v, nstep):
                 vo = np.array([0, DFMesh.vel])
                 elbc = DFMesh.n_el - 1
             uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
+            uploc = np.array([up[DFMesh.connect[elbc][0]], up[DFMesh.connect[elbc][1]]])
             # External work
             f = np.matmul(k_elem, uloc)
-            stress_bound = f/DFMesh.A
-            work = 0.5*np.dot(stress_bound,vo)*time
+            fp = np.matmul(k_elem, uploc)
+            fr = (f+fp)*0.5
+            stress_bound = fr/DFMesh.A
+            work = np.dot(stress_bound,vo)*time
             Wext += work
 
     return Epot, Ekin, Edis, Erev, Econ, Wext
@@ -146,3 +155,31 @@ def StressBar(current_stress, els_step):
     av_stress_bar = sumstress/els_step
 
     return av_stress_bar
+
+
+# def VerifyFractureState(stress, u, v, up, vp):
+#     for el in range(len(DFMesh.materials)):
+#         if DFMesh.materials[el] == 1:
+#             if stress[el] == 0.0:
+#                 u[DFMesh.connect[el][0]] = 0.0
+#                 u[DFMesh.connect[el][1]] = 0.0
+#                 v[DFMesh.connect[el][0]] = 0.0
+#                 v[DFMesh.connect[el][1]] = 0.0
+
+#                 if DFMesh.connect[el][0] == DFMesh.connect[0][1]:
+#                     u[DFMesh.connect[0][0]] = 0.0
+#                     v[DFMesh.connect[0][0]] = 0.0
+
+#                 if DFMesh.connect[el][1] == DFMesh.connect[DFMesh.n_el-1][0]:
+#                     u[DFMesh.connect[DFMesh.n_el-1][1]] = 0.0
+#                     v[DFMesh.connect[DFMesh.n_el-1][1]] = 0.0
+
+#                 # u[DFMesh.connect[el][0]] = up[DFMesh.connect[el][0]]
+#                 # u[DFMesh.connect[el][1]] = up[DFMesh.connect[el][1]]
+#                 # v[DFMesh.connect[el][0]] = vp[DFMesh.connect[el][0]]
+#                 # v[DFMesh.connect[el][1]] = vp[DFMesh.connect[el][1]]
+
+#                 # if DFMesh.connect[el][0] == DFMesh.connect[0][1]:
+#                 #     u[DFMesh.connect[0][0]] = up[DFMesh.connect[0][0]]
+#                 # if DFMesh.connect[el][1] == DFMesh.connect[DFMesh.n_el-1][0]:
+#                 #     u[DFMesh.connect[DFMesh.n_el-1][1]] = up[DFMesh.connect[DFMesh.n_el-1][1]]
