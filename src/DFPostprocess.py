@@ -5,7 +5,7 @@ import DFInterface
 
 
 
-def Energy(up, u, v, nstep, work_previous_step):
+def Energy(up_bc_left, up_bc_right, u, v, nstep, work_previous_step):
     """Returns potential, kinetic, dissipated, reversible and external energies.\n
     Arguments:\n
     u -- displacements vector;\n
@@ -63,16 +63,23 @@ def Energy(up, u, v, nstep, work_previous_step):
             if DFMesh.materials[el] == 4:
                 vo = np.array([-DFMesh.vel, 0])
                 elbc = 0
+                uploc = up_bc_left
             else:
                 vo = np.array([0, DFMesh.vel])
                 elbc = DFMesh.n_el - 1
+                uploc = up_bc_right
             uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
-            uploc = np.array([up[DFMesh.connect[elbc][0]], up[DFMesh.connect[elbc][1]]])
+            # uploc = np.array([up[DFMesh.connect[elbc][0]], up[DFMesh.connect[elbc][1]]])
             # External work
-            f = np.matmul(k_elem, uloc)
+            # Force on the current time step fn
+            fn = np.matmul(k_elem, uloc)
+            # Force on the previous time step fp
             fp = np.matmul(k_elem, uploc)
-            fr = (f+fp)*0.5
+            # Reaction force
+            fr = (fn+fp)*0.5
+            # Stress on the boundary
             stress_bound = fr/DFMesh.A
+            # Work is power integrated in time
             work = np.dot(stress_bound,vo)*time
             Wext += work
 
