@@ -33,13 +33,10 @@ av_stress_bar = np.zeros((DFMesh.n_steps))
 
 for n in range(DFMesh.n_steps):
 
-    up = u
-
     # Post process (stress, strain, energies)
     strain, stress, average_stress = DFPostprocess.PostProcess(u)
     stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
     av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
-
     Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,up_bc_right, u, v, n, work)
     work =  Wext[n]
 
@@ -51,24 +48,21 @@ for n in range(DFMesh.n_steps):
     # DFPlot.PlotByDOF(acel)
     # DFPlot.PlotByElement(stress)
 
+    # Save the displacement u in the boundary elements to use as previous u in the next time step
     up_bc_left = np.array([0,0])
     up_bc_right = np.array([0,0])
-
     for bc in range(len(DFMesh.materials)):
         if DFMesh.materials[bc] == 4 or DFMesh.materials[bc] == 5:
-            # Velocity on the boundary
             if DFMesh.materials[bc] == 4:
                 elbc = 0
                 up_bc_left = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
             else:
                 elbc = DFMesh.n_el - 1
-                up_bc_right = np.array([up[DFMesh.connect[elbc][0]], up[DFMesh.connect[elbc][1]]])
+                up_bc_right = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
 
     # u,v,acel returns a vector for u,v and acel at every dof at the n step
     u, v, acel = DFNewmark.Newmark_exp(K, M, DFMesh.C, u, v, acel, F, DFMesh.dt, DFMesh.gamma)
 
-    # DFPostprocess.VerifyFractureState(stress, u, v, up, vp)
-    
     # Check limit stress
     for el in range(DFMesh.n_el-1):
         if average_stress[el] > DFMesh.stress_c:
@@ -80,7 +74,7 @@ for n in range(DFMesh.n_steps):
     D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
     # DFPlot.PlotByInterface(D)
 
-# Variation of energy
+# Variation of energy [Energy, time] return the difference between the energy value between the time t and t0 
 varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
 
 # Plots
