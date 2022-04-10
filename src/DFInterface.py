@@ -99,4 +99,15 @@ def ForceInt(u):
 
     fint += ForceInterface(u)
 
+    # fcoh = ForceInterface(u)
+
+    # for el in range(DFMesh.n_el):
+    #     for coh in range(len(DFMesh.materials)):
+
+    #         if DFMesh.materials[coh] == 1:
+    #             if DFMesh.connect[el][1] == DFMesh.connect[coh][0]:
+    #                 fint[DFMesh.connect[el][1]] = fcoh[DFMesh.connect[coh][0]]
+    #             if DFMesh.connect[coh][1] == DFMesh.connect[el][0]:
+    #                 fint[DFMesh.connect[el][0]] = fcoh[DFMesh.connect[coh][1]]
+
     return fint

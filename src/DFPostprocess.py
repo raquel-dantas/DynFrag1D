@@ -17,26 +17,26 @@ def Energy(up_bc_left, up_bc_right, u, v, nstep, work_previous_step):
     k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
     m_elem = DFMesh.rho*DFMesh.A*h/6 * np.array([[2.0, 1.0], [1.0, 2.0]])
 
-    # Epot = ep
-    # Ekin = ek
     Epot = 0.0
     Ekin = 0.0
     Edis = 0.0
     Erev = 0.0
     Econ = 0.0
-    # Wext = 0.0
     Wext = work_previous_step
 
-    # time = nstep * DFMesh.dt
     time = DFMesh.dt
+
+    # fint = DFInterface.ForceInt(u)
 
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 0:
             # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
             uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
             vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
+            # fintloc = np.array([fint[DFMesh.connect[el][0]], fint[DFMesh.connect[el][1]]])
             
             # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
+            # Epot += (0.5*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
             Epot += (0.5*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
 
             # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
@@ -59,7 +59,6 @@ def Energy(up_bc_left, up_bc_right, u, v, nstep, work_previous_step):
             #     Econ += 0.5*alpha*jump_u**2
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
-            # Velocity on the boundary
             if DFMesh.materials[el] == 4:
                 vo = np.array([-DFMesh.vel, 0])
                 elbc = 0
@@ -69,13 +68,11 @@ def Energy(up_bc_left, up_bc_right, u, v, nstep, work_previous_step):
                 elbc = DFMesh.n_el - 1
                 uploc = up_bc_right
             uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
-            # uploc = np.array([up[DFMesh.connect[elbc][0]], up[DFMesh.connect[elbc][1]]])
-            # External work
             # Force on the current time step fn
             fn = np.matmul(k_elem, uloc)
             # Force on the previous time step fp
             fp = np.matmul(k_elem, uploc)
-            # Reaction force
+            # Reaction force as an average between fn and fp
             fr = (fn+fp)*0.5
             # Stress on the boundary
             stress_bound = fr/DFMesh.A
@@ -153,7 +150,7 @@ def StressBar(current_stress, els_step):
     """Returns the average stress at the whole bar at each time step.\n
     Arguments:\n
     current_stress: the stress vector of the current time step.\n
-    els_step: number of elements (linear + cohesive) at the current time step.\n"""
+    els_step: number of elements (linear + cohesive) at the current time step."""
 
     sumstress = 0.0
     numel = len(DFMesh.materials)
@@ -164,29 +161,16 @@ def StressBar(current_stress, els_step):
     return av_stress_bar
 
 
-# def VerifyFractureState(stress, u, v, up, vp):
-#     for el in range(len(DFMesh.materials)):
-#         if DFMesh.materials[el] == 1:
-#             if stress[el] == 0.0:
-#                 u[DFMesh.connect[el][0]] = 0.0
-#                 u[DFMesh.connect[el][1]] = 0.0
-#                 v[DFMesh.connect[el][0]] = 0.0
-#                 v[DFMesh.connect[el][1]] = 0.0
-
-#                 if DFMesh.connect[el][0] == DFMesh.connect[0][1]:
-#                     u[DFMesh.connect[0][0]] = 0.0
-#                     v[DFMesh.connect[0][0]] = 0.0
-
-#                 if DFMesh.connect[el][1] == DFMesh.connect[DFMesh.n_el-1][0]:
-#                     u[DFMesh.connect[DFMesh.n_el-1][1]] = 0.0
-#                     v[DFMesh.connect[DFMesh.n_el-1][1]] = 0.0
-
-#                 # u[DFMesh.connect[el][0]] = up[DFMesh.connect[el][0]]
-#                 # u[DFMesh.connect[el][1]] = up[DFMesh.connect[el][1]]
-#                 # v[DFMesh.connect[el][0]] = vp[DFMesh.connect[el][0]]
-#                 # v[DFMesh.connect[el][1]] = vp[DFMesh.connect[el][1]]
-
-#                 # if DFMesh.connect[el][0] == DFMesh.connect[0][1]:
-#                 #     u[DFMesh.connect[0][0]] = up[DFMesh.connect[0][0]]
-#                 # if DFMesh.connect[el][1] == DFMesh.connect[DFMesh.n_el-1][0]:
-#                 #     u[DFMesh.connect[DFMesh.n_el-1][1]] = up[DFMesh.connect[DFMesh.n_el-1][1]]
+# def FractureStateBoundary(u):
+#     fint = DFInterface.ForceInt(u)
+#     if DFMesh.materials.__contains__(1):
+#         for el in range(len(DFMesh.materials)):
+#             if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
+#                 if DFMesh.materials[el] == 4:
+#                     elbc = 0
+#                     if fint[DFMesh.connect[elbc][1]] == 0.0:
+#                         DFMesh.materials[el] = 6
+#                 else:
+#                     elbc = DFMesh.n_el - 1
+#                     if fint[DFMesh.connect[elbc][0]] == 0.0:
+#                         DFMesh.materials[el] = 6
