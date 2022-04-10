@@ -158,3 +158,37 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     plt.plot(x, varEtot, label='varEtot')
     plt.legend()
     plt.show()
+
+def PlotVTK(prefix, timestep, u):
+    filename = prefix + '.' + str(timestep) + '.vtk'
+    header = '''# vtk DataFile Version 3.0
+Dynamic fragmentation 
+ASCII
+
+DATASET UNSTRUCTURED_GRID
+'''
+    coord = DFMesh.ListDofCoord()
+    points = 'POINTS ' + str(len(coord)) + ' float\n' + np.array2string(coord).replace('[','').replace(']','') + '\n'
+
+    cellist = np.zeros((DFMesh.n_el,3),dtype=int)
+    for i in range(DFMesh.n_el):
+        cellist[i,0] = len(DFMesh.connect[i])
+        cellist[i,1] = DFMesh.connect[i][0]
+        cellist[i,2] = DFMesh.connect[i][1]
+
+    cells = '\nCELLS ' + str(DFMesh.n_el) + ' ' + str(DFMesh.n_el*3) + '\n' + np.array2string(cellist).replace('[','').replace(']','')+ '\n'
+
+    celltypes = '\nCELL_TYPES ' + str(DFMesh.n_el) + '\n' + '\n'.join(map(str,[3]*DFMesh.n_el))+ '\n'
+
+    displacement = np.array([[u[i],0.,0.] for i in range(len(u))])
+    displacement = '\nVECTORS displacement float\n' +  np.array2string(displacement).replace('[','').replace(']','')+ '\n'
+
+
+    output = open(filename, 'w')
+    output.write(header)
+    output.write(points)
+    output.write(cells)
+    output.write(celltypes)
+    output.write('\nPOINT_DATA ' + str(len(u)) + '\n')
+    output.write(displacement)
+    output.close()

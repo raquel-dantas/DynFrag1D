@@ -33,6 +33,8 @@ av_stress_bar = np.zeros((DFMesh.n_steps))
 
 for n in range(DFMesh.n_steps):
 
+    DFPlot.PlotVTK('animation/fragments',n,u)
+
     # Post process (stress, strain, energies)
     strain, stress, average_stress = DFPostprocess.PostProcess(u)
     stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
@@ -69,10 +71,19 @@ for n in range(DFMesh.n_steps):
             # Fracture happens: creat new interface element
             u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
             els_step = els_step + 1
+            
 
     # D returns a vector contained damage parameter for cohesive elements
     D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
     # DFPlot.PlotByInterface(D)
+
+    
+
+    # DFPostprocess.FractureStateBoundary(u)
+
+
+
+
 
 # Variation of energy [Energy, time] return the difference between the energy value between the time t and t0 
 varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
@@ -80,6 +91,6 @@ varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.Va
 # Plots
 # DFPlot.PlotStressByTime(stress_evl)
 # DFPlot.PlotAverageStressBar(av_stress_bar)
-DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
+# DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+# DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
 # DFPlot.PlotVarEnergy(varEtot)

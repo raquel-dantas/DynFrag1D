@@ -101,3 +101,26 @@ p = np.zeros((n_steps+1, n_dofs))
 C = np.zeros((n_dofs, n_dofs))
 # Initialization of maximum jump u between two linear elements (delta_max)
 delta_max = np.zeros((len(materials)*2))
+
+def NodeCoord(node_id):
+    return x0 + node_id*h
+
+def GetEl(connect, dof_id):
+    elid = 0
+    for el in connect:
+        locdof = 0
+        for dof in el:
+            if dof == dof_id:
+                return elid, locdof 
+            locdof = locdof + 1
+        elid = elid + 1
+
+def ListDofCoord():
+    ndofs = max(list(itertools.chain.from_iterable(connect))) + 1
+    DofCoord = np.zeros((ndofs,3))
+    for el in range(n_el):
+        dof = connect[el][0]
+        DofCoord[dof,0] = NodeCoord(node_id[el][0])
+        dof = connect[el][1]
+        DofCoord[dof,0] = NodeCoord(node_id[el][1])
+    return DofCoord
