@@ -54,7 +54,7 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             # vo is the velocity applied on the extremity
             # elbc is the element index of the applied velocity
             # uploc is the local displacement of elbc from the previous time step 
-            # c is the correct contribution of the boundary elements on the calculus of kinectic energy
+            # c is the correct contribution of the local velocity vector of boundary elements on the calculus of kinectic energy
             if DFMesh.materials[el] == 4:
                 vo = np.array([-DFMesh.vel, 0])
                 elbc = 0
@@ -80,7 +80,7 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             Wext += work
 
             # Correction of the Kinectic energy: subtract the kinectic energy from the boundary
-            Ekin_bc += (0.5*np.dot(np.matmul(m_elem, vo), (2*c + vo)))/DFMesh.A
+            Ekin_bc += (0.5*np.dot(np.matmul(m_elem, vo), (2.*c + vo)))/DFMesh.A
     
     Ekin = Ekin - Ekin_bc
 
@@ -88,7 +88,7 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
 
 
 def VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
-    """Returns the variation of energies between two consecutives time steps."""
+    """Returns the variation of energies between the current time step and the time step 0."""
 
     varEkin = np.zeros((DFMesh.n_steps))
     varEpot = np.zeros((DFMesh.n_steps))
@@ -107,6 +107,27 @@ def VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
         varEtot[n] = varWext[n] - (varEpot[n] + varEkin[n] + varEdis[n]  + varErev[n] + varEcon[n])
 
     return varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot
+
+def Power(Epot, Ekin, Edis, Erev, Econ, Wext):
+    """Returns the variation of energies between two consecutives time steps."""
+
+    PEkin = np.zeros((DFMesh.n_steps))
+    PEpot = np.zeros((DFMesh.n_steps))
+    PEdis = np.zeros((DFMesh.n_steps))
+    PWext = np.zeros((DFMesh.n_steps))
+    PErev = np.zeros((DFMesh.n_steps))
+    PEcon = np.zeros((DFMesh.n_steps))
+    PEtot = np.zeros((DFMesh.n_steps))
+    for n in range(1,DFMesh.n_steps):
+        PEpot[n] = Epot[n] - Epot[n-1]
+        PEkin[n] = Ekin[n] - Ekin[n-1]
+        PEdis[n] = Edis[n] - Edis[n-1]
+        PErev[n] = Erev[n] - Erev[n-1]
+        PEcon[n] = Econ[n] - Econ[n-1]
+        PWext[n] = Wext[n] - Wext[n-1]
+        PEtot[n] = PWext[n] - (PEpot[n] + PEkin[n] + PEdis[n]  + PErev[n] + PEcon[n])
+
+    return PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot
     
 
 def PostProcess(u):

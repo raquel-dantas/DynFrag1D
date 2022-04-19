@@ -33,13 +33,11 @@ av_stress_bar = np.zeros((DFMesh.n_steps))
 
 for n in range(DFMesh.n_steps):
 
-    DFPlot.PlotVTK('animation/fragments',n,u)
-
     # Post process (stress, strain, energies)
     strain, stress, average_stress = DFPostprocess.PostProcess(u)
     stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
     av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
-    Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,up_bc_right, u, v, n, work)
+    Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,up_bc_right, u, v, work)
     work =  Wext[n]
 
     # Get K, M and F
@@ -47,7 +45,7 @@ for n in range(DFMesh.n_steps):
     DFMesh.C = np.resize(DFMesh.C,K.shape)
 
     # Plots
-    # DFPlot.PlotByDOF(acel)
+    # DFPlot.PlotByDOF(v)
     # DFPlot.PlotByElement(stress)
 
     # Save the displacement u in the boundary elements to use as previous u in the next time step
@@ -62,6 +60,7 @@ for n in range(DFMesh.n_steps):
                 elbc = DFMesh.n_el - 1
                 up_bc_right = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
 
+    DFPlot.PlotVTK('animation/fragments',n,u,stress)
     # u,v,acel returns a vector for u,v and acel at every dof at the n step
     u, v, acel = DFNewmark.Newmark_exp(K, M, DFMesh.C, u, v, acel, F, DFMesh.dt, DFMesh.gamma)
 
@@ -71,26 +70,18 @@ for n in range(DFMesh.n_steps):
             # Fracture happens: creat new interface element
             u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
             els_step = els_step + 1
-            
 
     # D returns a vector contained damage parameter for cohesive elements
     D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
     # DFPlot.PlotByInterface(D)
 
-    
-
-    # DFPostprocess.FractureStateBoundary(u)
-
-
-
-
-
 # Variation of energy [Energy, time] return the difference between the energy value between the time t and t0 
 varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPostprocess.Power(Epot, Ekin, Edis, Erev, Econ, Wext)
 
 # Plots
-# DFPlot.PlotStressByTime(stress_evl)
-# DFPlot.PlotAverageStressBar(av_stress_bar)
-# DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-# DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-# DFPlot.PlotVarEnergy(varEtot)
+DFPlot.PlotStressByTime(stress_evl)
+DFPlot.PlotAverageStressBar(av_stress_bar)
+DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
+DFPlot.PlotVarEnergy(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
