@@ -36,16 +36,20 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             Ekin += (0.5*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
 
         if DFMesh.materials[el] == 1:
+            D = DFInterface.DamageParameter(el)
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
-            Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
+            # Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
+            Edis += D**2*DFMesh.Gc
+
+
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
             # stress_coh returns the stress in the cohesive elements give by an cohesive law 
             stress_coh = DFInterface.CohesiveLaw(jump_u,el)
-            if jump_u < DFMesh.delta_max[el]:
-                D = DFInterface.DamageParameter(el)
-                # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
-                Erev += 0.5*stress_coh*jump_u
+            # if jump_u < DFMesh.delta_max[el]:
+            #     # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
+            #     Erev += 0.5*stress_coh*jump_u
+            Erev += 2 * (1 - D) * jump_u / DFMesh.delta_c * DFMesh.Gc
             # Contact
             # if jump_u < 0:
             #     alpha = 10.0**15
@@ -185,18 +189,3 @@ def StressBar(current_stress, els_step):
     av_stress_bar = sumstress/els_step
 
     return av_stress_bar
-
-
-# def FractureStateBoundary(u):
-#     fint = DFInterface.ForceInt(u)
-#     if DFMesh.materials.__contains__(1):
-#         for el in range(len(DFMesh.materials)):
-#             if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
-#                 if DFMesh.materials[el] == 4:
-#                     elbc = 0
-#                     if fint[DFMesh.connect[elbc][1]] == 0.0:
-#                         DFMesh.materials[el] = 6
-#                 else:
-#                     elbc = DFMesh.n_el - 1
-#                     if fint[DFMesh.connect[elbc][0]] == 0.0:
-#                         DFMesh.materials[el] = 6
