@@ -5,49 +5,41 @@ import DFInterface
 
 
 
-def Energy(up_bc_left, up_bc_right, u, v, nstep, work_previous_step):
+def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
     """Returns potential, kinetic, dissipated, reversible and external energies.\n
     Arguments:\n
     u -- displacements vector;\n
     v -- velocities vector;\n
     work_previous_step -- external energy from the previous time step."""
-
+    
     # Element siffness and mass matrix
     h = DFMesh.L/DFMesh.n_el
     k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
     m_elem = DFMesh.rho*DFMesh.A*h/6 * np.array([[2.0, 1.0], [1.0, 2.0]])
-
+    # Initial values for the time step n
     Epot = 0.0
     Ekin = 0.0
     Edis = 0.0
     Erev = 0.0
     Econ = 0.0
     Wext = work_previous_step
-
-    time = DFMesh.dt
-
-    # fint = DFInterface.ForceInt(u)
-
+    Ekin_bc = 0.0
+    
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 0:
             # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
             uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
             vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
-            # fintloc = np.array([fint[DFMesh.connect[el][0]], fint[DFMesh.connect[el][1]]])
-            
             # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
-            # Epot += (0.5*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
             Epot += (0.5*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
-
             # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
             Ekin += (0.5*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
-
 
         if DFMesh.materials[el] == 1:
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
+            # stress_coh returns the stress in the cohesive elements give by an cohesive law 
             stress_coh = DFInterface.CohesiveLaw(jump_u,el)
-
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
             Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
             if jump_u < DFMesh.delta_max[el]:
@@ -59,26 +51,38 @@ def Energy(up_bc_left, up_bc_right, u, v, nstep, work_previous_step):
             #     Econ += 0.5*alpha*jump_u**2
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
+            # vo is the velocity applied on the extremity
+            # elbc is the element index of the applied velocity
+            # uploc is the local displacement of elbc from the previous time step 
+            # c is the correct contribution of the boundary elements on the calculus of kinectic energy
             if DFMesh.materials[el] == 4:
                 vo = np.array([-DFMesh.vel, 0])
                 elbc = 0
                 uploc = up_bc_left
+                c = np.array([0.0, v[DFMesh.connect[elbc][1]]])
             else:
                 vo = np.array([0, DFMesh.vel])
                 elbc = DFMesh.n_el - 1
                 uploc = up_bc_right
+                c = np.array([v[DFMesh.connect[elbc][0]], 0.0])
+            # uloc,vloc[u,v,elbc] returns vectors contained u and v for local dofs of elbc
             uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
-            # Force on the current time step fn
+            # fn is the internal force on the current time step
             fn = np.matmul(k_elem, uloc)
-            # Force on the previous time step fp
+            # fp is the internal force on the previous time step 
             fp = np.matmul(k_elem, uploc)
-            # Reaction force as an average between fn and fp
+            # The reaction force is taken s an average between fn and fp
             fr = (fn+fp)*0.5
             # Stress on the boundary
             stress_bound = fr/DFMesh.A
             # Work is power integrated in time
-            work = np.dot(stress_bound,vo)*time
+            work = np.dot(stress_bound,vo)*DFMesh.dt
             Wext += work
+
+            # Correction of the Kinectic energy: subtract the kinectic energy from the boundary
+            Ekin_bc += (0.5*np.dot(np.matmul(m_elem, vo), (2*c + vo)))/DFMesh.A
+    
+    Ekin = Ekin - Ekin_bc
 
     return Epot, Ekin, Edis, Erev, Econ, Wext
 
