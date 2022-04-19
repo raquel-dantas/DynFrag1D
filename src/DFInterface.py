@@ -73,7 +73,7 @@ def ForceInterface(u):
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 1:
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
-            flambda[DFMesh.connect[el][0]] = CohesiveLaw(jump_u,el) * DFMesh.A
+            flambda[DFMesh.connect[el][0]] = -CohesiveLaw(jump_u,el) * DFMesh.A
             flambda[DFMesh.connect[el][1]] = -flambda[DFMesh.connect[el][0]]
 
     return flambda
