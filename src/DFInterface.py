@@ -37,6 +37,7 @@ def CohesiveLaw(jump_u,el_index):
     Arguments:\n
     jump_u -- jump in the displacement between the DOFs at right and left sizes of the interface element;\n
     el_index -- cohesive element index."""
+    
     if DFMesh.delta_max[el_index] > jump_u:
         Tmax = DFMesh.stress_c * (1.0 - DFMesh.delta_max[el_index]/DFMesh.delta_c)
         stress = Tmax/DFMesh.delta_max[el_index] * jump_u
@@ -98,16 +99,5 @@ def ForceInt(u):
             fint[i_gl] += fint_loc[i_loc]
 
     fint += ForceInterface(u)
-
-    # fcoh = ForceInterface(u)
-
-    # for el in range(DFMesh.n_el):
-    #     for coh in range(len(DFMesh.materials)):
-
-    #         if DFMesh.materials[coh] == 1:
-    #             if DFMesh.connect[el][1] == DFMesh.connect[coh][0]:
-    #                 fint[DFMesh.connect[el][1]] = fcoh[DFMesh.connect[coh][0]]
-    #             if DFMesh.connect[coh][1] == DFMesh.connect[el][0]:
-    #                 fint[DFMesh.connect[el][0]] = fcoh[DFMesh.connect[coh][1]]
 
     return fint

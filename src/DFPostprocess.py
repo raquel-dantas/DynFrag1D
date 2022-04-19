@@ -36,13 +36,14 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             Ekin += (0.5*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
 
         if DFMesh.materials[el] == 1:
+            # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
+            Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
             # stress_coh returns the stress in the cohesive elements give by an cohesive law 
             stress_coh = DFInterface.CohesiveLaw(jump_u,el)
-            # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
-            Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
             if jump_u < DFMesh.delta_max[el]:
+                D = DFInterface.DamageParameter(el)
                 # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
                 Erev += 0.5*stress_coh*jump_u
             # Contact

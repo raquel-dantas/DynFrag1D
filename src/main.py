@@ -60,7 +60,7 @@ for n in range(DFMesh.n_steps):
                 elbc = DFMesh.n_el - 1
                 up_bc_right = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
 
-    DFPlot.PlotVTK('animation/fragments',n,u,stress)
+    # DFPlot.PlotVTK('animation/fragments',n,u,stress)
     # u,v,acel returns a vector for u,v and acel at every dof at the n step
     u, v, acel = DFNewmark.Newmark_exp(K, M, DFMesh.C, u, v, acel, F, DFMesh.dt, DFMesh.gamma)
 
