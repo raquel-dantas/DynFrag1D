@@ -71,7 +71,8 @@ rho = 2750.0  # (kg/m3)
 # Time integration
 time_simulation = 4.0*10**-6 # (s)
 # Critical time step
-dt_crit = h/((E/rho)**0.5)
+# dt_crit = h/((E/rho)**0.5)
+dt_crit = h/(2*3**0.5*np.pi*(E/rho)**0.5)
 # Adopted time step
 dt = dt_crit*0.1  # (s)
 # Number of time steps (n_steps)
