@@ -159,6 +159,27 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     plt.legend()
     plt.show()
 
+def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
+    """Plot variation of energy per time: power"""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title(str("Power"))
+    plt.xlabel(str("Time (s)"))
+    plt.ylabel(str("Power"))
+
+    x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
+    plt.plot(x, PEpot, label='varEpot')
+    plt.plot(x, PEkin, label='varEkin')
+    plt.plot(x, PEdis, label='varEdis')
+    plt.plot(x, PErev, label='varErev')
+    # plt.plot(x, varEcon, label='varEcon')
+    plt.plot(x, -PWext, label='-varWext')
+    plt.plot(x, PEtot, label='varEtot')
+    plt.legend()
+    plt.show()
+
 def PlotVTK(prefix, timestep, u, stress):
     filename = prefix + '.' + str(timestep) + '.vtk'
     header = '''# vtk DataFile Version 3.0
