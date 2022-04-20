@@ -16,7 +16,7 @@ def Newmark_exp(K, M, C, u, v, acel, p_next, dt, gamma):
     u_next = u + dt*v + ((1.0/2.0)*dt**2)*acel
 
     for i in range(dofs):
-        coord = DFMesh.u0[i] - u_next[i]
+        coord = DFMesh.NodeCoord(i) + u_next[i]
         if coord < 0:
             u_next[i] = 0
 

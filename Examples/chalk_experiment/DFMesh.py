@@ -19,27 +19,14 @@ h = L/n_el
 # 4 : Velocity applied left node
 # 5 : Velocity applied right node
 materials = [0] * n_el
-# materials.append(2) 
-# materials.append(4)
-# materials.append(5)
 
 # node_id[elem_index][local_node], returns the global node id
 node_id = []
 for i in range(n_el):
     node_id.append([i, i+1])
 
-# Identify each node has apllied BCs
-# node_id.append([0]) # Support
-# node_id.append([0]) # Applied velocity at left boundary
-# node_id.append([n_el]) # Applied velocity at right boundary 
-
 # Connect[el][j] returns the global index of local dof 'j' of the element 'el'
 connect = copy.deepcopy(node_id) 
-
-# Applied strain rate and veloctities
-# strain_rate = 10.0**3  # (s-1)
-# vel = strain_rate*L/2 
-# vel = strain_rate*L
 
 # BC dictionary
 bc_dict = {
@@ -87,14 +74,15 @@ beta = 0.0
 # Initial values
 
 # Initial high
-h0 = 20.0 * 10**-2 #(m)
+h0 = 15.0 * 10**-2 #(m)
 # h0 = 0 #(m)
 # Initial displacement (u0)
-u0 = np.zeros((n_dofs))
+# u0 = np.zeros((n_dofs))
+u0 = np.array(([h0]*n_dofs))
 n_points = n_dofs
-l = np.linspace(0, L, n_points)
-u0 = np.array([h0 + x for x in l])
-u0 = np.round(u0, 8)
+# l = np.linspace(0, L, n_points)
+# u0 = np.array([h0 + x for x in l])
+# u0 = np.round(u0, 8)
 print(u0)
 # Initial velocity (v0): 
 v0 = np.zeros((n_dofs))
