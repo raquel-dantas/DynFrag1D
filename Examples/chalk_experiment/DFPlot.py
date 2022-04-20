@@ -115,6 +115,20 @@ def PlotStressByTime(stress_evl):
     plt.legend()
     plt.show()
 
+def PlotDispEdge(uedge):
+    """Plot the stress on the elements at each time step"""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title("DispEdge")
+    plt.xlabel("Time (s)")
+    plt.ylabel("uedge (m)")
+
+    x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
+    plt.plot(x, uedge, label='uedge')
+    plt.legend()
+    plt.show()
 
 def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
     """Plot energies values per time"""

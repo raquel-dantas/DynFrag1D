@@ -60,6 +60,8 @@ for n in range(DFMesh.n_steps):
 
 print(uedge)
 
+DFPlot.PlotDispEdge(uedge)
+
 DFPlot.PlotByDOF(u)
 # Variation of energy [Energy, time] return the difference between the energy value between the time t and t0 
 varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
