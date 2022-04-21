@@ -52,17 +52,14 @@ for n in range(DFMesh.n_steps):
     # print(u)
     # DFPlot.PlotByElement(stress)
 
-    DFPlot.PlotVTK('animation/fragments',n,u,stress)
+    DFPlot.PlotVTK('animation/chalk',n,u,stress)
     # u,v,acel returns a vector for u,v and acel at every dof at the n step
     p_next = DFMesh.p[n+1]
-    u, v, acel = DFNewmark.Newmark_exp(K, M, DFMesh.C, u, v, acel, p_next, DFMesh.dt, DFMesh.gamma)
+    u, v, acel = DFNewmark.Newmark_exp(n, K, M, DFMesh.C, u, v, acel, p_next, DFMesh.dt, DFMesh.gamma)
     uedge[n] = u[0]
-
-print(uedge)
 
 DFPlot.PlotDispEdge(uedge)
 
-DFPlot.PlotByDOF(u)
 # Variation of energy [Energy, time] return the difference between the energy value between the time t and t0 
 varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
 PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPostprocess.Power(Epot, Ekin, Edis, Erev, Econ, Wext)
