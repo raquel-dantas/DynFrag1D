@@ -7,7 +7,7 @@ L = 50*10**-3  # (m)
 x0 = -L/2
 xf = L/2
 # Number of linear elements (n_el)
-n_el = 10
+n_el = 80
 # Lenght of each linear element (h)
 h = L/n_el
 
@@ -24,9 +24,7 @@ materials.append(4)
 materials.append(5)
 
 # node_id[elem_index][local_node], returns the global node id
-node_id = []
-for i in range(n_el):
-    node_id.append([i, i+1])
+node_id = [[i,i+1] for i in range(n_el)]
 
 # Identify each node has apllied BCs
 # node_id.append([0]) # Support

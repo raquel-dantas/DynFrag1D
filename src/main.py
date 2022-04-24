@@ -60,7 +60,7 @@ for n in range(DFMesh.n_steps):
                 elbc = DFMesh.n_el - 1
                 up_bc_right = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
 
-    DFPlot.PlotVTK('animation/fragments',n,u,stress)
+    # DFPlot.PlotVTK('animation/test',n,u,stress)
     # u,v,acel returns a vector for u,v and acel at every dof at the n step
     u, v, acel = DFNewmark.Newmark_exp(K, M, DFMesh.C, u, v, acel, F, DFMesh.dt, DFMesh.gamma)
 
@@ -80,8 +80,8 @@ varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.Va
 PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPostprocess.Power(Epot, Ekin, Edis, Erev, Econ, Wext)
 
 # Plots
-DFPlot.PlotStressByTime(stress_evl)
-DFPlot.PlotAverageStressBar(av_stress_bar)
-DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+# DFPlot.PlotStressByTime(stress_evl)
+# DFPlot.PlotAverageStressBar(av_stress_bar)
+# DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
 DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
 DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
