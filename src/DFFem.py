@@ -2,6 +2,11 @@ import numpy as np
 import itertools
 import DFMesh
 
+h = DFMesh.L/DFMesh.n_el
+k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
+m_elem = DFMesh.rho*DFMesh.A*h/2 * np.array([[1.0, 0.], [0., 1.0]])
+
+
 def Gl_index(elem_index, local_dof):
     """Returns the global index of a local dof."""
 
@@ -31,8 +36,6 @@ def Contribute_el(K, M, F, elem_index):
     
     # Element stiffness and mass matrix, and element load vector
     h = DFMesh.L/DFMesh.n_el
-    k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
-    m_elem = DFMesh.rho*DFMesh.A*h/6 * np.array([[2.0, 1.0], [1.0, 2.0]])
     f_elem = np.array([0.0, 0.0])
     # Contribution to K, M and F
     for i_loc in range(2):

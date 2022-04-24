@@ -2,6 +2,7 @@ from matplotlib.pyplot import connect
 import numpy as np
 import DFMesh
 import DFInterface
+import DFFem
 
 
 
@@ -14,8 +15,9 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
     
     # Element siffness and mass matrix
     h = DFMesh.L/DFMesh.n_el
-    k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
-    m_elem = DFMesh.rho*DFMesh.A*h/6 * np.array([[2.0, 1.0], [1.0, 2.0]])
+    k_elem = DFFem.k_elem
+    m_elem = DFFem.m_elem
+
     # Initial values for the time step n
     Epot = 0.0
     Ekin = 0.0
@@ -82,12 +84,11 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             stress_bound = fr/DFMesh.A
             # Work is power integrated in time
             work = np.dot(stress_bound,vo)*DFMesh.dt
-            Wext += work
+            Wext += work 
 
             # Correction of the Kinectic energy: subtract the kinectic energy from the boundary
             Ekin_bc += (0.5*np.dot(np.matmul(m_elem, vo), (2.*c + vo)))/DFMesh.A
     
-    Ekin = Ekin - Ekin_bc
 
     return Epot, Ekin, Edis, Erev, Econ, Wext
 

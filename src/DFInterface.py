@@ -87,7 +87,7 @@ def ForceInt(u):
     
     # Element stiffness matrix
     h = DFMesh.L/DFMesh.n_el
-    k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
+    k_elem = DFFem.k_elem
     n_dofs = u.shape[0]
     fint = np.zeros(n_dofs)
     for el in range(DFMesh.n_el):
