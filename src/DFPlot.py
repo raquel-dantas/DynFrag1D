@@ -181,6 +181,7 @@ def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
     plt.show()
 
 def PlotVTK(prefix, timestep, u, stress):
+    ndofs = len(u)
     filename = prefix + '.' + str(timestep) + '.vtk'
     header = '''# vtk DataFile Version 3.0
 Dynamic fragmentation 
@@ -204,6 +205,15 @@ DATASET UNSTRUCTURED_GRID
     displacement = np.array([[u[i],0.,0.] for i in range(len(u))])
     displacement = '\nVECTORS displacement float\n' +  np.array2string(displacement).replace('[','').replace(']','')+ '\n'
 
+    el_avgdisp = [(u[DFMesh.connect[el][0]] + u[DFMesh.connect[el][1]])*0.5 for el in range(DFMesh.n_el)]
+    
+    avgdisp = np.zeros((ndofs,3))
+    for el in range(DFMesh.n_el):
+        avgdisp[DFMesh.connect[el][0],0] = el_avgdisp[el]
+        avgdisp[DFMesh.connect[el][1],0] = el_avgdisp[el]
+
+    avgdisp = '\nVECTORS AvgDisplacement float\n' +  np.array2string(avgdisp).replace('[','').replace(']','')+ '\n'
+
     stressplot = 'StressX 1 '+str(DFMesh.n_el)+' float\n' +'\n'.join(map(str,stress[:DFMesh.n_el]))+ '\n'
 
     output = open(filename, 'w')
@@ -216,4 +226,5 @@ DATASET UNSTRUCTURED_GRID
     output.write(stressplot)
     output.write('\nPOINT_DATA ' + str(len(u)) + '\n')
     output.write(displacement)
+    output.write(avgdisp)
     output.close()
