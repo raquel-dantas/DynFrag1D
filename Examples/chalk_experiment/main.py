@@ -58,7 +58,7 @@ for n in range(DFMesh.n_steps):
     u, v, acel = DFNewmark.Newmark_exp(n, K, M, DFMesh.C, u, v, acel, p_next, DFMesh.dt, DFMesh.gamma)
     uedge[n] = u[0]
 
-DFPlot.PlotDispEdge(uedge)
+# DFPlot.PlotDispEdge(uedge)
 
 # Variation of energy [Energy, time] return the difference between the energy value between the time t and t0 
 varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
@@ -68,5 +68,5 @@ PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPostprocess.Power(Epot, Ekin
 # DFPlot.PlotStressByTime(stress_evl)
 # DFPlot.PlotAverageStressBar(av_stress_bar)
 # DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-# DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-# DFPlot.PlotVarEnergy(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
+DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
+DFPlot.PlotVarEnergy(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)

@@ -7,7 +7,7 @@ L = 80*10**-3  # (m)
 x0 = 0.
 xf = L
 # Number of linear elements (n_el)
-n_el = 5
+n_el = 50
 # Lenght of each linear element (h)
 h = L/n_el
 
@@ -53,7 +53,7 @@ dt = dt_crit*0.1  # (s)
 time_simulation = 0.2 # (s)
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
-n_steps = min(n_steps, 200)
+n_steps = min(n_steps, 1000)
 print('steps: ', n_steps)
 # Newmark explicity constants
 gamma = 0.5
