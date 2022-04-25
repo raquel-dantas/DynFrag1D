@@ -7,7 +7,7 @@ L = 80*10**-3  # (m)
 x0 = 0.
 xf = L
 # Number of linear elements (n_el)
-n_el = 50
+n_el = 20
 # Lenght of each linear element (h)
 h = L/n_el
 
@@ -31,7 +31,7 @@ bc_dict = {
 n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1
 
 # Young's module 
-E = 275.0*10**5  # (Pa)
+E = 275.0*10**6  # (Pa)
 # Cross sectional area
 A = 1*10**-4  # (m2)
 # Fracture energy
@@ -53,7 +53,7 @@ dt = dt_crit*0.1  # (s)
 time_simulation = 0.2 # (s)
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
-n_steps = min(n_steps, 1000)
+n_steps = min(n_steps, 2000)
 print('steps: ', n_steps)
 # Newmark explicity constants
 gamma = 0.5
@@ -67,7 +67,7 @@ h0 = 1.0 * 10**-2 #(m)
 u0 = np.full(n_dofs, h0)
 n_points = n_dofs
 # Initial velocity (v0):
-vel = 200. 
+vel = 100. 
 v0 = np.full(n_dofs, -vel)
 # Initial acceleration (acel0)
 acel0 = np.zeros((n_dofs))

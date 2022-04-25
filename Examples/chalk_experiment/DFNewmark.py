@@ -21,13 +21,16 @@ def Newmark_exp(n, K, M, C, u, v, acel, p_next, dt, gamma):
     if coord < 0:
         coord = 0.
         u_next[0] = coord - DFMesh.NodeCoord(0)
+        v[0] = 0
+        acel[0] = abs(acel[0])
     
 
     for i in range(1,dofs):
         coord_prev = copy.deepcopy(coord) 
         coord = DFMesh.NodeCoord(i) + u_next[i]
         if coord < coord_prev:
-            coord = coord_prev + DFMesh.h/100
+            # coord = coord_prev + DFMesh.h/100
+            coord = coord_prev + DFMesh.h
             u_next[i] = coord - DFMesh.NodeCoord(i)
 
     # Solution of the linear problem:
