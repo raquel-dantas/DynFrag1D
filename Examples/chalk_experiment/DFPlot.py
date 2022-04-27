@@ -130,7 +130,7 @@ def PlotDispEdge(uedge):
     plt.legend()
     plt.show()
 
-def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
+def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, Eimp):
     """Plot energies values per time"""
 
     fig, axes = plt.subplots()
@@ -143,15 +143,16 @@ def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
     x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
     plt.plot(x, Epot, label='Epot')
     plt.plot(x, Ekin, label='Ekin')
-    plt.plot(x, Edis, label='Edis')
-    plt.plot(x, Erev, label='Erev')
+    # plt.plot(x, Edis, label='Edis')
+    # plt.plot(x, Erev, label='Erev')
     # plt.plot(x, Econ, label='Econ')
-    plt.plot(x, Wext, label='Wext')
+    # plt.plot(x, Wext, label='Wext')
+    plt.plot(x, Eimp, label='Eimp')
     plt.legend()
     plt.show()
 
 
-def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot):
+def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEimp, varEtot):
 # def PlotVarEnergy( varEtot):
     """Plot variation of energy per time"""
 
@@ -165,10 +166,11 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
     plt.plot(x, varEpot, label='varEpot')
     plt.plot(x, varEkin, label='varEkin')
-    plt.plot(x, varEdis, label='varEdis')
-    plt.plot(x, varErev, label='varErev')
+    # plt.plot(x, varEdis, label='varEdis')
+    # plt.plot(x, varErev, label='varErev')
     # plt.plot(x, varEcon, label='varEcon')
-    plt.plot(x, -varWext, label='-varWext')
+    # plt.plot(x, -varWext, label='-varWext')?\
+    plt.plot(x, varEimp, label='VarEimp')
     plt.plot(x, varEtot, label='varEtot')
     plt.legend()
     plt.show()

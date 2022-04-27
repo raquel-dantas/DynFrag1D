@@ -16,22 +16,6 @@ def Newmark_exp(n, K, M, C, u, v, acel, p_next, dt, gamma):
     
     u_next = u + dt*v + ((1.0/2.0)*dt**2)*acel
 
-    # u = x - X
-    coord = DFMesh.NodeCoord(0) + u_next[0]
-    if coord < 0:
-        coord = 0.
-        u_next[0] = coord - DFMesh.NodeCoord(0)
-        v[0] = 0
-        acel[0] = abs(acel[0])
-    
-
-    for i in range(1,dofs):
-        coord_prev = copy.deepcopy(coord) 
-        coord = DFMesh.NodeCoord(i) + u_next[i]
-        if coord < coord_prev:
-            # coord = coord_prev + DFMesh.h/100
-            coord = coord_prev + DFMesh.h
-            u_next[i] = coord - DFMesh.NodeCoord(i)
 
     # Solution of the linear problem:
     Minv = np.linalg.inv(M)
@@ -50,6 +34,22 @@ def Newmark_exp(n, K, M, C, u, v, acel, p_next, dt, gamma):
                 u_next[i_dof] = value
                 acel_next[i_dof] = 0.0
                 v_next[i_dof] = 0.0
-                
+
+    
+
+    # Impact: node 0
+    coord = DFMesh.NodeCoord(0) + u_next[0]
+    if coord < 0:
+        coord = 0.
+        u_next[0] = coord - DFMesh.NodeCoord(0)
+        v_next[0] = 0.
+
+    # Impact: other nodes
+    for i in range(1,dofs):
+        coord_prev = copy.deepcopy(coord) 
+        coord = DFMesh.NodeCoord(i) + u_next[i]
+        if coord < coord_prev:
+            coord = coord_prev + DFMesh.h/100
+            u_next[i] = coord - DFMesh.NodeCoord(i)
 
     return u_next, v_next, acel_next

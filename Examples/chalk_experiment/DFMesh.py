@@ -7,13 +7,20 @@ L = 80*10**-3  # (m)
 x0 = 0.
 xf = L
 # Number of linear elements (n_el)
-n_el = 20
+n_el = 10
 # Lenght of each linear element (h)
 h = L/n_el
 
 # Material id convention: 
 # 0 : line elemnt
+# 1 : interface element
+# 2 : Support left node
+# 3 : Support right node 
+# 4 : Velocity applied left node
+# 5 : Velocity applied right node
+# 6 : Force applied 
 materials = [0] * n_el
+materials.append(6)
 
 # node_id[elem_index][local_node], returns the global node id
 node_id = [[i,i+1] for i in range(n_el)]
@@ -43,18 +50,17 @@ delta_c = (2.0*Gc)/stress_c
 # Density
 rho = 100.0  # (kg/m3)
 
-# n_steps = 5000
-dt_crit = h/((3*E/rho)**0.5)
+dt_crit = h/((E/rho)**0.5)
 dt = dt_crit*0.1  # (s)
-# time_simulation = n_steps*dt # (s)
-# print(time_simulation)
 
 # Time integration
 time_simulation = 0.2 # (s)
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
-n_steps = min(n_steps, 2000)
+n_steps = min(n_steps, 1000)
+time_simulation = n_steps*dt # (s)
 print('steps: ', n_steps)
+print(dt)
 # Newmark explicity constants
 gamma = 0.5
 beta = 0.0
@@ -62,7 +68,7 @@ beta = 0.0
 # Initial values
 
 # Initial high
-h0 = 1.0 * 10**-2 #(m)
+h0 = 0.2 * 10**-2 #(m)
 # Initial displacement (u0)
 u0 = np.full(n_dofs, h0)
 n_points = n_dofs
@@ -74,6 +80,7 @@ acel0 = np.zeros((n_dofs))
 
 # Inital load (p):
 p = np.zeros((n_steps+1, n_dofs))
+fimp = np.zeros(n_steps)
 # Damping
 C = np.zeros((n_dofs, n_dofs))
 # Initialization of maximum jump u between two linear elements (delta_max)

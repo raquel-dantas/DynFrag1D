@@ -6,7 +6,7 @@ import DFFem
 
 
 
-def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
+def Energy(up_bc_left, up_bc_right, n, u, v, acel, usi, vsi, acelsi, work_previous_step, imp_previous_step):
     """Returns potential, kinetic, dissipated, reversible and external energies.\n
     Arguments:\n
     u -- displacements vector;\n
@@ -24,8 +24,8 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
     Edis = 0.0
     Erev = 0.0
     Econ = 0.0
+    Eimp = imp_previous_step
     Wext = work_previous_step
-    Ekin_bc = 0.0
     
     for el in range(len(DFMesh.materials)):
         if DFMesh.materials[el] == 0:
@@ -42,58 +42,26 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
             # Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
             Edis += D**2*DFMesh.Gc
-
-
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
             # stress_coh returns the stress in the cohesive elements give by an cohesive law 
-            stress_coh = DFInterface.CohesiveLaw(jump_u,el)
-            # if jump_u < DFMesh.delta_max[el]:
-            #     # Erev[stress_coh,jump_u] returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
-            #     Erev += 0.5*stress_coh*jump_u
             Erev += 2 * (1 - D) * jump_u / DFMesh.delta_c * DFMesh.Gc
-            # Contact
-            # if jump_u < 0:
-            #     alpha = 10.0**15
-            #     Econ += 0.5*alpha*jump_u**2
 
-        if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
-            # vo is the velocity applied on the extremity
-            # elbc is the element index of the applied velocity
-            # uploc is the local displacement of elbc from the previous time step 
-            # c is the correct contribution of the local velocity vector of boundary elements on the calculus of kinectic energy
-            if DFMesh.materials[el] == 4:
-                vo = np.array([-DFMesh.vel, 0])
-                elbc = 0
-                uploc = up_bc_left
-                c = np.array([0.0, v[DFMesh.connect[elbc][1]]])
-            else:
-                vo = np.array([0, DFMesh.vel])
-                elbc = DFMesh.n_el - 1
-                uploc = up_bc_right
-                c = np.array([v[DFMesh.connect[elbc][0]], 0.0])
-            # uloc,vloc[u,v,elbc] returns vectors contained u and v for local dofs of elbc
-            uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
-            # fn is the internal force on the current time step
-            fn = np.matmul(k_elem, uloc)
-            # fp is the internal force on the previous time step 
-            fp = np.matmul(k_elem, uploc)
-            # The reaction force is taken s an average between fn and fp
-            fr = (fn+fp)*0.5
-            # Stress on the boundary
-            stress_bound = fr/DFMesh.A
-            # Work is power integrated in time
-            work = np.dot(stress_bound,vo)*DFMesh.dt
-            Wext += work 
+        if DFMesh.materials[el] == 6:
+            u_sinext = usi + DFMesh.dt*vsi + ((1.0/2.0)*DFMesh.dt**2)*acelsi
+            coord = DFMesh.NodeCoord(0) + u_sinext[0]
+            if coord < 0:
+                overshot = -(0. - coord)
+                spring_stiffness = DFMesh.E * DFMesh.A 
+                # spring_stiffness = 5*10.0**11
+                freac = - spring_stiffness * overshot
+                # DFMesh.fimp[n+1] = freac
+                Eimp += freac * overshot
 
-            # Correction of the Kinectic energy: subtract the kinectic energy from the boundary
-            Ekin_bc += (0.5*np.dot(np.matmul(m_elem, vo), (2.*c + vo)))/DFMesh.A
-    
-
-    return Epot, Ekin, Edis, Erev, Econ, Wext
+    return Epot, Ekin, Edis, Erev, Econ, Wext, Eimp
 
 
-def VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
+def VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, Eimp):
     """Returns the variation of energies between the current time step and the time step 0."""
 
     varEkin = np.zeros((DFMesh.n_steps))
@@ -102,6 +70,7 @@ def VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
     varWext = np.zeros((DFMesh.n_steps))
     varErev = np.zeros((DFMesh.n_steps))
     varEcon = np.zeros((DFMesh.n_steps))
+    varEimp = np.zeros((DFMesh.n_steps))
     varEtot = np.zeros((DFMesh.n_steps))
     for n in range(1,DFMesh.n_steps):
         varEpot[n] = Epot[n] - Epot[0]
@@ -110,11 +79,12 @@ def VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
         varErev[n] = Erev[n] - Erev[0]
         varEcon[n] = Econ[n] - Econ[0]
         varWext[n] = Wext[n] - Wext[0]
-        varEtot[n] = varWext[n] - (varEpot[n] + varEkin[n] + varEdis[n]  + varErev[n] + varEcon[n])
+        varEimp[n] = Eimp[n] - Eimp[0]
+        varEtot[n] = varWext[n] + varEimp[n] - (varEpot[n] + varEkin[n] + varEdis[n]  + varErev[n] + varEcon[n])
 
-    return varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot
+    return varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEimp, varEtot
 
-def Power(Epot, Ekin, Edis, Erev, Econ, Wext):
+def Power(Epot, Ekin, Edis, Erev, Econ, Wext, Eimp):
     """Returns the variation of energies between two consecutives time steps."""
 
     PEkin = np.zeros((DFMesh.n_steps))
@@ -123,6 +93,7 @@ def Power(Epot, Ekin, Edis, Erev, Econ, Wext):
     PWext = np.zeros((DFMesh.n_steps))
     PErev = np.zeros((DFMesh.n_steps))
     PEcon = np.zeros((DFMesh.n_steps))
+    PEimp = np.zeros((DFMesh.n_steps))
     PEtot = np.zeros((DFMesh.n_steps))
     for n in range(1,DFMesh.n_steps):
         PEpot[n] = Epot[n] - Epot[n-1]
@@ -131,9 +102,10 @@ def Power(Epot, Ekin, Edis, Erev, Econ, Wext):
         PErev[n] = Erev[n] - Erev[n-1]
         PEcon[n] = Econ[n] - Econ[n-1]
         PWext[n] = Wext[n] - Wext[n-1]
-        PEtot[n] = PWext[n] - (PEpot[n] + PEkin[n] + PEdis[n]  + PErev[n] + PEcon[n])
+        PEimp[n] = Eimp[n] - Eimp[n-1]
+        PEtot[n] = PWext[n] + PEimp[n] - (PEpot[n] + PEkin[n] + PEdis[n]  + PErev[n] + PEcon[n])
 
-    return PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot
+    return PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEimp, PEtot
     
 
 def PostProcess(u):
