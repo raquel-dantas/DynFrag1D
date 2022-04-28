@@ -2,7 +2,10 @@ import numpy as np
 import itertools
 import DFMesh
 
+
+# Size of linear elements
 h = DFMesh.L/DFMesh.n_el
+# Local stifness and mass matrix
 k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
 m_elem = DFMesh.rho*DFMesh.A*h/2 * np.array([[1.0, 0.], [0., 1.0]])
 
@@ -14,7 +17,14 @@ def Gl_index(elem_index, local_dof):
 
 
 def Apply_bc(K, M, F, elem_index):
+    """Apply boundary conditions.\n
+    Arguments:\n
+    K -- Global stiffness matrix which will be alterated to take account the contribution;\n
+    M -- Global stiffness matrix;\n
+    F -- Global load vector.\n"""
+
     phi = 1.0
+    # Penalty number
     bignumber = 10.0**30
     dof = DFMesh.connect[elem_index][0]
     value, bc_type = DFMesh.bc_dict[DFMesh.materials[elem_index]]
@@ -31,11 +41,9 @@ def Contribute_el(K, M, F, elem_index):
     Arguments:\n
     K -- Global stiffness matrix which will be alterated to take account the contribution;\n
     M -- Global stiffness matrix;\n
-    F -- Global load vector;\n
-    elem_index -- element index"""
+    F -- Global load vector."""
     
-    # Element stiffness and mass matrix, and element load vector
-    h = DFMesh.L/DFMesh.n_el
+    # Element load vector
     f_elem = np.array([0.0, 0.0])
     # Contribution to K, M and F
     for i_loc in range(2):
@@ -51,9 +59,12 @@ def GlobalSystem():
     """ Returns global stiffness and mass matrices, and global load vector."""
 
     n_dofs = max(list(itertools.chain.from_iterable(DFMesh.connect))) + 1
+
+    # Initiation of variables 
     K = np.zeros((n_dofs, n_dofs))
     F = np.zeros((n_dofs))
     M = np.zeros((n_dofs, n_dofs))
+
     # Assembly of elements
     n_el = len(DFMesh.connect)
     for i_el in range(n_el):

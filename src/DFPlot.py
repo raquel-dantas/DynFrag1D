@@ -4,7 +4,8 @@ import inspect
 import DFMesh
 import DFFem
 
-# Plot function
+
+# General plot function
 def Plot(x, y, labelx, labely, title):
     fig, axes = plt.subplots()
     axes.grid(True, which='both')
@@ -81,6 +82,7 @@ def PlotByInterface(func):
             y[j] = func[el]
     PlotScatter(x,y,"x",labely,title)
 
+
 def PlotAverageStressBar(average_stress_bar):
     """Plot a vector of values that corresponds to the average stress between all elements at eacth time step in the analysis"""
 
@@ -96,8 +98,6 @@ def PlotAverageStressBar(average_stress_bar):
     plt.plot(x, y)
     plt.show()
 
-
-# Plot more than one function
 
 def PlotStressByTime(stress_evl):
     """Plot the stress on the elements at each time step"""
@@ -138,8 +138,7 @@ def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
 
 
 def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot):
-# def PlotVarEnergy( varEtot):
-    """Plot variation of energy per time"""
+    """Plot variation of energy from time t to t0."""
 
     fig, axes = plt.subplots()
     axes.grid(True, which='both')
@@ -159,8 +158,9 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     plt.legend()
     plt.show()
 
+
 def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
-    """Plot variation of energy per time: power"""
+    """Plot variation of energy between time steps"""
 
     fig, axes = plt.subplots()
     axes.grid(True, which='both')
@@ -179,6 +179,7 @@ def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
     plt.plot(x, PEtot, label='varEtot')
     plt.legend()
     plt.show()
+
 
 def PlotVTK(prefix, timestep, u, stress):
     ndofs = len(u)
