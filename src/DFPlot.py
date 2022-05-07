@@ -196,7 +196,7 @@ def PlotNumberFragments(nfrag):
     plt.plot(x, y)
     plt.show()
 
-def PlotFragmentSize(frag_sizes):
+def PlotAvgFragmentSize(avg_frag_sizes):
     """Plot a vector of values that corresponds to the fragments length at eacth time step in the analysis"""
 
     fig, axes = plt.subplots()
@@ -207,7 +207,7 @@ def PlotFragmentSize(frag_sizes):
     plt.ylabel("m")
 
     x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
-    y = frag_sizes
+    y = avg_frag_sizes
     plt.plot(x, y)
     plt.show()
 

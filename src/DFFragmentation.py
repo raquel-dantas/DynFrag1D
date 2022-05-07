@@ -1,5 +1,6 @@
 import numpy as np
 import DFMesh
+import DFFem
 
 
 def NumberFragments(damage):
@@ -16,10 +17,10 @@ def SizeFragments(damage):
     coord = DFMesh.ListDofCoord()
     lastrup = DFMesh.x0
     j = 0
-    for i in range(len(coord)):
+    for i in range(len(DFMesh.materials)):
         if damage[i] > 0.999:
-            fraglen[j] = coord[i,0] - lastrup
-            lastrup = coord[i,0]
+            fraglen[j] = coord[DFFem.Gl_index(i,0) , 0] - lastrup
+            lastrup = coord[DFFem.Gl_index(i,1) , 0]
             j = j + 1
     
     return fraglen, np.average(fraglen)
