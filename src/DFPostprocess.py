@@ -107,8 +107,8 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             # Damage parameter (D)
             D = DFInterface.DamageParameter(el)
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
-            # Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
-            Edis += D**2*DFMesh.Gc
+            Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
+            # Edis += D**2*DFMesh.Gc
 
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
@@ -116,8 +116,8 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             stress_coh = DFInterface.CohesiveLaw(jump_u,el)
             # if jump_u < DFMesh.delta_max[el]:
             # Erev returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
-            #     Erev += 0.5*stress_coh*jump_u
-            Erev += 2 * (1 - D) * jump_u / DFMesh.delta_c * DFMesh.Gc
+            Erev += 0.5*stress_coh*jump_u
+            # Erev += 2 * (1 - D) * jump_u / DFMesh.delta_c * DFMesh.Gc
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
             # vo is the velocity applied on the extremity
@@ -144,7 +144,7 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             fr = (fn+fp)*0.5
             # Stress on the boundary
             stress_bound = fr/DFMesh.A
-            
+
             # Work is power integrated in time
             work = np.dot(stress_bound,vo)*DFMesh.dt
             Wext += work 
