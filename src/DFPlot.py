@@ -181,6 +181,38 @@ def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
     plt.show()
 
 
+def PlotNumberFragments(nfrag):
+    """Plot a vector of values that corresponds to the number of fragments at eacth time step in the analysis"""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title("Number of fragments")
+    plt.xlabel("Time (s)")
+    plt.ylabel("N")
+
+    x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
+    y = nfrag
+    plt.plot(x, y)
+    plt.show()
+
+def PlotFragmentSize(frag_sizes):
+    """Plot a vector of values that corresponds to the fragments length at eacth time step in the analysis"""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title("Fragments sizes")
+    plt.xlabel("Time (s)")
+    plt.ylabel("m")
+
+    x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
+    y = frag_sizes
+    plt.plot(x, y)
+    plt.show()
+
+
+
 def PlotVTK(prefix, timestep, u, stress):
     ndofs = len(u)
     filename = prefix + '.' + str(timestep) + '.vtk'

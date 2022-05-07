@@ -5,6 +5,7 @@ import DFPostprocess
 import DFNewmark
 import DFInterface
 import DFPlot
+import DFFragmentation
 import numpy as np
 
 
@@ -27,23 +28,32 @@ av_stress_bar = np.zeros((DFMesh.n_steps))
 up_bc_left = np.array([0,0])
 up_bc_right = np.array([0,0])
 
+nfrag = np.zeros((DFMesh.n_steps))
+fraglen = np.zeros((DFMesh.n_steps))
+avg_fraglen = np.zeros((DFMesh.n_steps))
+
 
 for n in range(DFMesh.n_steps):
 
     # Plots at each time step
     # DFPlot.PlotByDOF(v)
     # DFPlot.PlotByElement(stress)
-    # DFPlot.PlotVTK('animation/test',n,u,stress)
     # DFPlot.PlotByInterface(D)
 
 
     # Post process (stress, strain, energies)
     strain, stress, average_stress = DFPostprocess.PostProcess(u)
+
+    # nfrag retuns a vector contained the number of fragments 
+    nfrag[n] = DFFragmentation.NumberFragments(D)
+    fraglen[n], avg_fraglen[n] = DFFragmentation.SizeFragments(D)
+
     stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
     av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
     Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,up_bc_right, u, v, work)
     work =  Wext[n]
 
+    # DFPlot.PlotVTK('animation/test',n,u,stress)
     # Get K, M and F
     K, M, F = DFFem.GlobalSystem()
     DFMesh.C = np.resize(DFMesh.C,K.shape)
@@ -73,6 +83,7 @@ for n in range(DFMesh.n_steps):
 
     # D returns a vector contained damage parameter for cohesive elements
     D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
+    
 
 
 
@@ -83,8 +94,9 @@ varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.Va
 PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPostprocess.Power(Epot, Ekin, Edis, Erev, Econ, Wext)
 
 # Plots for the whole simulation
-DFPlot.PlotStressByTime(stress_evl)
-DFPlot.PlotAverageStressBar(av_stress_bar)
-DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
+# DFPlot.PlotStressByTime(stress_evl)
+# DFPlot.PlotAverageStressBar(av_stress_bar)
+# DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+# DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
+# DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
+DFPlot.PlotNumberFragments(nfrag)
