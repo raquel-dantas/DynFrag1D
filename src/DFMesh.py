@@ -8,7 +8,7 @@ L = 50*10**-3  # (m)
 x0 = -L/2
 xf = L/2
 # Number of linear elements (n_el)
-n_el = 80
+n_el = 5
 # Lenght of each linear element (h)
 h = L/n_el
 
@@ -62,19 +62,19 @@ delta_c = (2.0*Gc)/stress_c
 # Density
 rho = 2750.0  # (kg/m3)
 
-# n_steps = 100
+n_steps = 30
 # dt_crit = h/((E/rho)**0.5)
 # dt = dt_crit*0.1  # (s)
-# time_simulation = n_steps*dt # (s)
 
 # Time integration
-time_simulation = 4.0*10**-6 # (s)
+# time_simulation = 4.0*10**-6 # (s)
 # Critical time step
 dt_crit = h/((E/rho)**0.5) # (s)
 # Adopted time step
 dt = dt_crit*0.1  # (s)
+time_simulation = n_steps*dt # (s)
 # Number of time steps (n_steps)
-n_steps = int(time_simulation/dt)
+# n_steps = int(time_simulation/dt)
 print(dt)
 print(n_steps)
 
@@ -121,6 +121,10 @@ def GetEl(connect, dof_id):
 
 
 def ListDofCoord():
+    """Returns a list of coordinates by dof.\n
+    DofCoord[i] returns [x,y,z] of dof i.
+    """
+    
     ndofs = max(list(itertools.chain.from_iterable(connect))) + 1
     DofCoord = np.zeros((ndofs,3))
     for el in range(n_el):
