@@ -7,10 +7,15 @@ import DFInterface
 import DFPlot
 import DFFragmentation
 import numpy as np
+import progressbar
 
 
 
 def Run_simulation(strain_rate):
+
+    bar = progressbar.ProgressBar(maxval=20, \
+    widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+    bar.start()
 
     # Initiation of variables
     u = DFMesh.u0
@@ -35,6 +40,9 @@ def Run_simulation(strain_rate):
 
 
     for n in range(DFMesh.n_steps):
+
+        progress = int(bar.maxval*float(n/DFMesh.n_steps))
+        bar.update(progress)
 
         # Plots at each time step
         # DFPlot.PlotByDOF(v)
@@ -84,7 +92,7 @@ def Run_simulation(strain_rate):
                 u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
                 els_step = els_step + 1
 
-        
+        bar.finish()
 
 
 
@@ -96,9 +104,9 @@ def Run_simulation(strain_rate):
 
     # Plots for the whole simulation
     # DFPlot.PlotStressByTime(stress_evl)
-    # DFPlot.PlotAverageStressBar(av_stress_bar)
-    # DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-    # DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
+    DFPlot.PlotAverageStressBar(av_stress_bar)
+    DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+    DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     # DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
     DFPlot.PlotNumberFragments(nfrag)
     DFPlot.PlotAvgFragmentSize(avg_fraglen)
