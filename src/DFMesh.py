@@ -3,14 +3,36 @@ import itertools
 import copy 
 
 
+# Young's module 
+E = 275.0*10**9  # (Pa)
+# Density
+rho = 2750.0  # (kg/m3)
+
 # Lenght of the bar (L)
 L = 50*10**-3  # (m)
 x0 = -L/2
 xf = L/2
 # Number of linear elements (n_el)
-n_el = 5
+n_el = 150
 # Lenght of each linear element (h)
 h = L/n_el
+
+# Critical time step
+dt_crit = h/((E/rho)**0.5)
+# Adopted time step
+dt = dt_crit*0.1  # (s)
+# Time integration
+time_simulation = 2.0*10**-6 # (s)
+# Number of time steps (n_steps)
+n_steps = int(time_simulation/dt)
+time_simulation = n_steps*dt # (s)
+print(dt)
+print(n_steps)
+
+# Applied strain rate and veloctities
+strain_rate = 10.0**3  # (s-1)
+vel = strain_rate*L/2 
+# vel = strain_rate*L
 
 # Material id convention: 
 # 0 : line elemnt
@@ -35,10 +57,6 @@ node_id.append([n_el]) # Applied velocity at right boundary
 # Connect[el][j] returns the global index of local dof 'j' of the element 'el'
 connect = copy.deepcopy(node_id) 
 
-# Applied strain rate and veloctities
-strain_rate = 10.0**3  # (s-1)
-vel = strain_rate*L/2 
-# vel = strain_rate*L
 
 # BC dictionary
 bc_dict = {
@@ -49,8 +67,6 @@ bc_dict = {
 # Number of degree of freedom 
 n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1
 
-# Young's module 
-E = 275.0*10**9  # (Pa)
 # Cross sectional area
 A = 1*10**-3  # (m2)
 # Fracture energy
@@ -59,24 +75,8 @@ Gc = 100.0  # (N/m)
 stress_c = 300.0*10**6  # (Pa)
 # Limit fracture oppening
 delta_c = (2.0*Gc)/stress_c
-# Density
-rho = 2750.0  # (kg/m3)
 
-n_steps = 30
-# dt_crit = h/((E/rho)**0.5)
-# dt = dt_crit*0.1  # (s)
 
-# Time integration
-# time_simulation = 4.0*10**-6 # (s)
-# Critical time step
-dt_crit = h/((E/rho)**0.5) # (s)
-# Adopted time step
-dt = dt_crit*0.1  # (s)
-time_simulation = n_steps*dt # (s)
-# Number of time steps (n_steps)
-# n_steps = int(time_simulation/dt)
-print(dt)
-print(n_steps)
 
 
 # Initial values
