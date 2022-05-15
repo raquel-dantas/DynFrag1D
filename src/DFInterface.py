@@ -47,17 +47,18 @@ def CohesiveLaw(jump_u,el_index):
         Tmax = DFMesh.stress_c * (1.0 - DFMesh.delta_max[el_index]/DFMesh.delta_c)
         stress = Tmax/DFMesh.delta_max[el_index] * jump_u
     else:
-        stress = DFMesh.stress_c * (1.0 - jump_u/DFMesh.delta_c)
+        stress = DFMesh.stress_c * (1.0 - min(jump_u/DFMesh.delta_c, 1.0))
         DFMesh.delta_max[el_index] = min(jump_u,DFMesh.delta_c)
     
     # Verify if there is contact
     if jump_u < 0.0:
-        # alpha = 10.0**15
-        alpha = 0.0
+        alpha = DFMesh.E * DFMesh.A 
+        # alpha = 10**20
+        # alpha = 0.0
         stress = alpha*jump_u
 
-    # # After contact law implementation update this point in the code
-    stress = max(stress,0.0)
+    # After contact law implementation update this point in the code
+    # stress = max(stress,0.0)
 
     return stress
 
