@@ -10,7 +10,6 @@ import numpy as np
 import progressbar
 
 
-
 def Run_simulation(strain_rate):
 
     bar = progressbar.ProgressBar(maxval=20, \
@@ -35,7 +34,6 @@ def Run_simulation(strain_rate):
     up_bc_right = np.array([0,0])
 
     nfrag = np.zeros((DFMesh.n_steps))
-    # fraglen = np.zeros((DFMesh.n_steps))
     avg_fraglen = np.zeros((DFMesh.n_steps))
 
 
@@ -57,7 +55,7 @@ def Run_simulation(strain_rate):
         D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
-        fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)
+        avg_fraglen[n] = DFFragmentation.SizeFragments(D)
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
         av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)

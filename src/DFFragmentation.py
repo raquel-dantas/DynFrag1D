@@ -23,6 +23,6 @@ def SizeFragments(damage):
             lastrup = coord[DFFem.Gl_index(i,1) , 0]
             j = j + 1
     
-    return fraglen, np.average(fraglen)
+    return np.average(fraglen)
 
 
