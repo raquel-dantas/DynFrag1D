@@ -7,32 +7,42 @@ import copy
 E = 275.0*10**9  # (Pa)
 # Density
 rho = 2750.0  # (kg/m3)
+# Limit stress
+stress_c = 300.0*10**6  # (Pa)
 
 # Lenght of the bar (L)
 L = 50*10**-3  # (m)
 x0 = -L/2
 xf = L/2
+
 # Number of linear elements (n_el)
-n_el = 150
+n_el = 200
 # Lenght of each linear element (h)
 h = L/n_el
+
+# Applied strain rate 
+strain_rate = 10.0**2  # (s-1)
+# strain_rate = 10.0**3  # (s-1)
+# strain_rate = 10.0**4  # (s-1)
+# strain_rate = 10.0**5  # (s-1)
 
 # Critical time step
 dt_crit = h/((E/rho)**0.5)
 # Adopted time step
 dt = dt_crit*0.1  # (s)
-# Time integration
-time_simulation = 2.0*10**-6 # (s)
+
+# Time peak stress (stress_c)
+time_peakstress = stress_c / (E * strain_rate)
+print(time_peakstress)
+nstep_peak = int(time_peakstress/dt)
+print(nstep_peak)
+# Total time of simulation
+time_simulation = 0.5*10**-5 # (s)
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
 time_simulation = n_steps*dt # (s)
 print(dt)
 print(n_steps)
-
-# Applied strain rate and veloctities
-strain_rate = 10.0**3  # (s-1)
-vel = strain_rate*L/2 
-# vel = strain_rate*L
 
 # Material id convention: 
 # 0 : line elemnt
@@ -42,7 +52,6 @@ vel = strain_rate*L/2
 # 4 : Velocity applied left node
 # 5 : Velocity applied right node
 materials = [0] * n_el
-# materials.append(2) 
 materials.append(4)
 materials.append(5)
 
@@ -57,6 +66,8 @@ node_id.append([n_el]) # Applied velocity at right boundary
 # Connect[el][j] returns the global index of local dof 'j' of the element 'el'
 connect = copy.deepcopy(node_id) 
 
+# Applied velocity
+vel = strain_rate*L/2 
 
 # BC dictionary
 bc_dict = {
@@ -71,24 +82,25 @@ n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1
 A = 1*10**-3  # (m2)
 # Fracture energy
 Gc = 100.0  # (N/m)
-# Limit stress
-stress_c = 300.0*10**6  # (Pa)
+
 # Limit fracture oppening
 delta_c = (2.0*Gc)/stress_c
 
 
-
-
 # Initial values
 
-# Initial displacement (u0)
-u0 = np.zeros((n_dofs))
 # Initial velocity (v0): velocity profile (vel) is a function v(x)
 n_points = n_dofs
 l = np.linspace(-L/2, L/2, n_points)
-# l = np.linspace(0, L, n_points)
 v0 = np.array([strain_rate*x for x in l])
 v0 = np.round(v0, 8)
+
+# Initial displacement (u0)
+if strain_rate < 5.0 * 10.0**3:
+    u0 = np.array([0.9*stress_c*x / E for x in l])
+else:
+    u0 = np.zeros((n_dofs))
+
 # Initial acceleration (acel0)
 acel0 = np.zeros((n_dofs))
 # Inital load (p)
