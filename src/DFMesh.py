@@ -7,8 +7,6 @@ import copy
 E = 275.0*10**9  # (Pa)
 # Density
 rho = 2750.0  # (kg/m3)
-# Limit stress
-stress_c = 300.0*10**6  # (Pa)
 
 # Lenght of the bar (L)
 L = 50*10**-3  # (m)
@@ -16,13 +14,19 @@ x0 = -L/2
 xf = L/2
 
 # Number of linear elements (n_el)
-n_el = 200
+n_el = 500
 # Lenght of each linear element (h)
 h = L/n_el
 
+# Limit stress / critical stress (stress_c)
+stress_c = 300.0*10**6  # (Pa)
+# Assuming a random distribution of critical stress 
+diststress_c = np.random.uniform(low=299*10**6, high=301*10**6, size=(n_el))
+# print(diststress_c)
+
 # Applied strain rate 
-strain_rate = 10.0**2  # (s-1)
-# strain_rate = 10.0**3  # (s-1)
+# strain_rate = 10.0**2  # (s-1)
+strain_rate = 10.0**3  # (s-1)
 # strain_rate = 10.0**4  # (s-1)
 # strain_rate = 10.0**5  # (s-1)
 
@@ -37,10 +41,10 @@ print(time_peakstress)
 nstep_peak = int(time_peakstress/dt)
 print(nstep_peak)
 # Total time of simulation
-time_simulation = 0.5*10**-5 # (s)
+time_simulation = 1.25*10**-6 # (s)
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
-time_simulation = n_steps*dt # (s)
+# time_simulation = n_steps*dt # (s)
 print(dt)
 print(n_steps)
 

@@ -85,7 +85,7 @@ def Run_simulation(strain_rate):
 
         # Check limit stress for possible insertion of interface elements
         for el in range(DFMesh.n_el-1):
-            if average_stress[el] > DFMesh.stress_c:
+            if average_stress[el] > DFMesh.diststress_c[el]:
                 # Fracture happens: creat new interface element
                 u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
                 els_step = els_step + 1
@@ -105,11 +105,11 @@ def Run_simulation(strain_rate):
     DFPlot.PlotAverageStressBar(av_stress_bar)
     DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
     DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-    # DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
+    DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
     DFPlot.PlotNumberFragments(nfrag)
     DFPlot.PlotAvgFragmentSize(avg_fraglen)
 
-
+    print(avg_fraglen[n])
 
 if __name__ == '__main__':
     Run_simulation(DFMesh.strain_rate)
