@@ -41,24 +41,20 @@ def CohesiveLaw(jump_u,el_index):
     Arguments:\n
     jump_u -- jump in the displacement between the DOFs at right and left sizes of the interface element;\n
     el_index -- cohesive element index."""
-    
+
+    # Get linear element related to the dof[0] in order to get the random values of critical stress and crak oppening
     el_diststress, locdof = DFMesh.GetEl(DFMesh.connect, DFMesh.connect[el_index][0])
     # Verify if the jump_u is the maximum for the element so far in the analysis
     if DFMesh.delta_max[el_index] > jump_u:
-        Tmax = DFMesh.diststress_c[el_diststress] * (1.0 - DFMesh.delta_max[el_index]/DFMesh.delta_c)
-        # Tmax = DFMesh.stress_c * (1.0 - DFMesh.delta_max[el_index]/DFMesh.delta_c)
-        stress = Tmax/DFMesh.delta_max[el_index] * jump_u
+        Tmax = DFMesh.diststress_c[el_diststress] * (1.0 - DFMesh.delta_max[el_index]/DFMesh.distdelta_c[el_diststress])
+        if abs(DFMesh.delta_max[el_index]) < 10.0**-15:
+            stress = Tmax
+        else:
+            stress = Tmax/DFMesh.delta_max[el_index] * jump_u
     else:
-        stress = DFMesh.diststress_c[el_diststress] * (1.0 - min(jump_u/DFMesh.delta_c, 1.0))
-        # stress = DFMesh.stress_c * (1.0 - min(jump_u/DFMesh.delta_c, 1.0))
-        DFMesh.delta_max[el_index] = min(jump_u,DFMesh.delta_c)
+        stress = DFMesh.diststress_c[el_diststress] * (1.0 - min(jump_u/DFMesh.distdelta_c[el_diststress], 1.0))
+        DFMesh.delta_max[el_index] = min(jump_u,DFMesh.distdelta_c[el_diststress])
     
-    # Verify if there is contact
-    # if jump_u < 0.0:
-    #     alpha = DFMesh.E * DFMesh.A 
-    #     # alpha = 10**20
-    #     stress = alpha*jump_u
-
     return stress
 
 
@@ -66,7 +62,8 @@ def DamageParameter(el_index):
     """Returns the damage parameter for an interface element.\n"""
 
     if DFMesh.materials[el_index] == 1:
-        return min(1.0,DFMesh.delta_max[el_index]/DFMesh.delta_c)
+        el_diststress, locdof = DFMesh.GetEl(DFMesh.connect, DFMesh.connect[el_index][0])
+        return min(1.0,DFMesh.delta_max[el_index]/DFMesh.distdelta_c[el_diststress])
     else:
         return 0.0
 
@@ -98,7 +95,7 @@ def InternalForce(u):
     fint = np.zeros(n_dofs)
 
     for el in range(DFMesh.n_el):
-        # u_loc returns a vector contained u local dof
+        # u_loc returns a vector contained u for a local dof
         u_loc = np.array([u[DFFem.Gl_index(el, 0)], u[DFFem.Gl_index(el, 1)]])
         fint_loc = np.matmul(k_elem, u_loc)
         # Contribution of each dof in the internal force vector
