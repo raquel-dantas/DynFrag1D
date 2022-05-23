@@ -5,36 +5,48 @@ import copy
 
 # Input for the simulation of the expanding ring as an 1D bar using symmetry
 
-# Young's module 
-E = 275.0*10**9  # (Pa)
-# Density
-rho = 2750.0  # (kg/m3)
+# Young's module (Pa)
+E = 275.0*10**9  
+# Density (kg/m3)
+rho = 2750.0  
 
-# Lenght of the bar (L)
-L = 50*10**-3  # (m)
+# Lenght of the bar (m)
+L = 50*10**-3  
 x0 = 0
 xf = L
 
 # Number of linear elements (n_el)
-n_el = 300
+n_el = 1500
 # Lenght of each linear element (h)
 h = L/n_el
 
-# Critical time step
+# Limit stress / critical stress (stress_c) (Pa)
+stress_c = 300.0*10**6 
+# Assuming a random distribution of critical stress in the linear elements
+diststress_c = np.random.uniform(low=299*10**6, high=301*10**6, size=(n_el))
+
+# Applied strain rate (s-1)
+# strain_rate = 10.0**2 
+# strain_rate = 10.0**3  
+strain_rate = 10.0**4  
+# strain_rate = 10.0**5 
+
+# Critical time step 
 dt_crit = h/((E/rho)**0.5)
-# Adopted time step
-dt = dt_crit*0.1  # (s)
-# Time integration
-time_simulation = 6.0*10**-7 # (s)
+# Adopted time step (s)
+dt = dt_crit*0.1  
+
+# Time peak stress (stress_c)
+time_peakstress = stress_c / (E * strain_rate)
+print(time_peakstress)
+nstep_peak = int(time_peakstress/dt)
+print(nstep_peak)
+# Total time of simulation (s)
+time_simulation = 1.25*10**-6 
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
-time_simulation = n_steps*dt # (s)
 print(dt)
 print(n_steps)
-
-# Applied strain rate and veloctities
-strain_rate = 10.0**4  # (s-1)
-vel = strain_rate*L
 
 # Material id convention: 
 # 0 : line elemnt
@@ -57,6 +69,8 @@ node_id.append([n_el]) # Applied velocity at right boundary
 # Connect[el][j] returns the global index of local dof 'j' of the element 'el'
 connect = copy.deepcopy(node_id) 
 
+# Applied velocity
+vel = strain_rate*L
 
 # BC dictionary
 bc_dict = {
@@ -67,32 +81,41 @@ bc_dict = {
 # Number of degree of freedom 
 n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1
 
-# Cross sectional area
-A = 1*10**-3  # (m2)
-# Fracture energy
-Gc = 100.0  # (N/m)
-# Limit stress
-stress_c = 300.0*10**6  # (Pa)
+# Cross sectional area (m2)
+A = 1*10**-3  
+# Fracture energy (N/m)
+Gc = 100.0 
+
 # Limit fracture oppening
 delta_c = (2.0*Gc)/stress_c
-
+# Assuming the random distribution of critical stress
+distdelta_c = np.zeros(n_el)
+for el in range(n_el):
+    distdelta_c[el] = (2.0*Gc)/diststress_c[el]
 
 
 
 # Initial values
 
-# Initial displacement (u0)
-u0 = np.zeros((n_dofs))
 # Initial velocity (v0): velocity profile (vel) is a function v(x)
 n_points = n_dofs
 l = np.linspace(0, L, n_points)
 v0 = np.array([strain_rate*x for x in l])
 v0 = np.round(v0, 8)
+
+# Initial displacement (u0)
+if strain_rate < 5.0 * 10.0**3:
+    u0 = np.array([0.95*stress_c*x / E for x in l])
+else:
+    u0 = np.zeros((n_dofs))
+
 # Initial acceleration (acel0)
 acel0 = np.zeros((n_dofs))
-# Inital load (p)
+# External forces (p)
 p = np.zeros((n_steps+1, n_dofs))
 # Damping
 C = np.zeros((n_dofs, n_dofs))
 # Initialization of maximum jump u between two linear elements (delta_max)
 delta_max = np.zeros((len(materials)*2))
+
+
