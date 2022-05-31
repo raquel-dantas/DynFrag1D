@@ -24,9 +24,9 @@ stress_c = 300.0*10**6
 diststress_c = np.random.uniform(low=299*10**6, high=301*10**6, size=(n_el))
 
 # Applied strain rate (s-1)
-strain_rate = 10.0**2 
+# strain_rate = 10.0**2 
 # strain_rate = 10.0**3  
-# strain_rate = 10.0**4  
+strain_rate = 10.0**4  
 # strain_rate = 10.0**5 
 
 # Critical time step 
@@ -40,7 +40,7 @@ print(time_peakstress)
 nstep_peak = int(time_peakstress/dt)
 print(nstep_peak)
 # Total time of simulation (s)
-time_simulation = 1.0*10**-6
+time_simulation = 6.0*10**-7
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
 print(dt)
@@ -116,8 +116,8 @@ p = np.zeros((n_steps+1, n_dofs))
 C = np.zeros((n_dofs, n_dofs))
 # Initialization of maximum jump u between two linear elements (delta_max)
 delta_max = np.zeros((len(materials)*2))
-
-
+# Contact penalty
+alpha = (stress_c**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
 
 
 
