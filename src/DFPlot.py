@@ -16,6 +16,17 @@ def Plot(x, y, labelx, labely, title):
     plt.plot(x, y)
     plt.show()
 
+def Plotlog(x, y, labelx, labely, title):
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title(str(title))
+    plt.xlabel(str(labelx))
+    plt.ylabel(str(labely))
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.plot(x, y)
+    plt.show()
 
 def retrieve_name(var):
     """Gets the name of the argument passed to it, as you coded it in your python script"""
