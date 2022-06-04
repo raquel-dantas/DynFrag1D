@@ -14,7 +14,7 @@ x0 = -L/2
 xf = L/2
 
 # Number of linear elements (n_el)
-n_el = 500
+n_el = 1500
 # Lenght of each linear element (h)
 h = L/n_el
 
@@ -82,6 +82,7 @@ n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1
 
 # Cross sectional area (m2)
 A = 1*10**-3  
+# A = 1.0  
 # Fracture energy (N/m)
 Gc = 100.0 
 
@@ -118,8 +119,11 @@ C = np.zeros((n_dofs, n_dofs))
 delta_max = np.zeros((len(materials)*2))
 # Contact penalty
 alpha = (stress_c**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
-
-
+print(alpha)
+distalpha = np.zeros(n_el)
+for el in range(n_el):
+    distalpha[el] = (diststress_c[el]**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
+    
 
 
 
