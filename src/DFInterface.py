@@ -42,17 +42,13 @@ def CohesiveLaw(jump_u,el_index):
     jump_u -- jump in the displacement between the DOFs at right and left sizes of the interface element;\n
     el_index -- cohesive element index."""
 
-    small_value = 10.0**-15
+    # Get linear element related to the dof[0] in order to get the random values of critical stress and crak oppening
+    el_diststress, locdof = DFMesh.GetEl(DFMesh.connect, DFMesh.connect[el_index][0])
     if jump_u >= 0:
-        # Get linear element related to the dof[0] in order to get the random values of critical stress and crak oppening
-        el_diststress, locdof = DFMesh.GetEl(DFMesh.connect, DFMesh.connect[el_index][0])
         # Verify if the jump_u is the maximum for the element so far in the analysis
         if DFMesh.delta_max[el_index] > jump_u:
             Tmax = DFMesh.diststress_c[el_diststress] * (1.0 - DFMesh.delta_max[el_index]/DFMesh.distdelta_c[el_diststress])
-            if abs(DFMesh.delta_max[el_index]) < small_value:
-                stress = Tmax
-            else:
-                stress = Tmax/DFMesh.delta_max[el_index] * jump_u
+            stress = Tmax/DFMesh.delta_max[el_index] * jump_u
         else:
             stress = DFMesh.diststress_c[el_diststress] * (1.0 - min(jump_u/DFMesh.distdelta_c[el_diststress], 1.0))
             DFMesh.delta_max[el_index] = min(jump_u,DFMesh.distdelta_c[el_diststress])
