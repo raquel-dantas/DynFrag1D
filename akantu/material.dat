@@ -1,0 +1,6 @@
+material elastic [
+    name = linear
+    rho = 2750.0 # Density (kg/m3)
+    E = 275.0e+9  # Young's module (Pa)
+    nu = 0.2 
+]
