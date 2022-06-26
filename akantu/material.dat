@@ -19,7 +19,7 @@ model solid_mechanics_model_cohesive [
         sigma_c = 300.0e+6 uniform [-1e6, 1e6] # critical stress (Pa)
         G_c = 100.0 # Fracture energy (N/m)
         beta = 0.
-        penalty = 1e17
+        penalty = 1e11
     ]
 ]
 
