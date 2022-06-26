@@ -10,7 +10,7 @@ L = 50*10**-3
 x0 = -L/2
 xf = L/2
 # Number of triangular elements (n_el)
-n_el = 10
+n_el = 2
 # Lenght of each linear element (h)
 h = L/(n_el/2)
 # Cross sectional area (m2)
@@ -51,6 +51,8 @@ Transfinite Surface {1} Left;
 """
 
 subprocess.run("mkdir LOG", shell=True)
+subprocess.run("rm -r paraview_backup", shell=True)
+subprocess.run("mv paraview paraview_backup", shell=True)
 
 with open('LOG/bar.geo', 'w') as f:
     f.write(geometry_file)
