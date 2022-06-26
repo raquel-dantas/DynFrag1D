@@ -82,25 +82,21 @@ model.getVelocity()[:] = v0
 
 
 
-# Initialization for bulk vizualisation
+# VTK plot
 model.setBaseName('bar')
 model.addDumpFieldVector('displacement')
 model.addDumpFieldVector('velocity')
 model.addDumpField('strain')
 model.addDumpField('stress')
 model.addDumpField('blocked_dofs')
+model.addDumpField('material_index')
 
-# Initialization of vizualisation for Cohesive model
+# VTK plot for Cohesive model
 model.setBaseNameToDumper('cohesive elements', 'cohesive')
 model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
 model.addDumpFieldToDumper('cohesive elements', 'damage')
 model.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
 model.addDumpFieldVectorToDumper('cohesive elements', 'opening')
-
-
-
-
-
 
 
 
@@ -183,8 +179,8 @@ varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPosprocess2d.V
 # Power [Energy, time] returns the energy difference between consecutive time steps
 PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Ekin, Edis, Erev, Econ, Wext, n_steps)
 
-DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
-DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
+# DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
+# DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
 
-DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
+# DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
 
