@@ -14,7 +14,7 @@ x0 = -L/2
 xf = L/2
 
 # Number of linear elements (n_el)
-n_el = 2
+n_el = 500
 # Lenght of each linear element (h)
 h = L/n_el
 
@@ -132,30 +132,35 @@ for el in range(n_el):
 
 
 # Non uniform mesh 
-random_coord = np.random.uniform(low=x0, high=xf, size=(n_el-1))
-random_coord = np.sort(random_coord)
-coord_nodes = np.zeros(n_el+1)
-coord_nodes[0] = x0
-coord_nodes[n_el] = xf
-for i in range(1,n_el):
-    coord_nodes[i] = random_coord[i-1]
-print(random_coord)
-print(coord_nodes)
-
-si = np.zeros(n_el)
-for i in range(n_el):
-    si[i] = coord_nodes[i+1] - coord_nodes[i]
-print(si)
 
 
-
-
-
-
-
+hun = L/n_el
 
 def NodeCoord(node_id):
-    return coord_nodes[node_id]
+    """Returns the coodenate of a given node."""
+
+    # Coordinate for a uniform mesh
+    coord_node = x0 + node_id * hun
+
+    # To consider non-uniform mesh
+    # Coordinate for a non uniform mesh varying +-0.4 hun
+    if 0 < node_id < n_el:
+        coord_node = coord_node + np.random.uniform(low=-0.4, high=0.4) * hun
+    return coord_node
+
+node_coord = np.zeros(n_el + 1)
+for i in range(n_el+1):
+    node_coord[i] = NodeCoord(i)
+print(node_coord)
+
+
+def ElemLength(elem_index):
+    """Returns the element length (hel)."""
+
+    hel = node_coord[elem_index+1] - node_coord[elem_index]
+    
+    return hel
+
 
 
 def GetEl(connect, dof_id):
@@ -184,17 +189,3 @@ def ListDofCoord():
     return DofCoord
 
 
-
-def ElemLength(elem_index):
-    """Returns the element length (h)."""
-
-    hel = coord_nodes[elem_index+1] - coord_nodes[elem_index]
-    
-    return hel
-h = np.zeros(n_el)
-for el in range(n_el):
-    h[el] = ElemLength(el)
-print(h)
-
-h0 = ElemLength(0)
-print(h0)
