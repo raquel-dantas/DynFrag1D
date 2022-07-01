@@ -37,7 +37,7 @@ def Run_simulation(strain_rate):
     avg_fraglen = np.zeros((DFMesh.n_steps))
 
 
-    for n in range(DFMesh.n_steps):
+    for n in range(DFMesh.n_steps):        
 
         progress = int(bar.maxval*float(n/DFMesh.n_steps))
         bar.update(progress)

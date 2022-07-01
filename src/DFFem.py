@@ -3,11 +3,15 @@ import itertools
 import DFMesh
 
 
-# Size of linear elements
-h = DFMesh.L/DFMesh.n_el
-# Local stifness and mass matrix
-k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
-m_elem = DFMesh.rho*DFMesh.A*h/2 * np.array([[1.0, 0.], [0., 1.0]])
+def LocalSystem(elem_index):
+    # Size of linear elements
+    # h = DFMesh.L/DFMesh.n_el
+    h = DFMesh.ElemLength(elem_index)
+    # Local stifness and mass matrix
+    k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
+    m_elem = DFMesh.rho*DFMesh.A*h/2 * np.array([[1.0, 0.], [0., 1.0]])
+
+    return k_elem, m_elem
 
 
 def Gl_index(elem_index, local_dof):
@@ -45,7 +49,9 @@ def Contribute_el(K, M, F, elem_index):
     
     # Element load vector
     f_elem = np.array([0.0, 0.0])
+
     # Contribution to K, M and F
+    k_elem, m_elem = LocalSystem(elem_index)
     for i_loc in range(2):
         i_gl = Gl_index(elem_index, i_loc)
         F[i_gl] += f_elem[i_loc]

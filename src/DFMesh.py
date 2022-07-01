@@ -14,9 +14,12 @@ x0 = -L/2
 xf = L/2
 
 # Number of linear elements (n_el)
-n_el = 1500
+n_el = 2
 # Lenght of each linear element (h)
 h = L/n_el
+
+
+
 
 # Limit stress / critical stress (stress_c) (Pa)
 stress_c = 300.0*10**6 
@@ -36,15 +39,15 @@ dt = dt_crit*0.1
 
 # Time peak stress (stress_c)
 time_peakstress = stress_c / (E * strain_rate)
-print(time_peakstress)
+# print(time_peakstress)
 nstep_peak = int(time_peakstress/dt)
-print(nstep_peak)
+# print(nstep_peak)
 # Total time of simulation (s)
 time_simulation = 6.0*10**-7
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
-print(dt)
-print(n_steps)
+# print(dt)
+# print(n_steps)
 
 # Material id convention: 
 # 0 : line elemnt
@@ -119,7 +122,7 @@ C = np.zeros((n_dofs, n_dofs))
 delta_max = np.zeros((len(materials)*2))
 # Contact penalty
 alpha = (stress_c**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
-print(alpha)
+# print(alpha)
 distalpha = np.zeros(n_el)
 for el in range(n_el):
     distalpha[el] = (diststress_c[el]**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
@@ -128,8 +131,31 @@ for el in range(n_el):
 
 
 
+# Non uniform mesh 
+random_coord = np.random.uniform(low=x0, high=xf, size=(n_el-1))
+random_coord = np.sort(random_coord)
+coord_nodes = np.zeros(n_el+1)
+coord_nodes[0] = x0
+coord_nodes[n_el] = xf
+for i in range(1,n_el):
+    coord_nodes[i] = random_coord[i-1]
+print(random_coord)
+print(coord_nodes)
+
+si = np.zeros(n_el)
+for i in range(n_el):
+    si[i] = coord_nodes[i+1] - coord_nodes[i]
+print(si)
+
+
+
+
+
+
+
+
 def NodeCoord(node_id):
-    return x0 + node_id*h
+    return coord_nodes[node_id]
 
 
 def GetEl(connect, dof_id):
@@ -156,3 +182,19 @@ def ListDofCoord():
         dof = connect[el][1]
         DofCoord[dof,0] = NodeCoord(node_id[el][1])
     return DofCoord
+
+
+
+def ElemLength(elem_index):
+    """Returns the element length (h)."""
+
+    hel = coord_nodes[elem_index+1] - coord_nodes[elem_index]
+    
+    return hel
+h = np.zeros(n_el)
+for el in range(n_el):
+    h[el] = ElemLength(el)
+print(h)
+
+h0 = ElemLength(0)
+print(h0)

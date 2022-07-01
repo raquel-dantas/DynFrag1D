@@ -20,7 +20,7 @@ def PostProcess(u):
 
         if DFMesh.materials[el] == 0:
             # Strain[u,L] returns the strain value at each linear element 'el' 
-            strain[el] = (u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]) / DFMesh.h
+            strain[el] = (u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]) / DFMesh.ElemLength(el)
             # Stress[strain] retuns the stress value at each linear element 'el' 
             stress[el] = DFMesh.E * strain[el]
     
@@ -75,10 +75,6 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
     v -- velocities vector;\n
     work_previous_step -- external energy from the previous time step."""
     
-    # Element siffness and mass matrix
-    h = DFMesh.L/DFMesh.n_el
-    k_elem = DFFem.k_elem
-    m_elem = DFFem.m_elem
 
     # Initial energy values for the current time step
     Epot = 0.0
@@ -91,6 +87,8 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
     for el in range(len(DFMesh.materials)):
 
         if DFMesh.materials[el] == 0:
+            # Element siffness and mass matrix
+            k_elem, m_elem = DFFem.LocalSystem(el)
 
             # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
             uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
@@ -125,14 +123,17 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             # elbc is the element index of the applied velocity
             # uploc is the local displacement of elbc from the previous time step 
 
+
             if DFMesh.materials[el] == 4:
                 vo = np.array([-DFMesh.vel, 0])
                 elbc = 0
+                k_elem, m_elem = DFFem.LocalSystem(elbc)
                 uploc = up_bc_left
                 
             else:
                 vo = np.array([0, DFMesh.vel])
                 elbc = DFMesh.n_el - 1
+                k_elem, m_elem = DFFem.LocalSystem(elbc)
                 uploc = up_bc_right
             
             # uloc,vloc[u,v,elbc] returns vectors contained u and v for local dofs of elbc

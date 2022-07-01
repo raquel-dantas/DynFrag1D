@@ -90,11 +90,11 @@ def InternalForce(u):
     Arguments:\n
     u -- displacemnt vector for all dofs."""
     
-    k_elem = DFFem.k_elem
     n_dofs = u.shape[0]
     fint = np.zeros(n_dofs)
 
     for el in range(DFMesh.n_el):
+        k_elem, m_elem = DFFem.LocalSystem(el)   
         # u_loc returns a vector contained u for a local dof
         u_loc = np.array([u[DFFem.Gl_index(el, 0)], u[DFFem.Gl_index(el, 1)]])
         fint_loc = np.matmul(k_elem, u_loc)
