@@ -11,10 +11,19 @@ import DFPlot2d
 # Read material file
 aka.parseInput('LOG/material.dat')
 
+
+
 # Read mesh
+
 spatial_dimension = 2
 mesh = aka.Mesh(spatial_dimension)
 mesh.read('LOG/bar.msh')
+# Get connectivity list
+connect = mesh.getConnectivity(aka._triangle_3)
+# Get coordinates 
+coords = mesh.getNodes()
+
+
 
 # Create model
 model = aka.SolidMechanicsModelCohesive(mesh)
@@ -25,7 +34,6 @@ solver = model.getNonLinearSolver('static')
 solver.set('max_iterations', 100)
 solver.set('threshold', 1e-10)
 solver.set("convergence_type", aka.SolveConvergenceCriteria.residual)
-
 # Solver (explicit Newmark with lumped mass)
 model.initNewSolver(aka._explicit_lumped_mass)
 
@@ -43,21 +51,19 @@ time_simulation = 6.0*10**-6
 n_steps = int(time_simulation/dt)
 print(n_steps)
 
+
+
 # Apply Dirichlet BC to block dispacements at y direction on top and botton of the elements
 model.applyBC(aka.FixedValue(0., aka._y), 'YBlocked')
 
-
 # Applied strain rate (s-1)
-
 # strain_rate = 10.0**2
 # strain_rate = 10.0**3
 # strain_rate = 10.0**4
 strain_rate = 10.0**5
 
-# Applied velocity
+# Applied velocity at the bounary
 vel = strain_rate*DFMesh2d.L/2 
-
-
 
 # Apply constant velocity at the boundaries
 functor_left = DFModel.FixedVelocity(aka._x, -vel)
@@ -66,7 +72,20 @@ model.applyBC(functor_left, 'left')
 model.applyBC(functor_right, 'right')
 
 
-# Initial value 
+
+# Identify nodes to apply bc at left and right extremities of the bar 
+
+# Get nodes and its coordinates of the first and last triangles of the mesh
+last_triangle = connect[DFMesh2d.n_el-1]
+first_triangle = connect[0]
+coordx_first_triangle = [coords[node,0] for node in first_triangle]
+coordx_last_triangle = [coords[node,0] for node in last_triangle]
+# Separate the nodes with applied BCs
+nodebc_first_triangle = [last_triangle[local_node] for local_node, x in enumerate(coordx_last_triangle) if abs(x-DFMesh2d.x0)<0.0001]
+nodebc_last_triangle = [last_triangle[local_node] for local_node, x in enumerate(coordx_last_triangle) if abs(x-DFMesh2d.xf)<0.0001]
+
+
+# Initial values
 
 n_nodes = mesh.getNbNodes()
 u0 = model.getDisplacement()
@@ -79,6 +98,7 @@ v0[:,0] = np.array([strain_rate * x for x,y in mesh.getNodes()])
 
 # Apply initial conditions:
 model.getVelocity()[:] = v0
+
 
 
 
@@ -99,11 +119,6 @@ model.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
 model.addDumpFieldVectorToDumper('cohesive elements', 'opening')
 
 
-
-
-
-
-
 # Initiation of variables
 Epot = np.zeros(n_steps)
 Ekin = np.zeros(n_steps)
@@ -116,7 +131,6 @@ fp_left = 0.0
 fp_right = 0.0
 avg_stress = np.zeros(n_steps)
 
-# vp = np.zeros()
 
 
 
