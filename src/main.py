@@ -35,6 +35,7 @@ def Run_simulation(strain_rate):
 
     nfrag = np.zeros((DFMesh.n_steps))
     avg_fraglen = np.zeros((DFMesh.n_steps))
+    # fraglen = np.zeros((DFMesh.n_steps, DFMesh.n_el),dtype=float)
 
 
     for n in range(DFMesh.n_steps):        
@@ -55,7 +56,7 @@ def Run_simulation(strain_rate):
         D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
-        avg_fraglen[n] = DFFragmentation.SizeFragments(D)
+        fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
         av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
@@ -110,6 +111,7 @@ def Run_simulation(strain_rate):
     DFPlot.PlotAvgFragmentSize(avg_fraglen)
 
     print(avg_fraglen[n])
+    DFPlot.PlotFragmentSizeHistogram(fraglen)
 
 if __name__ == '__main__':
     Run_simulation(DFMesh.strain_rate)

@@ -216,6 +216,19 @@ def PlotAvgFragmentSize(avg_frag_sizes):
     plt.plot(x, y)
     plt.show()
 
+def PlotFragmentSizeHistogram(frag_sizes):
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title("Fragment size distribution")
+    plt.xlabel("Fragment size (m)")
+    plt.ylabel("Number of fragments")
+
+    plt.hist(frag_sizes)
+    plt.show()
+
+
 
 
 def PlotVTK(prefix, timestep, u, stress):
