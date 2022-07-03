@@ -41,9 +41,7 @@ def PlotByDOF(func):
     labely = retrieve_name(func)[0]
     title = labely
     n_oneD_elements = sum(1 for el in DFMesh.materials if el == 0)
-    h = DFMesh.L/n_oneD_elements
-    x0 = 0
-    x = np.array([[x0+h*el, x0+h*(el+1)] for el in range(n_oneD_elements)])
+    x = np.array([[DFMesh.node_coord[el] , DFMesh.node_coord[el+1]] for el in range(n_oneD_elements)])
     x = x.flatten()
     y = np.array([[func[DFFem.Gl_index(el,0)],func[DFFem.Gl_index(el,1)]] for el in range(n_oneD_elements)])
     y = y.flatten()
@@ -56,9 +54,7 @@ def PlotByElement(func):
     labely = retrieve_name(func)[0]
     title = labely
     n_oneD_elements = sum(1 for el in DFMesh.materials if el == 0)
-    h = DFMesh.L/n_oneD_elements
-    x0 = 0
-    x = np.array([[x0+h*el, x0+h*(el+1)] for el in range(n_oneD_elements)])
+    x = np.array([[DFMesh.node_coord[el] , DFMesh.node_coord[el+1]] for el in range(n_oneD_elements)])
     x = x.flatten()
     y = np.array([[func[el], func[el]] for el in range(n_oneD_elements)])
     y = y.flatten()
@@ -82,11 +78,9 @@ def PlotByInterface(func):
 
     labely = retrieve_name(func)[0]
     title = labely
-    n_int_elements = sum(1 for el in DFMesh.materials if el == 1)
     n_oneD_elements = sum(1 for el in DFMesh.materials if el == 0)
-    h = DFMesh.L/n_oneD_elements
-    x = np.array([i*h for i in range(0, n_oneD_elements + 1)])
-    y = np.zeros(x.shape[0])
+    x = [DFMesh.node_coord[el] for el in range(n_oneD_elements+1)]
+    y = np.zeros(len(x))
     for el in range(n_oneD_elements, len(DFMesh.materials)):
         if DFMesh.materials[el] == 1:
             j = DFMesh.connect[el][0]
