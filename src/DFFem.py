@@ -4,8 +4,10 @@ import DFMesh
 
 
 def LocalSystem(elem_index):
+    """Returns local stifness and mass matrices.
+    """
+    
     # Size of linear elements
-    # h = DFMesh.L/DFMesh.n_el
     h = DFMesh.ElemLength(elem_index)
     # Local stifness and mass matrix
     k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
