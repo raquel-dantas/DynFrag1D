@@ -5,7 +5,7 @@ import DFMesh
 import DFFem
 
 
-# General plot function
+
 def Plot(x, y, labelx, labely, title):
     fig, axes = plt.subplots()
     axes.grid(True, which='both')
@@ -28,11 +28,23 @@ def Plotlog(x, y, labelx, labely, title):
     plt.plot(x, y)
     plt.show()
 
+def PlotScatter(x, y, labelx, labely, title):
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title(str(title))
+    plt.xlabel(str(labelx))
+    plt.ylabel(str(labely))
+    plt.scatter(x, y)
+    plt.show()
+
 def retrieve_name(var):
     """Gets the name of the argument passed to it, as you coded it in your python script"""
 
     callers_local_vars = inspect.currentframe().f_back.f_back.f_locals.items()
     return [var_name for var_name, var_val in callers_local_vars if var_val is var]
+
+
 
 
 def PlotByDOF(func):
@@ -48,6 +60,7 @@ def PlotByDOF(func):
     Plot(x,y,"x",labely,title)
 
 
+
 def PlotByElement(func):
     """Plot a vector of values that corresponds to each element of the mesh """
 
@@ -60,17 +73,6 @@ def PlotByElement(func):
     y = y.flatten()
     Plot(x,y,"x",labely,title)
 
-
-# Plot points
-def PlotScatter(x, y, labelx, labely, title):
-    fig, axes = plt.subplots()
-    axes.grid(True, which='both')
-    axes.axhline(y=0, color='k')
-    plt.title(str(title))
-    plt.xlabel(str(labelx))
-    plt.ylabel(str(labely))
-    plt.scatter(x, y)
-    plt.show()
 
 
 def PlotByInterface(func):
@@ -86,6 +88,7 @@ def PlotByInterface(func):
             j = DFMesh.connect[el][0]
             y[j] = func[el]
     PlotScatter(x,y,"x",labely,title)
+
 
 
 def PlotAverageStressBar(average_stress_bar):
@@ -104,6 +107,7 @@ def PlotAverageStressBar(average_stress_bar):
     plt.show()
 
 
+
 def PlotStressByTime(stress_evl):
     """Plot the stress on the elements at each time step"""
 
@@ -119,6 +123,7 @@ def PlotStressByTime(stress_evl):
         plt.plot(x, stress_evl[el], label=el)
     plt.legend()
     plt.show()
+
 
 
 def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
@@ -140,6 +145,7 @@ def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
     plt.plot(x, Wext, label='Wext')
     plt.legend()
     plt.show()
+
 
 
 def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot):
@@ -164,6 +170,7 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     plt.show()
 
 
+
 def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
     """Plot variation of energy between time steps"""
 
@@ -186,6 +193,7 @@ def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
     plt.show()
 
 
+
 def PlotNumberFragments(nfrag):
     """Plot a vector of values that corresponds to the number of fragments at eacth time step in the analysis"""
 
@@ -200,6 +208,8 @@ def PlotNumberFragments(nfrag):
     y = nfrag
     plt.plot(x, y)
     plt.show()
+
+
 
 def PlotAvgFragmentSize(avg_frag_sizes):
     """Plot a vector of values that corresponds to the fragments length at eacth time step in the analysis"""
@@ -216,6 +226,8 @@ def PlotAvgFragmentSize(avg_frag_sizes):
     plt.plot(x, y)
     plt.show()
 
+
+
 def PlotFragmentSizeHistogram(frag_sizes):
 
     fig, axes = plt.subplots()
@@ -227,7 +239,6 @@ def PlotFragmentSizeHistogram(frag_sizes):
 
     plt.hist(frag_sizes)
     plt.show()
-
 
 
 
