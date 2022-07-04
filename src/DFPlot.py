@@ -290,3 +290,33 @@ DATASET UNSTRUCTURED_GRID
     output.write(displacement)
     output.write(avgdisp)
     output.close()
+
+
+
+def PlotConvergenceEnergy(energies, meshes):
+    """Plot total number of nodes of the mesh x energy dissipated.\n
+    Arguments: \n
+    energies -- dissipated energies for different mesh sizes;\n
+    meshes -- number of linear elements."""
+
+    title = "Energy convergence"
+    labelx = "Number of nodes"
+    labely = "Energy dissipated"
+    nnodes = [meshes[i]+1 for i in range(len(meshes))]
+
+    Plot(nnodes,energies,labelx,labely,title)
+
+
+
+def PlotConvergenceNumfrag(num_frags, meshes):
+    """Plot total number of nodes of the mesh x final number of fragments.\n
+    Arguments: \n
+    energies -- dissipated energies for different mesh sizes;\n
+    meshes -- number of linear elements."""
+
+    title = "Final number of fragments convergence"
+    labelx = "Number of nodes"
+    labely = "Number of fragments"
+    nnodes = [meshes[i]+1 for i in range(len(meshes))]
+
+    Plot(nnodes,num_frags,labelx,labely,title)
