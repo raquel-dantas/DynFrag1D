@@ -1,4 +1,5 @@
 from matplotlib.pyplot import connect
+from matplotlib import pyplot as plt
 import DFMesh
 import DFFem
 import DFPostprocess
@@ -103,15 +104,24 @@ def Run_simulation(strain_rate):
 
     # Plots for the whole simulation
     # DFPlot.PlotStressByTime(stress_evl)
-    DFPlot.PlotAverageStressBar(av_stress_bar)
-    DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-    DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-    DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
-    DFPlot.PlotNumberFragments(nfrag)
-    DFPlot.PlotAvgFragmentSize(avg_fraglen)
+    # DFPlot.PlotAverageStressBar(av_stress_bar)
+    # DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+    # DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
+    # DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
+    # DFPlot.PlotNumberFragments(nfrag)
+    # DFPlot.PlotAvgFragmentSize(avg_fraglen)
 
     print(avg_fraglen[n])
     DFPlot.PlotFragmentSizeHistogram(fraglen)
+    plt.savefig('LOG/convergence/strain_rate_10to5/fragment_size_distribution.svg')
+    f = str(avg_fraglen[n])
+    average_fragment_size = f
+    with open('LOG/convergence/strain_rate_10to5/average_fraglen.txt','w') as f: 
+        f.write(average_fragment_size)
+    f = str(nfrag[n])
+    number_fragments = f
+    with open('LOG/convergence/strain_rate_10to5/number_fragments.txt','w') as f: 
+        f.write(number_fragments)
 
 if __name__ == '__main__':
     Run_simulation(DFMesh.strain_rate)
