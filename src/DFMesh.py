@@ -14,7 +14,7 @@ x0 = -L/2
 xf = L/2
 
 # Number of linear elements (n_el)
-n_el = 5
+n_el = 5000
 # Lenght of each linear element (h)
 # h = L/n_el
 
@@ -27,8 +27,8 @@ diststress_c = np.random.uniform(low=299*10**6, high=301*10**6, size=(n_el))
 # Applied strain rate (s-1)
 # strain_rate = 10.0**2 
 # strain_rate = 10.0**3  
-strain_rate = 10.0**4  
-# strain_rate = 10.0**5 
+# strain_rate = 10.0**4  
+strain_rate = 10.0**5 
 
 
 
@@ -75,7 +75,7 @@ dt = dt_crit*0.1
 time_peakstress = stress_c / (E * strain_rate)
 nstep_peak = int(time_peakstress/dt)
 # Total time of simulation (s)
-time_simulation = 6.0*10**-7
+time_simulation = 4.0*10**-7
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
 
@@ -133,22 +133,6 @@ distalpha = np.zeros(n_el)
 for el in range(n_el):
     distalpha[el] = (diststress_c[el]**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
     
-
-
-
-
-
-
-
-# node_coord = np.zeros(n_el + 1)
-# for i in range(n_el+1):
-#     # Coordinate for a uniform mesh
-#     node_coord[i] = x0 + i * hun
-#     # To consider non-uniform mesh
-#     # Coordinate for a non uniform mesh varying +-0.4 hun
-#     if 0 < node_id < n_el:
-#         node_coord[i] = node_coord[i] + np.random.uniform(low=-0.4, high=0.4) * hun
-
 
 
 
