@@ -104,6 +104,7 @@ def PlotAverageStressBar(average_stress_bar):
     x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
     y = average_stress_bar
     plt.plot(x, y)
+    plt.savefig("LOG/average_stress_bar.svg")
     plt.show()
 
 
@@ -144,6 +145,7 @@ def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
     plt.plot(x, Econ, label='Econ')
     plt.plot(x, Wext, label='Wext')
     plt.legend()
+    plt.savefig("LOG/energies.svg")
     plt.show()
 
 
@@ -167,6 +169,7 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     plt.plot(x, -varWext, label='-varWext')
     plt.plot(x, varEtot, label='varEtot')
     plt.legend()
+    plt.savefig("LOG/var_energies.svg")
     plt.show()
 
 
@@ -190,6 +193,7 @@ def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
     plt.plot(x, -PWext, label='-varWext')
     plt.plot(x, PEtot, label='varEtot')
     plt.legend()
+    plt.savefig("LOG/power.svg")
     plt.show()
 
 
@@ -207,6 +211,7 @@ def PlotNumberFragments(nfrag):
     x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
     y = nfrag
     plt.plot(x, y)
+    plt.savefig("LOG/number_fragments.svg")
     plt.show()
 
 
@@ -224,6 +229,7 @@ def PlotAvgFragmentSize(avg_frag_sizes):
     x = np.linspace(0, DFMesh.time_simulation, DFMesh.n_steps)
     y = avg_frag_sizes
     plt.plot(x, y)
+    plt.savefig("LOG/size_fragments.svg")
     plt.show()
 
 
@@ -238,6 +244,7 @@ def PlotFragmentSizeHistogram(frag_sizes):
     plt.ylabel("Number of fragments")
 
     plt.hist(frag_sizes)
+    plt.savefig("LOG/fragment_size_distribution.svg")
     plt.show()
 
 
