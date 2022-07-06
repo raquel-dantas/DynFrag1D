@@ -320,3 +320,29 @@ def PlotConvergenceNumfrag(num_frags, meshes):
     nnodes = [meshes[i]+1 for i in range(len(meshes))]
 
     Plot(nnodes,num_frags,labelx,labely,title)
+
+
+def PlotAnalyticals(grady, gc, zmr, values_strainrate):
+    """Plot analytical estimation of fragment size given by analytical models.\n
+    Arguments:\n
+    grady -- estmations by Grady(1982);\n
+    gc - estmations by Glen and Chudnovisk(1986);
+    zmr -- estmations by Zhou, Molinari and Ramesh (2006)."""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title("Fragment size")
+    plt.xlabel("Strain rate (s-1)")
+    plt.ylabel("s")
+    plt.xscale("log")
+    plt.yscale("log")
+
+    plt.plot(values_strainrate, grady, label="Grady(1982)")
+    plt.plot(values_strainrate, gc, label="Glen and Chudnovisk (1986)")
+    plt.plot(values_strainrate, zmr, label="Zhou, Molinari and Ramesh (2006)")
+
+    plt.legend()
+    plt.show()
+
+        
