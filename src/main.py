@@ -102,26 +102,40 @@ def Run_simulation(strain_rate):
     # Power [Energy, time] returns the energy difference between consecutive time steps
     PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPostprocess.Power(Epot, Ekin, Edis, Erev, Econ, Wext)
 
-    # Plots for the whole simulation
-    # DFPlot.PlotStressByTime(stress_evl)
-    # DFPlot.PlotAverageStressBar(av_stress_bar)
-    # DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-    # DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-    # DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
-    # DFPlot.PlotNumberFragments(nfrag)
-    # DFPlot.PlotAvgFragmentSize(avg_fraglen)
 
-    print(avg_fraglen[n])
+
+    # Plots for the whole simulation
+
+    DFPlot.PlotAverageStressBar(av_stress_bar)
+
+    DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+
+    DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
+
+    DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
+
+    DFPlot.PlotNumberFragments(nfrag)
+
+    DFPlot.PlotAvgFragmentSize(avg_fraglen)
+
     DFPlot.PlotFragmentSizeHistogram(fraglen)
-    plt.savefig('LOG/convergence/strain_rate_10to5/fragment_size_distribution.svg')
+    
+    
+    # Save average fragment size and number of fragment
     f = str(avg_fraglen[n])
     average_fragment_size = f
-    with open('LOG/convergence/strain_rate_10to5/average_fraglen.txt','w') as f: 
+    with open('LOG/average_fraglen.txt','w') as f: 
         f.write(average_fragment_size)
+        
     f = str(nfrag[n])
     number_fragments = f
-    with open('LOG/convergence/strain_rate_10to5/number_fragments.txt','w') as f: 
+    with open('LOG/number_fragments.txt','w') as f: 
         f.write(number_fragments)
+
+    f = str(Edis[n])
+    Edis = f
+    with open('LOG/final_diss_energy.txt','w') as f: 
+        f.write(Edis)
 
 if __name__ == '__main__':
     Run_simulation(DFMesh.strain_rate)
