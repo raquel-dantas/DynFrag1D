@@ -66,7 +66,7 @@ def StressBar(current_stress, els_step):
     return av_stress_bar
 
 
-def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
+def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
     """Returns potential, kinetic, dissipated, reversible, contact and external energies.\n
     Arguments:\n
     up_bc_left -- displacement from previous time step at left boundary element;\n
@@ -110,7 +110,7 @@ def Energy(up_bc_left, up_bc_right, u, v, work_previous_step):
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
             # stress_coh returns the stress in the cohesive elements give by an cohesive law 
-            stress_coh = DFInterface.CohesiveLaw(jump_u,el)
+            stress_coh = stress[el]
             if jump_u >= 0:
                 # Erev returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
                 Erev += 0.5*stress_coh*jump_u
