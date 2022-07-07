@@ -43,15 +43,16 @@ def CohesiveLaw(jump_u,el_index):
     el_index -- cohesive element index."""
 
     # Get linear element related to the dof[0] in order to get the random values of critical stress and crak oppening
-    el_diststress, locdof = DFMesh.GetEl(DFMesh.connect, DFMesh.connect[el_index][0])
+    node_diststress = DFMesh.connect[el_index][0]
+
     if jump_u >= 0:
         # Verify if the jump_u is the maximum for the element so far in the analysis
         if DFMesh.delta_max[el_index] > jump_u:
-            Tmax = DFMesh.diststress_c[el_diststress] * (1.0 - DFMesh.delta_max[el_index]/DFMesh.distdelta_c[el_diststress])
+            Tmax = DFMesh.diststress_c[node_diststress] * (1.0 - DFMesh.delta_max[el_index]/DFMesh.distdelta_c[node_diststress])
             stress = Tmax/DFMesh.delta_max[el_index] * jump_u
         else:
-            stress = DFMesh.diststress_c[el_diststress] * (1.0 - min(jump_u/DFMesh.distdelta_c[el_diststress], 1.0))
-            DFMesh.delta_max[el_index] = min(jump_u,DFMesh.distdelta_c[el_diststress])
+            stress = DFMesh.diststress_c[node_diststress] * (1.0 - min(jump_u/DFMesh.distdelta_c[node_diststress], 1.0))
+            DFMesh.delta_max[el_index] = min(jump_u,DFMesh.distdelta_c[node_diststress])
     else:
         stress = DFMesh.alpha * jump_u
 
@@ -62,8 +63,8 @@ def DamageParameter(el_index):
     """Returns the damage parameter for an interface element.\n"""
 
     if DFMesh.materials[el_index] == 1:
-        el_diststress, locdof = DFMesh.GetEl(DFMesh.connect, DFMesh.connect[el_index][0])
-        return min(1.0,DFMesh.delta_max[el_index]/DFMesh.distdelta_c[el_diststress])
+        node_diststress = DFMesh.connect[el_index][0]
+        return min(1.0,DFMesh.delta_max[el_index]/DFMesh.distdelta_c[node_diststress])
     else:
         return 0.0
 
