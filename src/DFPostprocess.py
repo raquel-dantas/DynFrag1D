@@ -102,8 +102,6 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
 
         if DFMesh.materials[el] == 1:
 
-            # Damage parameter (D)
-            D = DFInterface.DamageParameter(el)
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
             Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
 
