@@ -66,8 +66,7 @@ def Run_simulation(strain_rate):
 
         # DFPlot.PlotVTK('animation/test',n,u,stress)
         # Get K, M and F
-        K, M, F = DFFem.GlobalSystem()
-        DFMesh.C = np.resize(DFMesh.C,K.shape)
+        M, F = DFFem.GlobalSystem()
 
 
         # up_bc is the previous displacement vector for the local dofs in the boundary elements (left and right)
@@ -83,7 +82,7 @@ def Run_simulation(strain_rate):
                     up_bc_right = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
 
         # u,v,acel returns a vector for u,v and acel at every dof at the n step
-        u, v, acel = DFNewmark.Newmark_exp(K, M, DFMesh.C, u, v, acel, F, DFMesh.dt)
+        u, v, acel = DFNewmark.Newmark_exp(M, u, v, acel, F, DFMesh.dt)
 
         # Check limit stress for possible insertion of interface elements
         for el in range(DFMesh.n_el-1):

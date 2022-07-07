@@ -82,4 +82,4 @@ def GlobalSystem():
         elif DFMesh.bc_dict.__contains__(mat_id):
             Apply_bc(K, M, F, i_el)
 
-    return K, M, F
+    return M, F

@@ -4,7 +4,7 @@ import DFInterface
 import DFFem
 
 
-def Newmark_exp(K, M, C, u, v, acel, p_next, dt):
+def Newmark_exp(M, u, v, acel, p_next, dt):
     """Apply Newmarks explicity integration scheme. Returns vectors with displacement, velocity and aceleration in all dofs for the next time step.\n
     Arguments: \n
     K -- Global stiffness matrix; \n
@@ -20,7 +20,7 @@ def Newmark_exp(K, M, C, u, v, acel, p_next, dt):
     beta = 0.0
 
     # Number of degrees of freedom
-    dofs = K.shape[0]
+    dofs = M.shape[0]
     
     # Initiation of variables
     u_next = np.zeros((dofs))
