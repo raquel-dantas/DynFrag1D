@@ -14,7 +14,7 @@ x0 = -L/2
 xf = L/2
 
 # Number of linear elements (n_el)
-n_el = 5000
+n_el = 800
 # Lenght of each linear element (h)
 # h = L/n_el
 
@@ -69,13 +69,13 @@ node_coord[n_el] = xf
 # Critical time step 
 dt_crit = 0.2*hun/((E/rho)**0.5)
 # Adopted time step (s)
-dt = dt_crit*0.1  
+dt = dt_crit*0.4
 
 # Time peak stress (stress_c)
 time_peakstress = stress_c / (E * strain_rate)
 nstep_peak = int(time_peakstress/dt)
 # Total time of simulation (s)
-time_simulation = 3.0*10**-7
+time_simulation = 4.0*10**-7
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
 

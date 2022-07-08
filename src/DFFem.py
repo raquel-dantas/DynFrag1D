@@ -3,15 +3,18 @@ import itertools
 import DFMesh
 
 
+k_elem = DFMesh.E*DFMesh.A* np.array([[1.0, -1.0], [-1.0, 1.0]])
+m_elem = DFMesh.rho*DFMesh.A/2 * np.diag([1,1])
+
 def LocalSystem(elem_index):
     """Returns local stifness and mass matrices.
     """
     
     # Size of linear elements
-    h = DFMesh.ElemLength(elem_index)
-    # Local stifness and mass matrix
-    k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
-    m_elem = DFMesh.rho*DFMesh.A*h/2 * np.diag([1,1])
+    # h = DFMesh.ElemLength(elem_index)
+    # # Local stifness and mass matrix
+    # k_elem = DFMesh.E*DFMesh.A/h * np.array([[1.0, -1.0], [-1.0, 1.0]])
+    # m_elem = DFMesh.rho*DFMesh.A*h/2 * np.diag([1,1])
 
     return k_elem, m_elem
 
@@ -53,14 +56,13 @@ def Contribute_el(M, F, elem_index):
     f_elem = np.array([0.0, 0.0])
 
     # Contribution to K, M and F
-    k_elem, m_elem = LocalSystem(elem_index)
     for i_loc in range(2):
         i_gl = Gl_index(elem_index, i_loc)
         F[i_gl] += f_elem[i_loc]
         for j_loc in range(2):
             j_gl = Gl_index(elem_index, j_loc)
             # K[i_gl, j_gl] += k_elem[i_loc, j_loc]
-            M[i_gl, j_gl] += m_elem[i_loc, j_loc]
+            M[i_gl, j_gl] += m_elem[i_loc, j_loc]*DFMesh.ElemLength(elem_index)
 
 
 def GlobalSystem():

@@ -95,10 +95,9 @@ def InternalForce(u):
     fint = np.zeros(n_dofs)
 
     for el in range(DFMesh.n_el):
-        k_elem, m_elem = DFFem.LocalSystem(el)   
         # u_loc returns a vector contained u for a local dof
         u_loc = np.array([u[DFFem.Gl_index(el, 0)], u[DFFem.Gl_index(el, 1)]])
-        fint_loc = np.matmul(k_elem, u_loc)
+        fint_loc = np.matmul(DFFem.k_elem, u_loc)/DFMesh.ElemLength(el)
         # Contribution of each dof in the internal force vector
         for i_loc in range(2):
             i_gl = DFFem.Gl_index(el, i_loc)

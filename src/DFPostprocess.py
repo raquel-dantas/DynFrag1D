@@ -88,17 +88,16 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
 
         if DFMesh.materials[el] == 0:
             # Element siffness and mass matrix
-            k_elem, m_elem = DFFem.LocalSystem(el)
 
             # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
             uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
             vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
 
             # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
-            Epot += (0.5*np.dot(np.matmul(k_elem, uloc), uloc))/DFMesh.A
+            Epot += (0.5*np.dot(np.matmul(DFFem.k_elem, uloc), uloc))/(DFMesh.A*DFMesh.ElemLength(el))
 
             # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
-            Ekin += (0.5*np.dot(np.matmul(m_elem, vloc), vloc))/DFMesh.A
+            Ekin += (0.5*np.dot(np.matmul(DFFem.m_elem, vloc), vloc))/(DFMesh.A)*DFMesh.ElemLength(el)
 
         if DFMesh.materials[el] == 1:
 
@@ -125,21 +124,20 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
             if DFMesh.materials[el] == 4:
                 vo = np.array([-DFMesh.vel, 0])
                 elbc = 0
-                k_elem, m_elem = DFFem.LocalSystem(elbc)
                 uploc = up_bc_left
                 
             else:
                 vo = np.array([0, DFMesh.vel])
                 elbc = DFMesh.n_el - 1
-                k_elem, m_elem = DFFem.LocalSystem(elbc)
                 uploc = up_bc_right
             
+            h = DFMesh.ElemLength(elbc)
             # uloc,vloc[u,v,elbc] returns vectors contained u and v for local dofs of elbc
             uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
             # fn is the internal force on the current time step
-            fn = np.matmul(k_elem, uloc)
+            fn = np.matmul(DFFem.k_elem, uloc)/h
             # fp is the internal force on the previous time step 
-            fp = np.matmul(k_elem, uploc)
+            fp = np.matmul(DFFem.k_elem, uploc)/h
             # The reaction force is taken as an average between fn and fp
             fr = (fn+fp)*0.5
             # Stress on the boundary
