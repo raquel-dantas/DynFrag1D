@@ -75,7 +75,7 @@ dt = dt_crit*0.1
 time_peakstress = stress_c / (E * strain_rate)
 nstep_peak = int(time_peakstress/dt)
 # Total time of simulation (s)
-time_simulation = 4.0*10**-7
+time_simulation = 3.0*10**-7
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
 

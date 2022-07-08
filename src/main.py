@@ -61,7 +61,8 @@ def Run_simulation(strain_rate):
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
         av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
-        Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,up_bc_right, u, v, stress, work)
+        Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,
+        up_bc_right, u, v, stress, work)
         work =  Wext[n]
 
         # DFPlot.PlotVTK('animation/test',n,u,stress)
