@@ -13,7 +13,7 @@ import progressbar
 
 def Run_simulation(strain_rate):
 
-    bar = progressbar.ProgressBar(maxval=20, \
+    bar = progressbar.ProgressBar(maxval=50, \
     widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
     bar.start()
 
@@ -92,8 +92,9 @@ def Run_simulation(strain_rate):
                 u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
                 els_step = els_step + 1
 
-        bar.finish()
-
+    
+    bar.finish()
+    print('\n')
 
 
     # Variation of energy [Energy, time] returns the difference of energy value between time t and t0 

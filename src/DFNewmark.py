@@ -20,7 +20,7 @@ def Newmark_exp(M, u, v, acel, p_next, dt):
     beta = 0.0
 
     # Number of degrees of freedom
-    dofs = M.shape[0]
+    dofs = u.shape[0]
     
     # Initiation of variables
     u_next = np.zeros((dofs))
@@ -31,10 +31,10 @@ def Newmark_exp(M, u, v, acel, p_next, dt):
     u_next = u + dt*v + ((1.0/2.0)*dt**2)*acel
 
     # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step 
-    Minv = np.linalg.inv(M)
+    # Minv = np.linalg.inv(M)
     f_int = DFInterface.InternalForce(u_next)
     inertia = p_next - f_int 
-    acel_next = np.matmul(Minv, inertia)
+    acel_next = np.linalg.solve(M[:dofs,:dofs], inertia)
     
     # v_next returns a vector with the velocity in all dofs for the next time step 
     v_next = v + (1 - gamma)*dt*acel + gamma*dt*acel_next
