@@ -243,7 +243,7 @@ def PlotFragmentSizeHistogram(frag_sizes):
     plt.xlabel("Fragment size (m)")
     plt.ylabel("Number of fragments")
 
-    plt.hist(frag_sizes)
+    plt.hist(frag_sizes,10)
     plt.savefig("LOG/fragment_size_distribution.svg")
     plt.show()
 
@@ -300,33 +300,62 @@ DATASET UNSTRUCTURED_GRID
 
 
 
-def PlotConvergenceEnergy(energies, meshes):
+def PlotConvergenceEnergy(energies_un, energies_nun, meshes):
     """Plot total number of nodes of the mesh x energy dissipated.\n
     Arguments: \n
     energies -- dissipated energies for different mesh sizes;\n
     meshes -- number of linear elements."""
 
-    title = "Energy convergence"
-    labelx = "Number of nodes"
-    labely = "Energy dissipated"
+    plt.title(str("Energy convergence"))
+    plt.xlabel(str("Number of nodes"))
+    plt.ylabel(str("Energy dissipated (N/m)"))
     nnodes = [meshes[i]+1 for i in range(len(meshes))]
 
-    Plot(nnodes,energies,labelx,labely,title)
+    plt.plot(nnodes, energies_un, label='Uniform mesh')
+    plt.plot(nnodes, energies_nun, label='Non-uniform mesh')
+    plt.legend()
+    plt.savefig("LOG/convergence_energy.svg")
+    plt.show()
 
 
 
-def PlotConvergenceNumfrag(num_frags, meshes):
+def PlotLogConvergenceEnergy(energies_un, energies_nun, meshes):
+    """Plot total number of nodes of the mesh x energy dissipated.\n
+    Arguments: \n
+    energies -- dissipated energies for different mesh sizes;\n
+    meshes -- number of linear elements."""
+
+    plt.title(str("Energy convergence"))
+    plt.xlabel(str("Number of nodes"))
+    plt.ylabel(str("Energy dissipated (N/m)"))
+    plt.xscale("log")
+    plt.yscale("log")
+    nnodes = [meshes[i]+1 for i in range(len(meshes))]
+
+    plt.plot(nnodes, energies_un, label='Uniform mesh')
+    plt.plot(nnodes, energies_nun, label='Non-uniform mesh')
+    plt.legend()
+    plt.savefig("LOG/logconvergence_energy.svg")
+    plt.show()
+
+
+def PlotConvergenceNumfrag(nfrags_un, nfrags_nun, meshes):
     """Plot total number of nodes of the mesh x final number of fragments.\n
     Arguments: \n
     energies -- dissipated energies for different mesh sizes;\n
     meshes -- number of linear elements."""
 
-    title = "Final number of fragments convergence"
-    labelx = "Number of nodes"
-    labely = "Number of fragments"
+    plt.title(str("Nfrag convergence"))
+    plt.xlabel(str("Number of nodes"))
+    plt.ylabel(str("Number of fragments"))
     nnodes = [meshes[i]+1 for i in range(len(meshes))]
 
-    Plot(nnodes,num_frags,labelx,labely,title)
+    plt.plot(nnodes, nfrags_un, label='Uniform mesh')
+    plt.plot(nnodes, nfrags_nun, label='Non-uniform mesh')
+    plt.legend()
+    plt.savefig("LOG/convergence_nfrags.svg")
+    plt.show()
+
 
 
 def PlotAnalyticals(grady, gc, zmr, values_strainrate):
