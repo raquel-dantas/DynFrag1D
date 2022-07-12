@@ -330,6 +330,9 @@ def PlotLogConvergenceEnergy(energies_un, energies_nun, meshes):
     plt.ylabel(str("Energy dissipated (N/m)"))
     plt.xscale("log")
     plt.yscale("log")
+
+    plt.xlim(10**2,5*10**5)
+
     nnodes = [meshes[i]+1 for i in range(len(meshes))]
 
     plt.plot(nnodes, energies_un, label='Uniform mesh')
