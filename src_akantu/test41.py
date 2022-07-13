@@ -3,12 +3,9 @@ import numpy as np
 import subprocess
 
 # Material parameters
-# Young's module (Pa)
-E = 275.0*10**9  
-# Density (kg/m3)
-rho = 2750.0  
-# Limit stress / critical stress (stress_c) (Pa)
-stress_c = 300.0*10**6
+E = 275.0*10**9         # Young's module (Pa)
+rho = 2750.0            # Density (kg/m3)
+stress_c = 300.0*10**6  # Limit stress / critical stress (stress_c) (Pa)
 
 # Material file
 material_file = f"""
@@ -33,25 +30,17 @@ model solid_mechanics_model_cohesive [
 ]
 """
 subprocess.run("mkdir LOG", shell=True)
-
 with open('LOG/material.dat', 'w') as f:
     f.write(material_file)
-
-# Read material
 aka.parseInput('LOG/material.dat')
 
 
-
-
 # Geometry parameters
-# Lenght of the bar (m)
-L = 50*10**-3  
+L = 50*10**-3   # Lenght of the bar (m)
 x0 = -L/2
 xf = L/2
-# Number of triangular elements (n_el)
-n_el = 2
-# Lenght of each linear element (h)
-h = L/(n_el/2)
+n_el = 2        # Number of triangular elements (n_el)
+h = L/(n_el/2)  # Lenght of each linear element (h)
 
 # Mesh file (Triangles elements)
 geometry_file = f"""
@@ -74,9 +63,6 @@ Physical Line("left") = {{4}};
 
 Transfinite Surface {1} Left;
 """
-subprocess.run("mkdir LOG", shell=True)
-subprocess.run("rm -r paraview_backup", shell=True)
-subprocess.run("mv paraview paraview_backup", shell=True)
 
 with open('LOG/bar.geo', 'w') as f:
     f.write(geometry_file)
@@ -91,48 +77,32 @@ else:
 spatial_dimension = 2
 mesh = aka.Mesh(spatial_dimension)
 mesh.read('LOG/bar.msh')
-# Get connectivity list
-connect = mesh.getConnectivity(aka._triangle_3)
-# Get coordinates 
-coords = mesh.getNodes()
-
-
-
 
 # Create model
 model = aka.SolidMechanicsModelCohesive(mesh)
 model.initFull(_analysis_method=aka._static, _is_extrinsic=True)
-
 # Configure solver
 solver = model.getNonLinearSolver('static')
 solver.set('max_iterations', 100)
 solver.set('threshold', 1e-10)
 solver.set("convergence_type", aka.SolveConvergenceCriteria.residual)
 model.initNewSolver(aka._explicit_lumped_mass)
-
 # Dynamic insertion of cohesive elements
 model.updateAutomaticInsertion()
 
-# Critical time step
-dt_crit = model.getStableTimeStep()
-# Adopted time step
-dt = dt_crit*0.1
-# Total time of simulation (s)
-time_simulation = 6.0*10**-6
-# Number of time steps (n_steps)
-n_steps = int(time_simulation/dt)
-
+dt_crit = model.getStableTimeStep() # Critical time step
+dt = dt_crit*0.1                    # Adopted time step
+time_simulation = 6.0*10**-6        # Total time of simulation (s)
+n_steps = int(time_simulation/dt)   # Number of time steps
 
 # Apply Dirichlet BC to block displacements at y direction on top and bottom
 model.applyBC(aka.FixedValue(0., aka._y), 'YBlocked')
 
+# Constant velocity boundary condition
 # Applied strain rate (s-1)
 strain_rate = 10.0**5
 # Applied velocity at the boundary
 vel = strain_rate*L/2 
-
-
-# Apply Velocity at the extremities
 class FixedVelocity (aka.DirichletFunctor):
     """Fixed velocity at the boundaries."""
 
@@ -154,14 +124,12 @@ functor_right = FixedVelocity(aka._x, vel)
 model.applyBC(functor_left, 'left')
 model.applyBC(functor_right, 'right')
 
-
-# VTK plot
+# VTK plot setup
 model.setBaseName('bar')
 model.addDumpFieldVector('displacement')
-# VTK plot for Cohesive model
+# VTK plot setup for Cohesive model
 model.setBaseNameToDumper('cohesive elements', 'cohesive')
 model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
-
 
 for n in range(n_steps):
 
@@ -177,7 +145,3 @@ for n in range(n_steps):
     # Run simulation
     model.checkCohesiveStress()
     model.solveStep('explicit_lumped')
-
-    # Outputs
-    u = model.getDisplacement()[:,0]
-
