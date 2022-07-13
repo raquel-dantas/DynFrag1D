@@ -180,7 +180,6 @@ for n in range(n_steps):
 
 
 
-
     # Fragmentation
     
 # print(Epot)
