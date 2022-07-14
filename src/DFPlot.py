@@ -361,11 +361,11 @@ def PlotConvergenceNumfrag(nfrags_un, nfrags_nun, meshes):
 
 
 
-def PlotAnalyticals(grady, gc, zmr, values_strainrate):
+def PlotLogAnalyticals(grady, gc, zmr, values_strainrate):
     """Plot analytical estimation of fragment size given by analytical models.\n
     Arguments:\n
     grady -- estmations by Grady(1982);\n
-    gc - estmations by Glen and Chudnovisk(1986);
+    gc - estmations by Glen and Chudnovisk(1986);\n
     zmr -- estmations by Zhou, Molinari and Ramesh (2006)."""
 
     fig, axes = plt.subplots()
