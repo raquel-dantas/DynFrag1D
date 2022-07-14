@@ -5,18 +5,22 @@ import DFFragmentation
 
 
 # Analytical estimations of fragment size
+points = 10
+strainrate = np.array([[10**x, 5*10**x] for x in range(2,points)])
+strainrate = strainrate.flatten()
+print(strainrate)
 
-points_interval = 10
-min_strainrate = 10**1
-max_strainrate = 10**10
-values_strainrate = np.linspace(min_strainrate, max_strainrate, num=points_interval)
-norm_strainrate = np.array([epsilon / (( (DFMesh.E / DFMesh.rho)**0.5 * DFMesh.stress_c**3) / (DFMesh.E**2 * DFMesh.Gc) ) for epsilon in values_strainrate])
-s_grady = DFFragmentation.GradyFragSize(values_strainrate)
-s_gc = DFFragmentation.GlenChudnoviskFragSize(values_strainrate)
-s_zmr = DFFragmentation.ZhouMolinariRameshFragSize(values_strainrate)
+norm_strainrate = np.array([epsilon/(((DFMesh.E / DFMesh.rho)**0.5 * DFMesh.stress_c**3)/(DFMesh.E**2 * DFMesh.Gc)) for epsilon in strainrate])
+print(norm_strainrate)
 
-# DFPlot.PlotAnalyticals(s_grady, s_gc, s_zmr, norm_strainrate)
+s_grady, norm_grady = DFFragmentation.GradyFragSize(strainrate)
 
+s_gc = DFFragmentation.GlenChudnoviskFragSize(strainrate)
+
+s_zmr = DFFragmentation.ZhouMolinariRameshFragSize(strainrate)
+
+
+DFPlot.PlotLogAnalyticals(norm_grady, s_gc, s_zmr, norm_strainrate)
 
 # Convergence study
 
