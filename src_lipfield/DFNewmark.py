@@ -28,6 +28,7 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     u_next = np.zeros((dofs))
     vp = np.zeros((dofs))
     dp = np.zeros((DFMesh.n_el))
+    d_next = np.zeros((DFMesh.n_el))
     acel_next = np.zeros((dofs))
     v_next = np.zeros((dofs))
     
@@ -45,9 +46,15 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     lip_constraint = 2.21*10**-6
     lamb = 2*Yc*lip_constraint/DFMesh.Gc
     h = lambda d: (2*d-d**2)/(1-d+lamb*d**2)**2
+    # TODO: numerical integration on func
     func = lambda d: (0.5*(1-d)**2*DFMesh.E*epsilon**2 + Yc*h(d) )
-
-    result = minimize(fun=func, x0=d, method='SLSQP', bounds=(0,1), tol=1e-5)
+    result = minimize(
+        fun=func, 
+        x0=d, 
+        method='SLSQP', 
+        bounds=zip(d,[1]*DFMesh.n_el),
+        tol=1e-5
+    )
     ddash = result.x
 
     # Coords integration point 
@@ -56,7 +63,7 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     # minimize(lambda j: ddash[el]+abs(y[j]-x[el])/lip_constraint, x0= ) 
 
 
-    # To do: Constraints of the minimizations may have to be put on the arguments but also on the minimized functional
+    # TODO: Constraints of the minimizations may have to be put on the arguments but also on the minimized functional
 
     # Projections
     pi_lower =  [minimize(
@@ -78,7 +85,14 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
         for el in range(DFMesh.n_el)
     ]
 
-
+    # Compute d_next
+    # Lipchitz constraints
+    # Constraint type ineq means that is a non negative result
+    # TODO: DFMesh.ElemLength(i) is assuming a uniform mesh
+    cons = ({'type': 'ineq', 
+            'fun': lambda i: -(d[i] - d[i+1] -DFMesh.ElemLength(i)/lip_constraint)},
+            {'type': 'ineq', 
+            'fun': lambda i: -(d[i] - d[i-1] -DFMesh.ElemLength(i)/lip_constraint)})
 
 
 
