@@ -105,3 +105,19 @@ def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, 
     plt.plot(x, PEtot, label='varEtot')
     plt.legend()
     plt.show()
+
+
+def PlotNumberFragments(nfrag, time_simulation, n_steps):
+    """Plot a vector of values that corresponds to the number of fragments at eacth time step in the analysis"""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+    plt.title("Number of fragments")
+    plt.xlabel("Time (s)")
+    plt.ylabel("N")
+
+    x = np.linspace(0, time_simulation, n_steps)
+    y = nfrag
+    plt.plot(x, y)
+    plt.show()

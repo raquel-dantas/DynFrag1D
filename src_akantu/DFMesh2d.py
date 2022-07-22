@@ -4,26 +4,17 @@ import subprocess
 
 
 # Geometry parameters
-
-# Lenght of the bar (m)
-L = 50*10**-3  
+L = 50*10**-3   # Lenght of the bar (m)
 x0 = -L/2
 xf = L/2
-# Number of triangular elements (n_el)
-n_el = 2
-# Lenght of each linear element (h)
-h = L/(n_el/2)
-# Cross sectional area (m2)
-A = 1*10**-3 
+n_el = 1000      # Number of triangular elements (n_el)
+h = L/(n_el/2)  # Lenght of each linear element (h) 
+A = 1*10**-3    # Cross sectional area (m2)
 
 # Material parameters
-
-# Young's module (Pa)
-E = 275.0*10**9  
-# Density (kg/m3)
-rho = 2750.0  
-# Limit stress / critical stress (stress_c) (Pa)
-stress_c = 300.0*10**6
+E = 275.0*10**9         # Young's module (Pa)
+rho = 2750.0            # Density (kg/m3)
+stress_c = 300.0*10**6  # Limit stress / critical stress (stress_c) (Pa)
 
 
 
@@ -82,7 +73,7 @@ model solid_mechanics_model_cohesive [
         sigma_c = {stress_c} uniform [-1e6, 1e6] # critical stress (Pa)
         G_c = 100.0 # Fracture energy (N/m)
         beta = 0.
-        penalty = 1e11
+        penalty = 1e17
     ]
 ]
 """

@@ -10,11 +10,7 @@ import DFPlot2d
 
 # Read material file
 aka.parseInput('LOG/material.dat')
-
-
-
 # Read mesh
-
 spatial_dimension = 2
 mesh = aka.Mesh(spatial_dimension)
 mesh.read('LOG/bar.msh')
@@ -22,7 +18,6 @@ mesh.read('LOG/bar.msh')
 connect = mesh.getConnectivity(aka._triangle_3)
 # Get coordinates 
 coords = mesh.getNodes()
-
 
 
 # Create model
@@ -36,22 +31,19 @@ solver.set('threshold', 1e-10)
 solver.set("convergence_type", aka.SolveConvergenceCriteria.residual)
 # Solver (explicit Newmark with lumped mass)
 model.initNewSolver(aka._explicit_lumped_mass)
-
 # Dynamic insertion of cohesive elements
 model.updateAutomaticInsertion()
 
 # Critical time step
 dt_crit = model.getStableTimeStep()
-
 # Adopted time step
 dt = dt_crit*0.1
+model.setTimeStep(dt)
 # Total time of simulation (s)
 time_simulation = 6.0*10**-6
 # Number of time steps (n_steps)
 n_steps = int(time_simulation/dt)
 print(n_steps)
-
-
 
 # Apply Dirichlet BC to block dispacements at y direction on top and botton of the elements
 model.applyBC(aka.FixedValue(0., aka._y), 'YBlocked')
@@ -59,8 +51,8 @@ model.applyBC(aka.FixedValue(0., aka._y), 'YBlocked')
 # Applied strain rate (s-1)
 # strain_rate = 10.0**2
 # strain_rate = 10.0**3
-# strain_rate = 10.0**4
-strain_rate = 10.0**5
+strain_rate = 10.0**4
+# strain_rate = 10.0**5
 
 # Applied velocity at the bounary
 vel = strain_rate*DFMesh2d.L/2 
@@ -72,34 +64,15 @@ model.applyBC(functor_left, 'left')
 model.applyBC(functor_right, 'right')
 
 
-
-# Identify nodes to apply bc at left and right extremities of the bar 
-
-# Get nodes and its coordinates of the first and last triangles of the mesh
-last_triangle = connect[DFMesh2d.n_el-1]
-first_triangle = connect[0]
-coordx_first_triangle = [coords[node,0] for node in first_triangle]
-coordx_last_triangle = [coords[node,0] for node in last_triangle]
-# Separate the nodes with applied BCs
-nodebc_first_triangle = [last_triangle[local_node] for local_node, x in enumerate(coordx_last_triangle) if abs(x-DFMesh2d.x0)<0.0001]
-nodebc_last_triangle = [last_triangle[local_node] for local_node, x in enumerate(coordx_last_triangle) if abs(x-DFMesh2d.xf)<0.0001]
-
-
 # Initial values
-
 n_nodes = mesh.getNbNodes()
 u0 = model.getDisplacement()
 v0 = model.getVelocity()
-
 # Initial velocity profile
 v0[:,0] = np.array([strain_rate * x for x,y in mesh.getNodes()])
-
 # DFPlot2d.PlotByCoord(v0[:,0],mesh,'initial vel')
-
 # Apply initial conditions:
 model.getVelocity()[:] = v0
-
-
 
 
 # VTK plot
@@ -130,13 +103,11 @@ work = 0.0
 fp_left = 0.0
 fp_right = 0.0
 avg_stress = np.zeros(n_steps)
-
-
+nfrag = np.zeros(n_steps)
 
 
 
 for n in range(n_steps):
-
 
     # Apply velocity at the boundaries 
     functor_left.set_time(dt*n)
@@ -153,12 +124,8 @@ for n in range(n_steps):
     model.checkCohesiveStress()
     model.solveStep('explicit_lumped')
 
- 
-
-    # Outputs
     u = model.getDisplacement()[:,0]
     v = model.getVelocity()[:,0]
-    # coord = mesh.getNodes()
     # DFPlot2d.PlotByCoord(v0[:,0],mesh,'v')
     a = model.getAcceleration()[:,0]
     fint = model.getInternalForce()[:,0]
@@ -176,15 +143,15 @@ for n in range(n_steps):
     Wext[n], fp_left, fp_right = DFPosprocess2d.ExternalWork(mesh, fint, fp_left, fp_right, work, vel, dt)
     work = Wext[n]
 
-
-
-
-
     # Fragmentation
-    
-# print(Epot)
-# print(Ekin)
-# print(Wext)
+    fragmentdata = aka.FragmentManager(model)
+    fragmentdata.computeAllData()
+    nfrag[n] = fragmentdata.getNbFragment()
+
+nel_per_frag = fragmentdata.getNbFragment()
+print(nel_per_frag)
+
+DFPlot2d.PlotNumberFragments(nfrag, time_simulation, n_steps)
 
 # Variation of energy [Energy, time] returns the difference of energy value between time t and t0 
 varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPosprocess2d.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, n_steps)
@@ -192,8 +159,7 @@ varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPosprocess2d.V
 # Power [Energy, time] returns the energy difference between consecutive time steps
 PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Ekin, Edis, Erev, Econ, Wext, n_steps)
 
-# DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
-# DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
-
-# DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
+DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
+DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
+DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
 
