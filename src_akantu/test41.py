@@ -4,8 +4,8 @@ import subprocess
 
 # Material parameters
 E = 275.0*10**9         # Young's module (Pa)
-rho = 2750.0            # Density (kg/m3)
-stress_c = 300.0*10**6  # Limit stress / critical stress (stress_c) (Pa)
+rho = 27.500            # Density (kg/m3)
+stress_c = 300.0*10**8  # Limit stress / critical stress (stress_c) (Pa)
 
 # Material file
 material_file = f"""
@@ -39,7 +39,7 @@ aka.parseInput('LOG/material.dat')
 L = 50*10**-3   # Lenght of the bar (m)
 x0 = -L/2
 xf = L/2
-n_el = 2        # Number of triangular elements (n_el)
+n_el = 10        # Number of triangular elements (n_el)
 h = L/(n_el/2)  # Lenght of each linear element (h)
 
 # Mesh file (Triangles elements)
@@ -92,6 +92,7 @@ model.updateAutomaticInsertion()
 
 dt_crit = model.getStableTimeStep() # Critical time step
 dt = dt_crit*0.1                    # Adopted time step
+model.setTimeStep(dt)
 time_simulation = 6.0*10**-6        # Total time of simulation (s)
 n_steps = int(time_simulation/dt)   # Number of time steps
 
@@ -130,6 +131,8 @@ model.addDumpFieldVector('displacement')
 # VTK plot setup for Cohesive model
 model.setBaseNameToDumper('cohesive elements', 'cohesive')
 model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
+
+
 
 for n in range(n_steps):
 
