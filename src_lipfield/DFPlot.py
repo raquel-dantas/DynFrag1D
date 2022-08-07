@@ -13,7 +13,8 @@ def Plot(x, y, labelx, labely, title):
     plt.title(str(title))
     plt.xlabel(str(labelx))
     plt.ylabel(str(labely))
-    plt.plot(x, y)
+    for col in range(len(y)):
+        plt.plot(x, y[col])
     plt.show()
 
 def Plotlog(x, y, labelx, labely, title):
