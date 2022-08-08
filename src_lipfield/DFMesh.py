@@ -173,3 +173,7 @@ def ListDofCoord():
     return DofCoord
 
 
+def DetJac(el_index):
+    """Returns Jacobian determinant for an element."""
+
+    return ElemLength(el_index)/2.
