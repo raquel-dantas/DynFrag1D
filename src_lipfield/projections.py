@@ -1,6 +1,7 @@
 from scipy.optimize import minimize
 import numpy as np
 import DFPlot
+import DFMesh
 
 # Lenght of the bar (m)
 L = 1.05
