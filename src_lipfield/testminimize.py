@@ -4,5 +4,8 @@ from scipy.optimize import minimize, rosen, rosen_der
 # res = minimize(rosen, x0, method='Nelder-Mead', tol=1e-6)
 # pass
 
-res = minimize(lambda x: (x-2)**2, 2, method='SLSQP', bounds=[(-3,3)], tol=1e-6)
+
+const =({'type': 'ineq', 'fun': lambda x:  x-1})
+
+res = minimize(lambda x: x**4-3*x**2+2, -2, method='SLSQP', bounds=[(-3,3)], constraints=const, tol=1e-8)
 pass
