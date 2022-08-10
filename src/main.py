@@ -55,8 +55,16 @@ def Run_simulation(strain_rate):
         # D returns a vector contained damage parameter for cohesive elements
         D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
         if (max(D)>0.7):
+            d = np.zeros(DFMesh.n_el+1)
             DFPlot.PlotByInterface(D)
-            print(D,v,u)
+            for el in range(DFMesh.n_el, len(DFMesh.materials)):
+                if DFMesh.materials[el] == 1:
+                    j = DFMesh.connect[el][0]
+                    d[j] = D[el]
+            print('d = ' , d)
+            print('v = ', v)
+            print('u = ' , u)
+            print('strain', strain)
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
         fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)
