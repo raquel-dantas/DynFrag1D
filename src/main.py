@@ -47,7 +47,6 @@ def Run_simulation(strain_rate):
         # Plots at each time step
         # DFPlot.PlotByDOF(v)
         # DFPlot.PlotByElement(stress)
-        # DFPlot.PlotByInterface(D)
 
 
         # Post process (stress, strain, energies)
@@ -55,6 +54,9 @@ def Run_simulation(strain_rate):
 
         # D returns a vector contained damage parameter for cohesive elements
         D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
+        if (max(D)>0.7):
+            DFPlot.PlotByInterface(D)
+            print(D,v,u)
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
         fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)

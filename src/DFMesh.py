@@ -9,12 +9,12 @@ E = 275.0*10**9
 rho = 2750.0  
 
 # Lenght of the bar (m)
-L = 50*10**-3  
-x0 = -L/2
-xf = L/2
+L = 1.05*10**-3  
+x0 = 0
+xf = L
 
 # Number of linear elements (n_el)
-n_el = 800
+n_el = 21
 # Lenght of each linear element (h)
 # h = L/n_el
 
@@ -22,7 +22,8 @@ n_el = 800
 # Limit stress / critical stress (stress_c) (Pa)
 stress_c = 300.0*10**6 
 # Assuming a random distribution of critical stress in the linear elements
-diststress_c = np.random.uniform(low=299*10**6, high=301*10**6, size=(n_el))
+# diststress_c = np.random.uniform(low=299*10**6, high=301*10**6, size=(n_el))
+
 
 # Applied strain rate (s-1)
 # strain_rate = 10.0**2 
@@ -61,10 +62,19 @@ n_points = n_dofs
 
 # Non uniform mesh 
 hun = L/n_el
-l = np.linspace(-L/2, L/2, n_points)
-node_coord = np.array([x + np.random.uniform(low=-0.4, high=0.4) * hun for x in l])
+l = np.linspace(x0, xf, n_points)
+# node_coord = np.array([x + np.random.uniform(low=-0.4, high=0.4) * hun for x in l])
+node_coord = l
 node_coord[0] = x0
 node_coord[n_el] = xf 
+
+# a critical stress field to fabricate concentrated damage at L/2
+a = L/2
+k = 3.5
+b = (L/2)**0.5/(stress_c*(k-1))
+diststress_c = [ (abs(node_coord[i]-a)**0.5)/b + stress_c for i in range(n_el)]
+
+
 
 # Critical time step 
 dt_crit = 0.2*hun/((E/rho)**0.5)
