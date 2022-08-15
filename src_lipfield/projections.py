@@ -21,10 +21,11 @@ coord = [x0 + hel*i for i in range(n_points)]
 
 
 # Damage prediction field
+# Predicted (before regularization) damage field on the next time-step
 ddash = [0.0, 0.03333333333333333, 0.06666666666666667,   0.08333333333333333, 0.11666666666666665, 0.13333333333333333,    0.16666666666666666, 0.19, 0.23999999999999997,   0.433333333333334, 0.9, 0.433333333333334, 0.23999999999999997,    0.19, 0.16666666666666666, 0.13333333333333333,    0.11666666666666665, 0.08333333333333333, 0.06666666666666667,    0.03333333333333333, 0]
 
 # Lip-field regularization lenght
-l = 0.2
+l = 0.000001
 
 lower = [minimize(
     lambda y: ddash[np.searchsorted(coord, y[0])-1] + abs(x[el]-y[0])/l,
@@ -82,8 +83,8 @@ epsilon = np.array([0.00336, 0.00336, 0.00336, 0.00335999, 0.003359, 0.00329387,
 
 
 Yc = DFMesh.stress_c**2/(2*DFMesh.E)
-lip_constraint = 2.21*10**-6
-lamb = 2*Yc*lip_constraint/DFMesh.Gc
+# lip_constraint = 2.21*10**-6
+lamb = 2*Yc*l/DFMesh.Gc
 def h(d): return (2*d-d**2)/(1-d+lamb*d**2)**2
 
 # Numerical integration on func
@@ -93,6 +94,7 @@ def func(d): return w*sum([
     (0.5*(1-d[el])**2*DFMesh.E*epsilon[el]**2 + Yc*h(d[el]))*hel/2.
     for el in range(n_el)
 ])
+
 
 const22a = [{'type': 'ineq', 'fun': lambda d:
          -(d[i] - d[i+1] - hel/l)} for i in range(0,n_el-2)]
