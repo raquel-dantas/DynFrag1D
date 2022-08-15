@@ -52,7 +52,7 @@ upper = [-minimize(
 
 # Damage next time step
 
-# Fabricated stress_c gives:
+# Fabricated sigmac gives:
 
 d = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.02204006, 0.06896462, 0.14971528, 0.10357966, 0.32905376, 0.70610548, 0.06212765, 0.2577371, 0.15601001, 0.14921157, 0.11367984, 0.04990276,
 0.0, 0.0, 0.0])
@@ -82,7 +82,7 @@ epsilon = np.array([0.00336, 0.00336, 0.00336, 0.00335999, 0.003359, 0.00329387,
 
 
 
-Yc = DFMesh.stress_c**2/(2*DFMesh.E)
+Yc = DFMesh.sigmac**2/(2*DFMesh.E)
 # lip_constraint = 2.21*10**-6
 lamb = 2*Yc*l/DFMesh.Gc
 def h(d): return (2*d-d**2)/(1-d+lamb*d**2)**2
