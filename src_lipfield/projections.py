@@ -1,4 +1,5 @@
 from scipy.optimize import minimize
+from matplotlib import pyplot as plt
 import numpy as np
 import DFPlot
 import DFMesh
@@ -47,7 +48,7 @@ upper = [-minimize(
     for el in range(n_el)
 ]
 
-# DFPlot.Plot(x,[ddash,lower,upper],"x","damage","Predicted damage field")
+DFPlot.Plot(x,[ddash,lower,upper],"x","damage","Predicted damage field")
 
 
 # Damage next time step
@@ -104,7 +105,7 @@ const = tuple([*const22a,*const22b])
 
 
 
-dnext = minimize(
+dlip = minimize(
     fun=func,
     x0=d,
     method='SLSQP',
@@ -113,11 +114,20 @@ dnext = minimize(
     constraints=const
 ).x
 
-# (
-#         {'type': 'ineq', 'fun': lambda d:
-#          -(x - d[i+1] - DFMesh.ElemLength(i)/l)},
-#         {'type': 'ineq', 'fun': lambda d:
-#          -(x - d[i-1] - DFMesh.ElemLength(i)/l)}
-#     )
 
-DFPlot.Plot(x,[dnext,d],"x","damage","Predicted damage field")
+def PlotDamage(x, d, dlip):
+    fig, axes = plt.subplots()
+    axes.grid(True, which='both')
+    axes.axhline(y=0, color='k')
+
+    plt.title(str("Predicted damage field"))
+    plt.xlabel(str("x"))
+    plt.ylabel(str("D"))
+    plt.plot(x, d, label='d')
+    plt.plot(x, dlip, label='dlip')
+    plt.legend()
+    plt.show()
+
+
+# DFPlot.Plot(x,[dnext,d],"x","damage","Predicted damage field")
+PlotDamage(x,d,dlip)
