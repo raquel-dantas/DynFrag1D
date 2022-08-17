@@ -10,7 +10,7 @@ strainrate = np.array([[10**x, 5*10**x] for x in range(2,points)])
 strainrate = strainrate.flatten()
 print(strainrate)
 
-norm_strainrate = np.array([epsilon/(((DFMesh.E / DFMesh.rho)**0.5 * DFMesh.stress_critical**3)/(DFMesh.E**2 * DFMesh.Gc)) for epsilon in strainrate])
+norm_strainrate = np.array([epsilon/(((DFMesh.E / DFMesh.rho)**0.5 * DFMesh.stress_c**3)/(DFMesh.E**2 * DFMesh.Gc)) for epsilon in strainrate])
 print(norm_strainrate)
 
 s_grady, norm_grady = DFFragmentation.GradyFragSize(strainrate)

@@ -19,10 +19,10 @@ n_el = 800
 # h = L/n_el
 
 
-# Limit stress / critical stress (sigmac) (Pa)
-stress_critical = 300.0*10**6 
+# Limit stress / critical stress (stress_c) (Pa)
+stress_c = 300.0*10**6 
 # Assuming a random distribution of critical stress in the linear elements
-sigmac = np.random.uniform(low=299*10**6, high=301*10**6, size=(n_el))
+diststress_c = np.random.uniform(low=299*10**6, high=301*10**6, size=(n_el))
 
 # Applied strain rate (s-1)
 # strain_rate = 10.0**2 
@@ -71,8 +71,8 @@ dt_crit = 0.2*hun/((E/rho)**0.5)
 # Adopted time step (s)
 dt = dt_crit*0.4
 
-# Time peak stress (sigmac)
-time_peakstress = stress_critical / (E * strain_rate)
+# Time peak stress (stress_c)
+time_peakstress = stress_c / (E * strain_rate)
 nstep_peak = int(time_peakstress/dt)
 # Total time of simulation (s)
 time_simulation = 4.0*10**-7
@@ -99,10 +99,12 @@ A = 1*10**-3
 # Fracture energy (N/m)
 Gc = 100.0 
 
-# Critical / Limit fracture oppening
-delta_critical = (2.0*Gc)/stress_critical
+# Limit fracture oppening
+delta_c = (2.0*Gc)/stress_c
 # Assuming the random distribution of critical stress
-deltac = (2.0*Gc)/sigmac
+distdelta_c = np.zeros(n_el)
+for el in range(n_el):
+    distdelta_c[el] = (2.0*Gc)/diststress_c[el]
 
 
 
@@ -113,7 +115,7 @@ v0 = np.array([strain_rate*x for x in node_coord])
 
 # Initial displacement (u0)
 if strain_rate < 5.0 * 10.0**3:
-    u0 = np.array([0.98*stress_critical*x / E for x in node_coord])
+    u0 = np.array([0.98*stress_c*x / E for x in node_coord])
 else:
     u0 = np.zeros((n_dofs))
 
@@ -127,11 +129,12 @@ p = np.zeros((n_steps+1, n_dofs))
 C = np.zeros((n_dofs, n_dofs))
 # Initialization of maximum jump u between two linear elements (delta_max)
 delta_max = np.zeros((len(materials)*2))
-
 # Contact penalty
-# Contact penalty
-nondistributed_alpha = (stress_critical**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
-alpha = np.array([(sigmac[el]**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc) for el in range(n_el-1)])    
+alpha = (stress_c**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
+distalpha = np.zeros(n_el)
+for el in range(n_el):
+    distalpha[el] = (diststress_c[el]**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
+    
 
 
 
