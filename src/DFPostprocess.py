@@ -102,7 +102,7 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
         if DFMesh.materials[el] == 1:
 
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
-            Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
+            Edis += 0.5*DFMesh.stress_critical*DFMesh.delta_max[el]
 
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
@@ -112,7 +112,8 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
                 # Erev returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
                 Erev += 0.5*stress_coh*jump_u
             else:
-                Econ += 0.5*DFMesh.alpha*jump_u**2
+                i = DFMesh.connect[el][0]-1
+                Econ += 0.5*DFMesh.alpha[i]*jump_u**2
 
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:

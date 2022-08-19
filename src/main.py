@@ -56,15 +56,16 @@ def Run_simulation(strain_rate):
         D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
         if (max(D)>0.7):
             d = np.zeros(DFMesh.n_el+1)
-            DFPlot.PlotByInterface(D)
             for el in range(DFMesh.n_el, len(DFMesh.materials)):
                 if DFMesh.materials[el] == 1:
                     j = DFMesh.connect[el][0]
                     d[j] = D[el]
-            print('d = ' , d)
-            print('v = ', v)
-            print('u = ' , u)
-            print('strain', strain)
+            # DFPlot.PlotByElement(d)
+            # DFPlot.PlotByInterface(D)
+            # print('d = ' , d)
+            # print('v = ', v)
+            # print('u = ' , u)
+            # print('strain', strain)
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
         fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)
@@ -97,7 +98,7 @@ def Run_simulation(strain_rate):
 
         # Check limit stress for possible insertion of interface elements
         for el in range(DFMesh.n_el-1):
-            if average_stress[el] > DFMesh.diststress_c[el]:
+            if average_stress[el] > DFMesh.sigmac[el]:
                 # Fracture happens: creat new interface element
                 u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
                 els_step = els_step + 1
