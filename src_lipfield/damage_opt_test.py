@@ -44,8 +44,8 @@ epsilon_next = [0.0034    , 0.0034    , 0.0034    , 0.00339998, 0.00339469, 0.00
 
 # Damage prediction field
 
-# l = 0.000001 # Lip-field regularization lenght
-l = 2.21*10**-6 # Lip-field regularization lenght
+l = 0.0001/2 # Lip-field regularization lenght
+# l = 2.21*10**-6 # Lip-field regularization lenght
 # l = 0.002 # Lip-field regularization lenght
 Yc = DFMesh.stress_c**2/(2*DFMesh.E)
 # lip_constraint = 2.21*10**-6
@@ -135,9 +135,9 @@ def PlotDamage(x, dn, dnext, ddash, upper, lower, dlip):
     plt.plot(x, dn, label='dn')
     # plt.plot(x, dnext, label='dnext')
     plt.plot(x, ddash, label='ddash')
-    # plt.plot(x, upper, label='upper')
-    # plt.plot(x, lower, label='lower')
-    plt.plot(x, dlip, label='dlip')
+    plt.plot(x, upper, label='upper')
+    plt.plot(x, lower, label='lower')
+    # plt.plot(x, dlip, label='dlip')
     plt.legend()
     plt.show()
 
