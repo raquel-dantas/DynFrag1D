@@ -291,10 +291,10 @@ def PlotDamage(x, dn, ddash, upper, lower, dlip):
     plt.xlabel(str("x"))
     plt.ylabel(str("D"))
     plt.plot(x, dn, label='dn')
-    plt.plot(x, ddash, label='ddash')
-    plt.plot(x, upper, label='upper')
-    plt.plot(x, lower, label='lower')
-    plt.plot(x, dlip, label='dlip')
+    plt.plot(x, upper, label='upper', color='red', linestyle = 'dashed')
+    plt.plot(x, lower, label='lower', color='green', linestyle = 'dashed')
+    plt.plot(x, ddash, label='ddash', color='orange')
+    plt.plot(x, dlip, label='dlip', color='black')
     plt.legend()
     plt.show()
 
@@ -313,23 +313,23 @@ def PlotDamage_ContEl(dn, ddash, upper, lower, dlip):
     dn_elem = np.array([[dn[el], dn[el]] for el in range(n_el)])
     dn_elem = dn_elem.flatten()
 
-    ddash_elem = np.array([[ddash[el], ddash[el]] for el in range(n_el)])
-    ddash_elem = ddash_elem.flatten()
-
     upper_elem = np.array([[upper[el], upper[el]] for el in range(n_el)])
     upper_elem = upper_elem.flatten()
 
     lower_elem = np.array([[lower[el], lower[el]] for el in range(n_el)])
     lower_elem = lower_elem.flatten()
 
+    ddash_elem = np.array([[ddash[el], ddash[el]] for el in range(n_el)])
+    ddash_elem = ddash_elem.flatten()
+
     dlip_elem = np.array([[dlip[el], dlip[el]] for el in range(n_el)])
     dlip_elem = dlip_elem.flatten()
 
     plt.plot(x, dn_elem, label='dn')
-    plt.plot(x, ddash_elem, label='ddash')
-    plt.plot(x, upper_elem, label='upper')
-    plt.plot(x, lower_elem, label='lower')
-    plt.plot(x, dlip_elem, label='dlip')
+    plt.plot(x, upper_elem, label='upper', color='red', linestyle = 'dashed')
+    plt.plot(x, lower_elem, label='lower', color='green', linestyle = 'dashed')
+    plt.plot(x, ddash_elem, label='ddash', color='orange')
+    plt.plot(x, dlip_elem, label='dlip', color='black')
     plt.legend()
     plt.show()
 
