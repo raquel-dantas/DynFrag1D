@@ -1,5 +1,3 @@
-from operator import index
-from textwrap import indent
 import akantu as aka
 import numpy as np
 import DFMesh2d
@@ -46,7 +44,8 @@ dt_crit = model.getStableTimeStep()     # Critical time step (s)
 dt = dt_crit*0.1                        # Adopted time step
 model.setTimeStep(dt)
 time_simulation = 6.0*10**-6            # Total time of simulation (s)
-n_steps = int(time_simulation/dt)       # Number of time steps
+# n_steps = int(time_simulation/dt)       # Number of time steps
+n_steps = 500       # Number of time steps
 
 
 
@@ -115,7 +114,19 @@ work = 0.0                          # External work from the previous time-step
 fp_left = 0.0                       # Equivalent force applied at the left boundary in the previous time-step
 fp_right = 0.0                      # Equivalent force applied at the right boundary in the previous time-step
 avg_stress = np.zeros(n_steps)      # Average stress in the whole bar
-nfrag = np.zeros(n_steps)           # Number of fragments  
+
+
+# Initiation of fragmentatio postprocess variables
+nfrag = np.zeros(n_steps)                           # Number of fragments  
+mean_nelfrag = np.zeros(n_steps)                    # Mean number of elements per fragment
+
+mean_sfrag = np.zeros(n_steps)                      # Mean fragment size
+sfrag_all_steps = [[] for _ in range(n_steps)]      # Fragment size for all fragments at all time-steps
+
+mean_velfrag = np.zeros(n_steps)                    # Mean fragments velocity
+velfrag_all_steps = [[] for _ in range(n_steps)]    # Velocitis of all fragments at all time-steps
+
+mfrag_all_steps = [[] for _ in range(n_steps)]      # Mass of all fragments ata all time-steps 
 
 
 
@@ -155,12 +166,34 @@ for n in range(n_steps):
     Wext[n], fp_left, fp_right = DFPosprocess2d.ExternalWork(mesh, fint, fp_left, fp_right, work, vel, dt)
     work = Wext[n]
 
+
     # Fragmentation data
     fragmentdata = aka.FragmentManager(model)
     fragmentdata.computeAllData()
-    nfrag[n] = fragmentdata.getNbFragment()
 
-nel_per_frag = fragmentdata.getNbFragment()
+    # Number of fragments
+    nfrag[n] = fragmentdata.getNbFragment()                             # Number of fragments at time-step n   
+    mean_nelfrag[n] = np.mean(fragmentdata.getNbElementsPerFragment())  # Mean number of elements per fragment at time-step n 
+    
+    # Fragments size (assuming uniform mesh)
+    sfrag = np.zeros(fragmentdata.getNbFragment())                      
+    sfrag = fragmentdata.getNbElementsPerFragment() * DFMesh2d.hun      # Sizes of all fragments 
+    sfrag_all_steps[n] = sfrag                                          # Store the fragments sizes of time-step n
+    mean_sfrag[n] = mean_nelfrag[n] * DFMesh2d.hun                      # Mean size of fragments 
+    
+    # Fragments velocities
+    velfrag = np.zeros(fragmentdata.getNbFragment())
+    velfrag = fragmentdata.getVelocity()                                # Velocities of all fragments 
+    velfrag_all_steps[n] = velfrag                                      # Store the velocities of time-step n
+    mean_velfrag[n] = np.mean(velfrag)                                  # Mean velocity of fragments
+    
+    # Fragments mass
+    mfrag = np.zeros(fragmentdata.getNbFragment())
+    mfrag = fragmentdata.getMass()                                      # Fragments mass of all fragments
+    mfrag_all_steps[n] = mfrag                                          # Store the mass of time-step n
+
+
+
 
 DFPlot2d.PlotNumberFragments(nfrag, time_simulation, n_steps)
 
