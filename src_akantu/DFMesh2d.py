@@ -3,18 +3,19 @@ import numpy as np
 import subprocess
 
 
-# Geometry parameters
-L = 50*10**-3   # Lenght of the bar (m)
-x0 = -L/2
-xf = L/2
-n_el = 1000      # Number of triangular elements (n_el)
-h = L/(n_el/2)  # Lenght of each linear element (h) 
-A = 1*10**-3    # Cross sectional area (m2)
+# Material
+E = 275.0*10**9     # Young's module (Pa)
+rho = 2750.0        # Density (kg/m3)
+Gc = 100.0          # Fracture energy (N/m)
+stress_critical = 300.0*10**6   # Limit stress / critical stress (Pa)
+# Geometry
+A = 1*10**-3        # Cross sectional area (m2)
+L = 1.05*10**-3     # Lenght of the bar (m)
+x0 = 0              # Left extremitiy x coordinate / 0-initial
+xf = L              # Rigth extremitiy x coordinate / f-final
+n_el = 10           # Number of linear elements (n_el)
+hun = L/n_el        # Size of the elemenets (h) for a uniform mesh (un) 
 
-# Material parameters
-E = 275.0*10**9         # Young's module (Pa)
-rho = 2750.0            # Density (kg/m3)
-stress_c = 300.0*10**6  # Limit stress / critical stress (stress_c) (Pa)
 
 
 
