@@ -22,10 +22,10 @@ hun = L/n_el        # Size of the elemenets (h) for a uniform mesh (un)
 # Mesh (Triangles elements)
 
 geometry_file = f"""
-Point(1) = {{ {x0}, 0, 0, {h} }};
-Point(2) = {{ {xf}, 0, 0, {h} }};
-Point(3) = {{ {xf}, {h}, 0, {h} }};
-Point(4) = {{ {x0}, {h}, 0, {h} }};
+Point(1) = {{ {x0}, 0, 0, {hun} }};
+Point(2) = {{ {xf}, 0, 0, {hun} }};
+Point(3) = {{ {xf}, {hun}, 0, {hun} }};
+Point(4) = {{ {x0}, {hun}, 0, {hun} }};
 
 Line(1) = {{1,2}};
 Line(2) = {{2,3}};
@@ -71,7 +71,7 @@ model solid_mechanics_model_cohesive [
 
     material cohesive_linear [
         name = insertion
-        sigma_c = {stress_c} uniform [-1e6, 1e6] # critical stress (Pa)
+        sigma_c = {stress_critical} uniform [-1e6, 1e6] # critical stress (Pa)
         G_c = 100.0 # Fracture energy (N/m)
         beta = 0.
         penalty = 1e17
