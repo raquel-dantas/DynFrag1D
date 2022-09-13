@@ -195,16 +195,48 @@ for n in range(n_steps):
 
 
 
-DFPlot2d.PlotNumberFragments(nfrag, time_simulation, n_steps)
-
 # Variation of energy [Energy, time] returns the difference of energy value between time t and t0 
 varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPosprocess2d.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, n_steps)
 
 # Power [Energy, time] returns the energy difference between consecutive time steps
 PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Ekin, Edis, Erev, Econ, Wext, n_steps)
 
+
+
 # Plots
-DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
-DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
+
 DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
 
+DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, time_simulation, n_steps)
+
+DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
+
+DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
+
+
+
+# Plots fragmentation data
+
+DFPlot2d.PlotNumberFragments(nfrag, time_simulation, n_steps)
+
+DFPlot2d.PlotAvgFragmentSize(mean_sfrag, time_simulation, n_steps)
+
+DFPlot2d.PlotFragmentSizeHistogram(sfrag)
+
+
+
+# Save average results for convergence study
+f = str(mean_sfrag[n])
+average_fragment_size = f
+with open('LOG/average_fraglen_dynfrag_akantu.txt','w') as f: 
+    f.write(average_fragment_size)
+    
+f = str(nfrag[n])
+number_fragments = f
+with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
+    f.write(number_fragments)
+
+f = str(Edis[n])
+Edis = f
+with open('LOG/final_diss_energy_dynfrag_akantu.txt','w') as f: 
+    f.write(Edis)
