@@ -43,9 +43,8 @@ model.updateAutomaticInsertion()
 dt_crit = model.getStableTimeStep()     # Critical time step (s)
 dt = dt_crit*0.1                        # Adopted time step
 model.setTimeStep(dt)
-time_simulation = 6.0*10**-6            # Total time of simulation (s)
-# n_steps = int(time_simulation/dt)       # Number of time steps
-n_steps = 500       # Number of time steps
+time_simulation = 1.0*10**-7            # Total time of simulation (s)
+n_steps = int(time_simulation/dt)       # Number of time steps
 
 
 
@@ -57,7 +56,7 @@ model.applyBC(aka.FixedValue(0., aka._y), 'YBlocked')
 # Applied strain rate (s-1)
 # strain_rate = 10.0**2
 # strain_rate = 10.0**3
-strain_rate = 10.0**4
+strain_rate = 10.0**5
 # strain_rate = 10.0**5
 
 

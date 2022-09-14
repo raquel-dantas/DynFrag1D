@@ -10,13 +10,14 @@ Gc = 100.0          # Fracture energy (N/m)
 stress_critical = 300.0*10**6   # Limit stress / critical stress (Pa)
 # Geometry
 A = 1*10**-3        # Cross sectional area (m2)
-L = 1.05*10**-3     # Lenght of the bar (m)
-x0 = 0              # Left extremitiy x coordinate / 0-initial
-xf = L              # Rigth extremitiy x coordinate / f-final
-n_el = 10           # Number of linear elements (n_el)
-hun = L/n_el        # Size of the elemenets (h) for a uniform mesh (un) 
+L = 50*10**-3       # Lenght of the bar (m)
+x0 = -0.5*L         # Left extremitiy x coordinate / 0-initial
+xf = 0.5*L          # Rigth extremitiy x coordinate / f-final
+n_el = 5000         # Number of elements (n_el)
+hun = L/(n_el*0.5)  # Size of the elements (h) for a uniform mesh (un) 
 
-
+strain_rate = 10.0**5
+alpha = (stress_critical**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
 
 
 # Mesh (Triangles elements)
@@ -72,9 +73,9 @@ model solid_mechanics_model_cohesive [
     material cohesive_linear [
         name = insertion
         sigma_c = {stress_critical} uniform [-1e6, 1e6] # critical stress (Pa)
-        G_c = 100.0 # Fracture energy (N/m)
+        G_c = {Gc} # Fracture energy (N/m)
         beta = 0.
-        penalty = 1e17
+        penalty = {alpha}
     ]
 ]
 """
