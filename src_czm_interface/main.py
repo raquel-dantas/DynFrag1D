@@ -38,6 +38,13 @@ def Run_simulation(strain_rate):
     avg_fraglen = np.zeros((DFMesh.n_steps))
     # fraglen = np.zeros((DFMesh.n_steps, DFMesh.n_el),dtype=float)
 
+    # Create file 
+    f = str(nfrag)
+    number_fragments = f
+    with open('LOG/number_fragments.txt','w') as f: 
+        f.write("--\n")
+
+
 
     for n in range(DFMesh.n_steps):        
 
@@ -69,6 +76,12 @@ def Run_simulation(strain_rate):
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
         fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)
+
+        f = str(nfrag[n])
+        number_fragments = f
+        with open('LOG/number_fragments.txt','a') as f: 
+            f.write(number_fragments + "\n")
+
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
         av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
@@ -139,11 +152,7 @@ def Run_simulation(strain_rate):
     with open('LOG/average_fraglen.txt','w') as f: 
         f.write(average_fragment_size)
         
-    f = str(nfrag[n])
-    number_fragments = f
-    with open('LOG/number_fragments.txt','w') as f: 
-        f.write(number_fragments)
-
+   
     f = str(Edis[n])
     Edis = f
     with open('LOG/final_diss_energy.txt','w') as f: 

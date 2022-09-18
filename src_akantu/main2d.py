@@ -128,6 +128,12 @@ velfrag_all_steps = [[] for _ in range(n_steps)]    # Velocitis of all fragments
 mfrag_all_steps = [[] for _ in range(n_steps)]      # Mass of all fragments ata all time-steps 
 
 
+# Create files to save outputs
+f = str(nfrag)
+number_fragments = f
+with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
+    f.write("--\n")
+
 
 for n in range(n_steps):
 
@@ -191,6 +197,11 @@ for n in range(n_steps):
     mfrag = fragmentdata.getMass()                                      # Fragments mass of all fragments
     mfrag_all_steps[n] = mfrag                                          # Store the mass of time-step n
 
+    # write outputs in .txt
+    f = str(nfrag)
+    number_fragments = f
+    with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
+        f.write("--\n")
 
 
 

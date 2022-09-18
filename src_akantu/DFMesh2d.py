@@ -13,7 +13,7 @@ A = 1*10**-3        # Cross sectional area (m2)
 L = 50*10**-3       # Lenght of the bar (m)
 x0 = -0.5*L         # Left extremitiy x coordinate / 0-initial
 xf = 0.5*L          # Rigth extremitiy x coordinate / f-final
-n_el = 5000         # Number of elements (n_el)
+n_el = 100          # Number of elements (n_el)
 hun = L/(n_el*0.5)  # Size of the elements (h) for a uniform mesh (un) 
 
 strain_rate = 10.0**5
