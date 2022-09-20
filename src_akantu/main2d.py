@@ -194,7 +194,7 @@ for n in range(n_steps):
     # Fragments size (assuming uniform mesh)
     sfrag = np.zeros(fragmentdata.getNbFragment())                      
     sfrag = fragmentdata.getNbElementsPerFragment() * DFMesh2d.hun      # Sizes of all fragments 
-    mean_sfrag[n] = mean_nelfrag[n] * DFMesh2d.hun                      # Mean size of fragments 
+    mean_sfrag[n] = (mean_nelfrag[n]%2 + (mean_nelfrag[n] - mean_nelfrag[n]%2)/2 ) * DFMesh2d.hun                      # Mean size of fragments 
     datahist = plt.hist(sfrag,10)
 
 
