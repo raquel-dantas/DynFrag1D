@@ -1,5 +1,6 @@
 import akantu as aka
 import numpy as np
+from matplotlib import pyplot as plt
 import DFMesh2d
 import DFModel
 import DFPosprocess2d
@@ -45,7 +46,6 @@ dt = dt_crit*0.1                        # Adopted time step
 model.setTimeStep(dt)
 time_simulation = 1.0*10**-7            # Total time of simulation (s)
 n_steps = int(time_simulation/dt)       # Number of time steps
-
 
 
 # Apply Dirichlet BC to block dispacements at y direction on top and botton of the elements
@@ -116,23 +116,34 @@ avg_stress = np.zeros(n_steps)      # Average stress in the whole bar
 
 
 # Initiation of fragmentatio postprocess variables
-nfrag = np.zeros(n_steps)                           # Number of fragments  
-mean_nelfrag = np.zeros(n_steps)                    # Mean number of elements per fragment
+nfrag = np.zeros(n_steps)           # Number of fragments  
+mean_nelfrag = np.zeros(n_steps)    # Mean number of elements per fragment
+sfrag = DFMesh2d.L                  # Mean size of fragment
+mean_sfrag = np.zeros(n_steps)      # Mean fragment size
+datahist = []                       # Data of histogram of fragment size
+mean_velfrag = np.zeros(n_steps)    # Mean fragments velocity
 
-mean_sfrag = np.zeros(n_steps)                      # Mean fragment size
-sfrag_all_steps = [[] for _ in range(n_steps)]      # Fragment size for all fragments at all time-steps
-
-mean_velfrag = np.zeros(n_steps)                    # Mean fragments velocity
-velfrag_all_steps = [[] for _ in range(n_steps)]    # Velocitis of all fragments at all time-steps
-
-mfrag_all_steps = [[] for _ in range(n_steps)]      # Mass of all fragments ata all time-steps 
 
 
 # Create files to save outputs
+# Save mean size of fragment
+f = str(mean_sfrag)
+average_fragment_size = f
+with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
+    f.write("--\n")
+# Save data of histogram of size of fragments
+f = str(datahist)
+average_fragment_size = f
+with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
+    f.write("--\n")
+# Save number of fragments
 f = str(nfrag)
 number_fragments = f
 with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
     f.write("--\n")
+
+
+
 
 
 for n in range(n_steps):
@@ -183,26 +194,38 @@ for n in range(n_steps):
     # Fragments size (assuming uniform mesh)
     sfrag = np.zeros(fragmentdata.getNbFragment())                      
     sfrag = fragmentdata.getNbElementsPerFragment() * DFMesh2d.hun      # Sizes of all fragments 
-    sfrag_all_steps[n] = sfrag                                          # Store the fragments sizes of time-step n
     mean_sfrag[n] = mean_nelfrag[n] * DFMesh2d.hun                      # Mean size of fragments 
-    
+    datahist = plt.hist(sfrag,10)
+
+
     # Fragments velocities
     velfrag = np.zeros(fragmentdata.getNbFragment())
     velfrag = fragmentdata.getVelocity()                                # Velocities of all fragments 
-    velfrag_all_steps[n] = velfrag                                      # Store the velocities of time-step n
     mean_velfrag[n] = np.mean(velfrag)                                  # Mean velocity of fragments
     
     # Fragments mass
     mfrag = np.zeros(fragmentdata.getNbFragment())
     mfrag = fragmentdata.getMass()                                      # Fragments mass of all fragments
-    mfrag_all_steps[n] = mfrag                                          # Store the mass of time-step n
+
 
     # write outputs in .txt
-    f = str(nfrag)
-    number_fragments = f
-    with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
-        f.write("--\n")
+    f = str(datahist)
+    datahist = f
+    with open('LOG/datahist_dynfrag_akantu.txt','a') as f: 
+        f.write(datahist + "\n")
+    
+    f = str(mean_sfrag[n])
+    avgsize_fragments = f
+    with open('LOG/avgsize_fragments_dynfrag_akantu.txt','a') as f: 
+        f.write(avgsize_fragments + "\n")
 
+    f = str(nfrag[n])
+    number_fragments = f
+    with open('LOG/number_fragments_dynfrag_akantu.txt','a') as f: 
+        f.write(number_fragments + "\n")
+
+
+    
 
 
 # Variation of energy [Energy, time] returns the difference of energy value between time t and t0 
@@ -213,40 +236,81 @@ PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Eki
 
 
 
-# Plots
-
+# Plots and results 
+# Average stress for the bar 
 DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
+f = str(avg_stress)
+average_stress = f
+with open('LOG/average_stress_dynfrag_akantu.txt','w') as f: 
+    f.write(average_stress)
 
+# Energy and variation of energy 
 DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, time_simulation, n_steps)
-
 DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
-
 DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
 
+f = str(Epot)
+potential_energy = f
+with open('LOG/energy_pot_dynfrag_akantu.txt','w') as f: 
+    f.write(potential_energy)
+
+f = str(varEpot)
+potential_varenergy = f
+with open('LOG/varenergy_pot_dynfrag_akantu.txt','w') as f: 
+    f.write(potential_varenergy)
+
+f = str(Ekin)
+kinetic_energy = f
+with open('LOG/energy_kin_dynfrag_akantu.txt','w') as f: 
+    f.write(kinetic_energy)
+
+f = str(varEkin)
+kinetic_varenergy = f
+with open('LOG/varenergy_kin_dynfrag_akantu.txt','w') as f: 
+    f.write(kinetic_varenergy)
+
+f = str(Edis)
+dissipated_energy = f
+with open('LOG/energy_diss_dynfrag_akantu.txt','w') as f: 
+    f.write(dissipated_energy)
+
+f = str(varEdis)
+dissipated_varenergy = f
+with open('LOG/varenergy_diss_dynfrag_akantu.txt','w') as f: 
+    f.write(dissipated_varenergy)
+
+f = str(Econ)
+contact_energy = f
+with open('LOG/energy_con_dynfrag_akantu.txt','w') as f: 
+    f.write(contact_energy)
+
+f = str(varEcon)
+contact_varenergy = f
+with open('LOG/varenergy_con_dynfrag_akantu.txt','w') as f: 
+    f.write(contact_varenergy)
+
+f = str(Wext)
+external_energy = f
+with open('LOG/energy_external_dynfrag_akantu.txt','w') as f: 
+    f.write(external_energy)
+
+f = str(varWext)
+external_varenergy = f
+with open('LOG/varenergy_external_dynfrag_akantu.txt','w') as f: 
+    f.write(external_varenergy)
 
 
-# Plots fragmentation data
 
+# Plots and results fragmentation data
+# Number of fragments
 DFPlot2d.PlotNumberFragments(nfrag, time_simulation, n_steps)
-
-DFPlot2d.PlotAvgFragmentSize(mean_sfrag, time_simulation, n_steps)
 
 DFPlot2d.PlotFragmentSizeHistogram(sfrag)
 
 
 
-# Save average results for convergence study
-f = str(mean_sfrag[n])
-average_fragment_size = f
-with open('LOG/average_fraglen_dynfrag_akantu.txt','w') as f: 
-    f.write(average_fragment_size)
-    
-f = str(nfrag[n])
-number_fragments = f
-with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
-    f.write(number_fragments)
 
-f = str(Edis[n])
-Edis = f
-with open('LOG/final_diss_energy_dynfrag_akantu.txt','w') as f: 
-    f.write(Edis)
+
+
+
+    

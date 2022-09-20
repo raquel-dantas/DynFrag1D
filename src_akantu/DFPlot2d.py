@@ -173,7 +173,6 @@ def PlotFragmentSizeHistogram(frag_sizes):
     plt.title("Fragment size distribution")
     plt.xlabel("Fragment size (m)")
     plt.ylabel("Number of fragments")
-
     plt.hist(frag_sizes,10)
     plt.savefig("LOG/fragment_size_distribution_dynfrag_akantu.svg")
     plt.show()
