@@ -30,19 +30,33 @@ def Run_simulation(strain_rate):
     work = 0.0
     els_step = DFMesh.n_el
     stress_evl = np.zeros((2*len(DFMesh.materials),DFMesh.n_steps))
-    av_stress_bar = np.zeros((DFMesh.n_steps))
+    avg_stress_bar = np.zeros((DFMesh.n_steps))
     up_bc_left = np.array([0,0])
     up_bc_right = np.array([0,0])
 
     nfrag = np.zeros((DFMesh.n_steps))
-    avg_fraglen = np.zeros((DFMesh.n_steps))
+    mean_sfrag = np.zeros((DFMesh.n_steps))
     # fraglen = np.zeros((DFMesh.n_steps, DFMesh.n_el),dtype=float)
+    datahist = []
 
-    # Create file 
+
+    # Create files to save outputs
+    # Save mean size of fragment
+    f = str(mean_sfrag)
+    average_fragment_size = f
+    with open('LOG/avgsize_fragments_czm_interface.txt','w') as f: 
+        f.write("--\n")
+    # Save data of histogram of size of fragments
+    f = str(datahist)
+    average_fragment_size = f
+    with open('LOG/avgsize_fragments_czm_interface.txt','w') as f: 
+        f.write("--\n")
+    # Save number of fragments
     f = str(nfrag)
     number_fragments = f
-    with open('LOG/number_fragments.txt','w') as f: 
+    with open('LOG/number_fragments_czm_interface.txt','w') as f: 
         f.write("--\n")
+
 
 
 
@@ -56,35 +70,20 @@ def Run_simulation(strain_rate):
         # DFPlot.PlotByElement(stress)
 
 
+
         # Post process (stress, strain, energies)
         strain, stress, average_stress = DFPostprocess.PostProcess(u)
 
         # D returns a vector contained damage parameter for cohesive elements
         D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
-        if (max(D)>0.7):
-            d = np.zeros(DFMesh.n_el+1)
-            for el in range(DFMesh.n_el, len(DFMesh.materials)):
-                if DFMesh.materials[el] == 1:
-                    j = DFMesh.connect[el][0]
-                    d[j] = D[el]
-            # DFPlot.PlotByElement(d)
-            # DFPlot.PlotByInterface(D)
-            # print('d = ' , d)
-            # print('v = ', v)
-            # print('u = ' , u)
-            # print('strain', strain)
+        # DFPlot.PlotByInterface(D)
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
-        fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)
-
-        f = str(nfrag[n])
-        number_fragments = f
-        with open('LOG/number_fragments.txt','a') as f: 
-            f.write(number_fragments + "\n")
-
+        fraglen, mean_sfrag[n] = DFFragmentation.SizeFragments(D)
+        datahist = plt.hist(fraglen,10)
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
-        av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
+        avg_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
         Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,
         up_bc_right, u, v, stress, work)
         work =  Wext[n]
@@ -115,6 +114,23 @@ def Run_simulation(strain_rate):
                 # Fracture happens: creat new interface element
                 u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
                 els_step = els_step + 1
+    
+
+    # write outputs in .txt
+    f = str(datahist)
+    datahist = f
+    with open('LOG/datahist_czm_interface.txt','a') as f: 
+        f.write(datahist + "\n")
+    
+    f = str(mean_sfrag[n])
+    avgsize_fragments = f
+    with open('LOG/avgsize_fragments_czm_interface.txt','a') as f: 
+        f.write(avgsize_fragments + "\n")
+
+    f = str(nfrag[n])
+    number_fragments = f
+    with open('LOG/number_fragments_czm_interface.txt','a') as f: 
+        f.write(number_fragments + "\n")
 
     
     bar.finish()
@@ -129,34 +145,80 @@ def Run_simulation(strain_rate):
 
 
 
-    # Plots for the whole simulation
+    # Plots and results
 
-    DFPlot.PlotAverageStressBar(av_stress_bar)
+    # Average stress for the bar 
+    DFPlot.PlotAverageStressBar(avg_stress_bar)
 
+    f = str(avg_stress_bar)
+    average_stress = f
+    with open('LOG/average_stress_czm_interface.txt','w') as f: 
+        f.write(average_stress)
+
+    # Energy and variation of energy
     DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-
     DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-
     DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
 
+    f = str(Epot)
+    potential_energy = f
+    with open('LOG/energy_pot_czm_interface.txt','w') as f: 
+        f.write(potential_energy)
+
+    f = str(varEpot)
+    potential_varenergy = f
+    with open('LOG/varenergy_pot_czm_interface.txt','w') as f: 
+        f.write(potential_varenergy)
+
+    f = str(Ekin)
+    kinetic_energy = f
+    with open('LOG/energy_kin_czm_interface.txt','w') as f: 
+        f.write(kinetic_energy)
+
+    f = str(varEkin)
+    kinetic_varenergy = f
+    with open('LOG/varenergy_kin_czm_interface.txt','w') as f: 
+        f.write(kinetic_varenergy)
+
+    f = str(Edis)
+    dissipated_energy = f
+    with open('LOG/energy_diss_czm_interface.txt','w') as f: 
+        f.write(dissipated_energy)
+
+    f = str(varEdis)
+    dissipated_varenergy = f
+    with open('LOG/varenergy_diss_czm_interface.txt','w') as f: 
+        f.write(dissipated_varenergy)
+
+    f = str(Econ)
+    contact_energy = f
+    with open('LOG/energy_con_czm_interface.txt','w') as f: 
+        f.write(contact_energy)
+
+    f = str(varEcon)
+    contact_varenergy = f
+    with open('LOG/varenergy_con_czm_interface.txt','w') as f: 
+        f.write(contact_varenergy)
+
+    f = str(Wext)
+    external_energy = f
+    with open('LOG/energy_external_czm_interface.txt','w') as f: 
+        f.write(external_energy)
+
+    f = str(varWext)
+    external_varenergy = f
+    with open('LOG/varenergy_external_czm_interface.txt','w') as f: 
+        f.write(external_varenergy)
+
+
+
+    # Plots and results fragmentation data
+
+    # Number of fragments
     DFPlot.PlotNumberFragments(nfrag)
-
-    DFPlot.PlotAvgFragmentSize(avg_fraglen)
-
+    # Histogram final size fragments 
     DFPlot.PlotFragmentSizeHistogram(fraglen)
     
-    
-    # Save average fragment size and number of fragment
-    f = str(avg_fraglen[n])
-    average_fragment_size = f
-    with open('LOG/average_fraglen.txt','w') as f: 
-        f.write(average_fragment_size)
-        
-   
-    f = str(Edis[n])
-    Edis = f
-    with open('LOG/final_diss_energy.txt','w') as f: 
-        f.write(Edis)
 
 if __name__ == '__main__':
     Run_simulation(DFMesh.strain_rate)
