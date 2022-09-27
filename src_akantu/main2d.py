@@ -85,20 +85,20 @@ model.getVelocity()[:] = v0
 
 
 # VTK plot
-model.setBaseName('bar')
-model.addDumpFieldVector('displacement')
-model.addDumpFieldVector('velocity')
-model.addDumpField('strain')
-model.addDumpField('stress')
-model.addDumpField('blocked_dofs')
-model.addDumpField('material_index')
+# model.setBaseName('bar')
+# model.addDumpFieldVector('displacement')
+# model.addDumpFieldVector('velocity')
+# model.addDumpField('strain')
+# model.addDumpField('stress')
+# model.addDumpField('blocked_dofs')
+# model.addDumpField('material_index')
 
-# VTK plot for Cohesive model
-model.setBaseNameToDumper('cohesive elements', 'cohesive')
-model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
-model.addDumpFieldToDumper('cohesive elements', 'damage')
-model.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
-model.addDumpFieldVectorToDumper('cohesive elements', 'opening')
+# # VTK plot for Cohesive model
+# model.setBaseNameToDumper('cohesive elements', 'cohesive')
+# model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
+# model.addDumpFieldToDumper('cohesive elements', 'damage')
+# model.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
+# model.addDumpFieldVectorToDumper('cohesive elements', 'opening')
 
 
 
@@ -127,16 +127,16 @@ mean_velfrag = np.zeros(n_steps)    # Mean fragments velocity
 
 # Create files to save outputs
 # Save mean size of fragment
-f = str(mean_sfrag)
-average_fragment_size = f
-with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
-    f.write("--\n")
-# Save data of histogram of size of fragments
-f = str(datahist)
-average_fragment_size = f
-with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
-    f.write("--\n")
-# Save number of fragments
+# f = str(mean_sfrag)
+# average_fragment_size = f
+# with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
+#     f.write("--\n")
+# # Save data of histogram of size of fragments
+# f = str(datahist)
+# average_fragment_size = f
+# with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
+#     f.write("--\n")
+# # Save number of fragments
 f = str(nfrag)
 number_fragments = f
 with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
@@ -155,8 +155,8 @@ for n in range(n_steps):
     model.applyBC(functor_right, 'right')
 
     # VTK files
-    model.dump()
-    model.dump('cohesive elements')
+    # model.dump()
+    # model.dump('cohesive elements')
 
     # Run simulation
     model.checkCohesiveStress()
@@ -182,6 +182,13 @@ for n in range(n_steps):
     Wext[n], fp_left, fp_right = DFPosprocess2d.ExternalWork(mesh, fint, fp_left, fp_right, work, vel, dt)
     work = Wext[n]
 
+    coh = model.getMaterial(1)
+    # d = model.getMaterial(1).getDamage('_cohesive_2d_4' )
+    # d = coh.getDamage()
+    # d = coh.getInternalReal('damage')
+    d = model.getMaterial(1).getInternalReal('damage')
+    d = d(aka._cohesive_2d_4)
+    coh_id = model.getMaterial('insertion').getElementFilter()(aka._cohesive_2d_4)
 
     # Fragmentation data
     fragmentdata = aka.FragmentManager(model)
@@ -195,7 +202,7 @@ for n in range(n_steps):
     sfrag = np.zeros(fragmentdata.getNbFragment())                      
     sfrag = fragmentdata.getNbElementsPerFragment() * DFMesh2d.hun      # Sizes of all fragments 
     mean_sfrag[n] = (mean_nelfrag[n]%2 + (mean_nelfrag[n] - mean_nelfrag[n]%2)/2 ) * DFMesh2d.hun                      # Mean size of fragments 
-    datahist = plt.hist(sfrag,10)
+    # datahist = plt.hist(sfrag,10)
 
 
     # Fragments velocities
@@ -208,16 +215,17 @@ for n in range(n_steps):
     mfrag = fragmentdata.getMass()                                      # Fragments mass of all fragments
 
 
+
     # write outputs in .txt
-    f = str(datahist)
-    datahist = f
-    with open('LOG/datahist_dynfrag_akantu.txt','a') as f: 
-        f.write(datahist + "\n")
+    # f = str(datahist)
+    # datahist = f
+    # with open('LOG/datahist_dynfrag_akantu.txt','a') as f: 
+    #     f.write(datahist + "\n")
     
-    f = str(mean_sfrag[n])
-    avgsize_fragments = f
-    with open('LOG/avgsize_fragments_dynfrag_akantu.txt','a') as f: 
-        f.write(avgsize_fragments + "\n")
+    # f = str(mean_sfrag[n])
+    # avgsize_fragments = f
+    # with open('LOG/avgsize_fragments_dynfrag_akantu.txt','a') as f: 
+    #     f.write(avgsize_fragments + "\n")
 
     f = str(nfrag[n])
     number_fragments = f
@@ -237,6 +245,7 @@ PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Eki
 
 
 # Plots and results 
+
 # Average stress for the bar 
 DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
 f = str(avg_stress)
@@ -300,12 +309,14 @@ with open('LOG/varenergy_external_dynfrag_akantu.txt','w') as f:
     f.write(external_varenergy)
 
 
-
 # Plots and results fragmentation data
+
 # Number of fragments
 DFPlot2d.PlotNumberFragments(nfrag, time_simulation, n_steps)
-
+# Histogram final size fragments 
 DFPlot2d.PlotFragmentSizeHistogram(sfrag)
+
+
 
 
 
