@@ -12,7 +12,7 @@ stress_critical = 300.0*10**6   # Limit stress / critical stress (Pa)
 A = 1*10**-3        # Cross sectional area (m2)
 L = 50*10**-3       # Lenght of the bar (m)
 x0 = -0.5*L         # Left extremitiy x coordinate / 0-initial
-xf = L              # Rigth extremitiy x coordinate / f-final
+xf = 0.5* L         # Rigth extremitiy x coordinate / f-final
 n_el = 10           # Number of linear elements (n_el)
 hun = L/n_el        # Size of the elemenets (h) for a uniform mesh (un) 
 
