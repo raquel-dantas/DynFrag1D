@@ -1,5 +1,6 @@
 import akantu as aka
 import numpy as np
+import pickle
 from matplotlib import pyplot as plt
 import DFMesh2d
 import DFModel
@@ -44,7 +45,7 @@ model.updateAutomaticInsertion()
 dt_crit = model.getStableTimeStep()     # Critical time step (s)
 dt = dt_crit*0.1                        # Adopted time step
 model.setTimeStep(dt)
-time_simulation = 1.0*10**-7            # Total time of simulation (s)
+time_simulation = 7.0*10**-6            # Total time of simulation (s)
 n_steps = int(time_simulation/dt)       # Number of time steps
 
 
@@ -56,7 +57,7 @@ model.applyBC(aka.FixedValue(0., aka._y), 'YBlocked')
 # Applied strain rate (s-1)
 # strain_rate = 10.0**2
 # strain_rate = 10.0**3
-strain_rate = 10.0**5
+strain_rate = 10.0**4
 # strain_rate = 10.0**5
 
 
@@ -84,7 +85,7 @@ model.getVelocity()[:] = v0
 
 
 
-# VTK plot
+# # VTK plot
 # model.setBaseName('bar')
 # model.addDumpFieldVector('displacement')
 # model.addDumpFieldVector('velocity')
@@ -127,16 +128,16 @@ mean_velfrag = np.zeros(n_steps)    # Mean fragments velocity
 
 # Create files to save outputs
 # Save mean size of fragment
-# f = str(mean_sfrag)
-# average_fragment_size = f
-# with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
-#     f.write("--\n")
-# # Save data of histogram of size of fragments
-# f = str(datahist)
-# average_fragment_size = f
-# with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
-#     f.write("--\n")
-# # Save number of fragments
+f = str(mean_sfrag)
+average_fragment_size = f
+with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
+    f.write("--\n")
+# Save data of histogram of size of fragments
+f = str(datahist)
+average_fragment_size = f
+with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
+    f.write("--\n")
+# Save number of fragments
 f = str(nfrag)
 number_fragments = f
 with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
@@ -182,13 +183,10 @@ for n in range(n_steps):
     Wext[n], fp_left, fp_right = DFPosprocess2d.ExternalWork(mesh, fint, fp_left, fp_right, work, vel, dt)
     work = Wext[n]
 
-    coh = model.getMaterial(1)
-    # d = model.getMaterial(1).getDamage('_cohesive_2d_4' )
-    # d = coh.getDamage()
-    # d = coh.getInternalReal('damage')
-    d = model.getMaterial(1).getInternalReal('damage')
-    d = d(aka._cohesive_2d_4)
-    coh_id = model.getMaterial('insertion').getElementFilter()(aka._cohesive_2d_4)
+    # coh = model.getMaterial(1)
+    # d = model.getMaterial(1).getInternalReal('damage')
+    # d = d(aka._cohesive_2d_4)
+    # coh_id = model.getMaterial('insertion').getElementFilter()(aka._cohesive_2d_4)
 
     # Fragmentation data
     fragmentdata = aka.FragmentManager(model)
@@ -202,7 +200,7 @@ for n in range(n_steps):
     sfrag = np.zeros(fragmentdata.getNbFragment())                      
     sfrag = fragmentdata.getNbElementsPerFragment() * DFMesh2d.hun      # Sizes of all fragments 
     mean_sfrag[n] = (mean_nelfrag[n]%2 + (mean_nelfrag[n] - mean_nelfrag[n]%2)/2 ) * DFMesh2d.hun                      # Mean size of fragments 
-    # datahist = plt.hist(sfrag,10)
+    datahist = plt.hist(sfrag,10)
 
 
     # Fragments velocities
@@ -227,10 +225,10 @@ for n in range(n_steps):
     # with open('LOG/avgsize_fragments_dynfrag_akantu.txt','a') as f: 
     #     f.write(avgsize_fragments + "\n")
 
-    f = str(nfrag[n])
-    number_fragments = f
-    with open('LOG/number_fragments_dynfrag_akantu.txt','a') as f: 
-        f.write(number_fragments + "\n")
+    # f = str(nfrag[n])
+    # number_fragments = f
+    # with open('LOG/number_fragments_dynfrag_akantu.txt','a') as f: 
+    #     f.write("["+number_fragments+"],")
 
 
     
@@ -246,67 +244,72 @@ PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Eki
 
 # Plots and results 
 
+# Number of fragments
+with open('LOG/number_fragments_14000_test.pickle', 'wb') as handle:
+    pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
 # Average stress for the bar 
-DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
-f = str(avg_stress)
-average_stress = f
-with open('LOG/average_stress_dynfrag_akantu.txt','w') as f: 
-    f.write(average_stress)
+# DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
+# f = str(avg_stress)
+# average_stress = f
+# with open('LOG/average_stress_dynfrag_akantu.txt','w') as f: 
+#     f.write(average_stress)
 
-# Energy and variation of energy 
-DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, time_simulation, n_steps)
-DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
-DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
+# # Energy and variation of energy 
+# DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, time_simulation, n_steps)
+# DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
+# DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
 
-f = str(Epot)
-potential_energy = f
-with open('LOG/energy_pot_dynfrag_akantu.txt','w') as f: 
-    f.write(potential_energy)
+# f = str(Epot)
+# potential_energy = f
+# with open('LOG/energy_pot_dynfrag_akantu.txt','w') as f: 
+#     f.write(potential_energy)
 
-f = str(varEpot)
-potential_varenergy = f
-with open('LOG/varenergy_pot_dynfrag_akantu.txt','w') as f: 
-    f.write(potential_varenergy)
+# f = str(varEpot)
+# potential_varenergy = f
+# with open('LOG/varenergy_pot_dynfrag_akantu.txt','w') as f: 
+#     f.write(potential_varenergy)
 
-f = str(Ekin)
-kinetic_energy = f
-with open('LOG/energy_kin_dynfrag_akantu.txt','w') as f: 
-    f.write(kinetic_energy)
+# f = str(Ekin)
+# kinetic_energy = f
+# with open('LOG/energy_kin_dynfrag_akantu.txt','w') as f: 
+#     f.write(kinetic_energy)
 
-f = str(varEkin)
-kinetic_varenergy = f
-with open('LOG/varenergy_kin_dynfrag_akantu.txt','w') as f: 
-    f.write(kinetic_varenergy)
+# f = str(varEkin)
+# kinetic_varenergy = f
+# with open('LOG/varenergy_kin_dynfrag_akantu.txt','w') as f: 
+#     f.write(kinetic_varenergy)
 
-f = str(Edis)
-dissipated_energy = f
-with open('LOG/energy_diss_dynfrag_akantu.txt','w') as f: 
-    f.write(dissipated_energy)
+# f = str(Edis)
+# dissipated_energy = f
+# with open('LOG/energy_diss_dynfrag_akantu.txt','w') as f: 
+#     f.write(dissipated_energy)
 
-f = str(varEdis)
-dissipated_varenergy = f
-with open('LOG/varenergy_diss_dynfrag_akantu.txt','w') as f: 
-    f.write(dissipated_varenergy)
+# f = str(varEdis)
+# dissipated_varenergy = f
+# with open('LOG/varenergy_diss_dynfrag_akantu.txt','w') as f: 
+#     f.write(dissipated_varenergy)
 
-f = str(Econ)
-contact_energy = f
-with open('LOG/energy_con_dynfrag_akantu.txt','w') as f: 
-    f.write(contact_energy)
+# f = str(Econ)
+# contact_energy = f
+# with open('LOG/energy_con_dynfrag_akantu.txt','w') as f: 
+#     f.write(contact_energy)
 
-f = str(varEcon)
-contact_varenergy = f
-with open('LOG/varenergy_con_dynfrag_akantu.txt','w') as f: 
-    f.write(contact_varenergy)
+# f = str(varEcon)
+# contact_varenergy = f
+# with open('LOG/varenergy_con_dynfrag_akantu.txt','w') as f: 
+#     f.write(contact_varenergy)
 
-f = str(Wext)
-external_energy = f
-with open('LOG/energy_external_dynfrag_akantu.txt','w') as f: 
-    f.write(external_energy)
+# f = str(Wext)
+# external_energy = f
+# with open('LOG/energy_external_dynfrag_akantu.txt','w') as f: 
+#     f.write(external_energy)
 
-f = str(varWext)
-external_varenergy = f
-with open('LOG/varenergy_external_dynfrag_akantu.txt','w') as f: 
-    f.write(external_varenergy)
+# f = str(varWext)
+# external_varenergy = f
+# with open('LOG/varenergy_external_dynfrag_akantu.txt','w') as f: 
+#     f.write(external_varenergy)
 
 
 # Plots and results fragmentation data
