@@ -1,5 +1,6 @@
 from matplotlib.pyplot import connect
 from matplotlib import pyplot as plt
+import pickle
 import DFMesh
 import DFFem
 import DFPostprocess
@@ -150,65 +151,67 @@ def Run_simulation(strain_rate):
     # Average stress for the bar 
     DFPlot.PlotAverageStressBar(avg_stress_bar)
 
-    f = str(avg_stress_bar)
-    average_stress = f
-    with open('LOG/average_stress_czm_interface.txt','w') as f: 
-        f.write(average_stress)
+
+
+    # f = str(avg_stress_bar)
+    # average_stress = f
+    # with open('LOG/average_stress_czm_interface.txt','w') as f: 
+    #     f.write(average_stress)
 
     # Energy and variation of energy
     DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
     DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
 
-    f = str(Epot)
-    potential_energy = f
-    with open('LOG/energy_pot_czm_interface.txt','w') as f: 
-        f.write(potential_energy)
+    # f = str(Epot)
+    # potential_energy = f
+    # with open('LOG/energy_pot_czm_interface.txt','w') as f: 
+    #     f.write(potential_energy)
 
-    f = str(varEpot)
-    potential_varenergy = f
-    with open('LOG/varenergy_pot_czm_interface.txt','w') as f: 
-        f.write(potential_varenergy)
+    # f = str(varEpot)
+    # potential_varenergy = f
+    # with open('LOG/varenergy_pot_czm_interface.txt','w') as f: 
+    #     f.write(potential_varenergy)
 
-    f = str(Ekin)
-    kinetic_energy = f
-    with open('LOG/energy_kin_czm_interface.txt','w') as f: 
-        f.write(kinetic_energy)
+    # f = str(Ekin)
+    # kinetic_energy = f
+    # with open('LOG/energy_kin_czm_interface.txt','w') as f: 
+    #     f.write(kinetic_energy)
 
-    f = str(varEkin)
-    kinetic_varenergy = f
-    with open('LOG/varenergy_kin_czm_interface.txt','w') as f: 
-        f.write(kinetic_varenergy)
+    # f = str(varEkin)
+    # kinetic_varenergy = f
+    # with open('LOG/varenergy_kin_czm_interface.txt','w') as f: 
+    #     f.write(kinetic_varenergy)
 
-    f = str(Edis)
-    dissipated_energy = f
-    with open('LOG/energy_diss_czm_interface.txt','w') as f: 
-        f.write(dissipated_energy)
+    # f = str(Edis)
+    # dissipated_energy = f
+    # with open('LOG/energy_diss_czm_interface.txt','w') as f: 
+    #     f.write(dissipated_energy)
 
-    f = str(varEdis)
-    dissipated_varenergy = f
-    with open('LOG/varenergy_diss_czm_interface.txt','w') as f: 
-        f.write(dissipated_varenergy)
+    # f = str(varEdis)
+    # dissipated_varenergy = f
+    # with open('LOG/varenergy_diss_czm_interface.txt','w') as f: 
+    #     f.write(dissipated_varenergy)
 
-    f = str(Econ)
-    contact_energy = f
-    with open('LOG/energy_con_czm_interface.txt','w') as f: 
-        f.write(contact_energy)
+    # f = str(Econ)
+    # contact_energy = f
+    # with open('LOG/energy_con_czm_interface.txt','w') as f: 
+    #     f.write(contact_energy)
 
-    f = str(varEcon)
-    contact_varenergy = f
-    with open('LOG/varenergy_con_czm_interface.txt','w') as f: 
-        f.write(contact_varenergy)
+    # f = str(varEcon)
+    # contact_varenergy = f
+    # with open('LOG/varenergy_con_czm_interface.txt','w') as f: 
+    #     f.write(contact_varenergy)
 
-    f = str(Wext)
-    external_energy = f
-    with open('LOG/energy_external_czm_interface.txt','w') as f: 
-        f.write(external_energy)
+    # f = str(Wext)
+    # external_energy = f
+    # with open('LOG/energy_external_czm_interface.txt','w') as f: 
+    #     f.write(external_energy)
 
-    f = str(varWext)
-    external_varenergy = f
-    with open('LOG/varenergy_external_czm_interface.txt','w') as f: 
-        f.write(external_varenergy)
+    # f = str(varWext)
+    # external_varenergy = f
+    # with open('LOG/varenergy_external_czm_interface.txt','w') as f: 
+    #     f.write(external_varenergy)
 
 
 
@@ -216,6 +219,8 @@ def Run_simulation(strain_rate):
 
     # Number of fragments
     DFPlot.PlotNumberFragments(nfrag)
+    with open('LOG/number_fragments_3000_czmint.pickle', 'wb') as handle:
+        pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
     # Histogram final size fragments 
     DFPlot.PlotFragmentSizeHistogram(fraglen)
     

@@ -245,7 +245,7 @@ PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Eki
 # Plots and results 
 
 # Number of fragments
-with open('LOG/number_fragments_14000_test.pickle', 'wb') as handle:
+with open('LOG/number_fragments_5000_test.pickle', 'wb') as handle:
     pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
