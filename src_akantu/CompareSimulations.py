@@ -24,6 +24,13 @@ n_steps_sim3 = 9705
 n_steps_sim4 = 13864
 n_steps_sim5 = 19410
 
+
+n_steps_sim6 = 874
+n_steps_sim7 = 1749
+n_steps_sim8 = 3499
+n_steps_sim9 = 4374
+n_steps_sim10 = 5249
+
 avg_stress_bar_sim1 = []
 avg_stress_bar_sim2 = []
 
@@ -60,6 +67,31 @@ with open('LOG/number_fragments_14000.pickle', 'rb') as handle:
     nfrag_sim5 = pickle.load(handle)
 
 
+with open('LOG/number_fragments_500_czmint.pickle', 'rb') as handle:
+    nfrag_sim6 = pickle.load(handle)
+with open('LOG/number_fragments_1000_czmint.pickle', 'rb') as handle:
+    nfrag_sim7 = pickle.load(handle)
+with open('LOG/number_fragments_2000_czmint.pickle', 'rb') as handle:
+    nfrag_sim8 = pickle.load(handle)
+with open('LOG/number_fragments_2500_czmint.pickle', 'rb') as handle:
+    nfrag_sim9 = pickle.load(handle)
+with open('LOG/number_fragments_3000_czmint.pickle', 'rb') as handle:
+    nfrag_sim10 = pickle.load(handle)
+
+
+
+print(nfrag_sim1[n_steps_sim1-1])
+print(nfrag_sim2[n_steps_sim2-1])
+print(nfrag_sim3[n_steps_sim3-1])
+print(nfrag_sim4[n_steps_sim4-1])
+print(nfrag_sim5[n_steps_sim5-1])
+
+print(nfrag_sim6[n_steps_sim6-1])
+print(nfrag_sim7[n_steps_sim7-1])
+print(nfrag_sim8[n_steps_sim8-1])
+print(nfrag_sim9[n_steps_sim9-1])
+print(nfrag_sim10[n_steps_sim10-1])
+
 
 sfrag_sim1 = []
 sfrag_sim2 = []
@@ -81,3 +113,7 @@ DFPlotCompare.PlotCompareNumberFragments(nfrag_sim1, nfrag_sim2, nfrag_sim3, nfr
 # DFPlotCompare.PlotCompareAvgFragmentSize(sfrag_sim1, sfrag_sim2, time_simulation, n_steps_sim1, n_steps_sim2)
 
 # DFPlotCompare.PlotCompareFragmentSizeHistogram(frag_sizes_sim1,frag_sizes_sim2)
+
+
+
+

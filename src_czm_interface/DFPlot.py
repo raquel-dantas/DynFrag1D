@@ -342,7 +342,7 @@ def PlotLogConvergenceEnergy(energies_un, energies_nun, meshes):
     plt.show()
 
 
-def PlotConvergenceNumfrag(nfrags_un, nfrags_nun, meshes):
+def PlotConvergenceNumfrag(nfrags_un, nfrags_2, nfrags_nun, meshes, meshes2):
     """Plot total number of nodes of the mesh x final number of fragments.\n
     Arguments: \n
     energies -- dissipated energies for different mesh sizes;\n
@@ -352,9 +352,11 @@ def PlotConvergenceNumfrag(nfrags_un, nfrags_nun, meshes):
     plt.xlabel(str("Number of nodes"))
     plt.ylabel(str("Number of fragments"))
     nnodes = [meshes[i]+1 for i in range(len(meshes))]
+    nnodes2 = [meshes2[i]+1 for i in range(len(meshes2))]
 
-    plt.plot(nnodes, nfrags_un, label='Uniform mesh')
-    plt.plot(nnodes, nfrags_nun, label='Non-uniform mesh')
+    plt.plot(nnodes, nfrags_un, label='src_akantu')
+    plt.plot(nnodes2, nfrags_2, label='src_czm_interface')
+    # plt.plot(nnodes, nfrags_nun, label='Non-uniform mesh')
     plt.legend()
     plt.savefig("LOG/convergence_nfrags.svg")
     plt.show()
