@@ -31,33 +31,14 @@ def Run_simulation(strain_rate):
     work = 0.0
     els_step = DFMesh.n_el
     stress_evl = np.zeros((2*len(DFMesh.materials),DFMesh.n_steps))
-    avg_stress_bar = np.zeros((DFMesh.n_steps))
+    avg_stress = np.zeros((DFMesh.n_steps))
     up_bc_left = np.array([0,0])
     up_bc_right = np.array([0,0])
 
     nfrag = np.zeros((DFMesh.n_steps))
-    mean_sfrag = np.zeros((DFMesh.n_steps))
+    avg_sfrag = np.zeros((DFMesh.n_steps))
     # fraglen = np.zeros((DFMesh.n_steps, DFMesh.n_el),dtype=float)
     datahist = []
-
-
-    # Create files to save outputs
-    # Save mean size of fragment
-    f = str(mean_sfrag)
-    average_fragment_size = f
-    with open('LOG/avgsize_fragments_czm_interface.txt','w') as f: 
-        f.write("--\n")
-    # Save data of histogram of size of fragments
-    f = str(datahist)
-    average_fragment_size = f
-    with open('LOG/avgsize_fragments_czm_interface.txt','w') as f: 
-        f.write("--\n")
-    # Save number of fragments
-    f = str(nfrag)
-    number_fragments = f
-    with open('LOG/number_fragments_czm_interface.txt','w') as f: 
-        f.write("--\n")
-
 
 
 
@@ -70,8 +51,6 @@ def Run_simulation(strain_rate):
         # DFPlot.PlotByDOF(v)
         # DFPlot.PlotByElement(stress)
 
-
-
         # Post process (stress, strain, energies)
         strain, stress, average_stress = DFPostprocess.PostProcess(u)
 
@@ -80,11 +59,11 @@ def Run_simulation(strain_rate):
         # DFPlot.PlotByInterface(D)
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
-        fraglen, mean_sfrag[n] = DFFragmentation.SizeFragments(D)
+        fraglen, avg_sfrag[n] = DFFragmentation.SizeFragments(D)
         datahist = plt.hist(fraglen,10)
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
-        avg_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
+        avg_stress[n] = DFPostprocess.StressBar(stress, els_step)
         Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,
         up_bc_right, u, v, stress, work)
         work =  Wext[n]
@@ -117,22 +96,6 @@ def Run_simulation(strain_rate):
                 els_step = els_step + 1
     
 
-    # write outputs in .txt
-    f = str(datahist)
-    datahist = f
-    with open('LOG/datahist_czm_interface.txt','a') as f: 
-        f.write(datahist + "\n")
-    
-    f = str(mean_sfrag[n])
-    avgsize_fragments = f
-    with open('LOG/avgsize_fragments_czm_interface.txt','a') as f: 
-        f.write(avgsize_fragments + "\n")
-
-    f = str(nfrag[n])
-    number_fragments = f
-    with open('LOG/number_fragments_czm_interface.txt','a') as f: 
-        f.write(number_fragments + "\n")
-
     
     bar.finish()
     print('\n')
@@ -146,83 +109,54 @@ def Run_simulation(strain_rate):
 
 
 
-    # Plots and results
-
-    # Average stress for the bar 
-    DFPlot.PlotAverageStressBar(avg_stress_bar)
-
-
-
-    # f = str(avg_stress_bar)
-    # average_stress = f
-    # with open('LOG/average_stress_czm_interface.txt','w') as f: 
-    #     f.write(average_stress)
-
-    # Energy and variation of energy
+    # Plots
+    DFPlot.PlotAverageStressBar(avg_stress)
     DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
     DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
-
-    # f = str(Epot)
-    # potential_energy = f
-    # with open('LOG/energy_pot_czm_interface.txt','w') as f: 
-    #     f.write(potential_energy)
-
-    # f = str(varEpot)
-    # potential_varenergy = f
-    # with open('LOG/varenergy_pot_czm_interface.txt','w') as f: 
-    #     f.write(potential_varenergy)
-
-    # f = str(Ekin)
-    # kinetic_energy = f
-    # with open('LOG/energy_kin_czm_interface.txt','w') as f: 
-    #     f.write(kinetic_energy)
-
-    # f = str(varEkin)
-    # kinetic_varenergy = f
-    # with open('LOG/varenergy_kin_czm_interface.txt','w') as f: 
-    #     f.write(kinetic_varenergy)
-
-    # f = str(Edis)
-    # dissipated_energy = f
-    # with open('LOG/energy_diss_czm_interface.txt','w') as f: 
-    #     f.write(dissipated_energy)
-
-    # f = str(varEdis)
-    # dissipated_varenergy = f
-    # with open('LOG/varenergy_diss_czm_interface.txt','w') as f: 
-    #     f.write(dissipated_varenergy)
-
-    # f = str(Econ)
-    # contact_energy = f
-    # with open('LOG/energy_con_czm_interface.txt','w') as f: 
-    #     f.write(contact_energy)
-
-    # f = str(varEcon)
-    # contact_varenergy = f
-    # with open('LOG/varenergy_con_czm_interface.txt','w') as f: 
-    #     f.write(contact_varenergy)
-
-    # f = str(Wext)
-    # external_energy = f
-    # with open('LOG/energy_external_czm_interface.txt','w') as f: 
-    #     f.write(external_energy)
-
-    # f = str(varWext)
-    # external_varenergy = f
-    # with open('LOG/varenergy_external_czm_interface.txt','w') as f: 
-    #     f.write(external_varenergy)
-
-
-
-    # Plots and results fragmentation data
-
-    # Number of fragments
     DFPlot.PlotNumberFragments(nfrag)
-    with open('LOG/number_fragments_3000_czmint.pickle', 'wb') as handle:
-        pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # Histogram final size fragments 
     DFPlot.PlotFragmentSizeHistogram(fraglen)
+
+    # Save results 
+    # Number of fragments
+    with open('LOG/src_czm_interface_number_fragments.pickle', 'wb') as handle:
+        pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # Average fragment size
+    with open('LOG/src_czm_interface_average_fragment_size.pickle', 'wb') as handle:
+        pickle.dump(avg_sfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # Histogram fragment size
+    with open('LOG/src_czm_interface_datahist_fragment_size.pickle', 'wb') as handle:
+        pickle.dump(datahist, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # Average stress for the bar 
+    with open('LOG/src_czm_interface_avg_stress.pickle', 'wb') as handle:
+        pickle.dump(avg_stress, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # Energy
+    with open('LOG/src_czm_interface_epot.pickle', 'wb') as handle:
+        pickle.dump(Epot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_ekin.pickle', 'wb') as handle:
+        pickle.dump(Ekin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_edis.pickle', 'wb') as handle:
+        pickle.dump(Edis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_erev.pickle', 'wb') as handle:
+        pickle.dump(Erev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_econ.pickle', 'wb') as handle:
+        pickle.dump(Econ, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_wext.pickle', 'wb') as handle:
+        pickle.dump(Wext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # Variation of energy
+    with open('LOG/src_czm_interface_var_epot.pickle', 'wb') as handle:
+        pickle.dump(varEpot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_var_ekin.pickle', 'wb') as handle:
+        pickle.dump(varEkin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_var_edis.pickle', 'wb') as handle:
+        pickle.dump(varEdis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_var_erev.pickle', 'wb') as handle:
+        pickle.dump(varErev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_var_econ.pickle', 'wb') as handle:
+        pickle.dump(varEcon, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('LOG/src_czm_interface_var_wext.pickle', 'wb') as handle:
+        pickle.dump(varWext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
     
 
 if __name__ == '__main__':
