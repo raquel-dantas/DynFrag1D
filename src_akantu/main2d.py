@@ -55,8 +55,7 @@ conn_facets = mesh_facets.getConnectivities()
 dt_crit = model.getStableTimeStep()     # Critical time step (s)
 dt = dt_crit*0.1                        # Adopted time step
 model.setTimeStep(dt)
-time_simulation = 7.0*10**-6            # Total time of simulation (s)
-n_steps = int(time_simulation/dt)       # Number of time steps
+n_steps = int(DFMesh2d.time_simulation/dt)       # Number of time steps
 
 
 # Apply Dirichlet BC to block dispacements at y direction on top and botton of the elements
@@ -207,11 +206,11 @@ PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Eki
 
 
 # Plots 
-DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
-DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, time_simulation, n_steps)
-DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
-DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
-DFPlot2d.PlotNumberFragments(nfrag, time_simulation, n_steps)
+DFPlot2d.PlotAverageStressBar(avg_stress, DFMesh2d.time_simulation, n_steps)
+DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, DFMesh2d.time_simulation, n_steps)
+DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, DFMesh2d.time_simulation, n_steps)
+DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, DFMesh2d.time_simulation, n_steps)
+DFPlot2d.PlotNumberFragments(nfrag, DFMesh2d.time_simulation, n_steps)
 DFPlot2d.PlotFragmentSizeHistogram(sfrag)
 
 

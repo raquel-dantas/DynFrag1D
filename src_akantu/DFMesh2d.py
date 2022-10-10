@@ -1,5 +1,3 @@
-import akantu as aka
-import numpy as np
 import subprocess
 import input_examples.DFInputModel as inputdata
 
@@ -18,8 +16,13 @@ xf = inputdata.xf       # Rigth extremitiy x coordinate / f-final
 n_el = inputdata.n_el   # Number of elements (n_el)
 hun = inputdata.hun     # Size of the elements (h) for a uniform mesh (un) 
 
+# Load
 strain_rate = inputdata.strain_rate
+# Contact penalty
 alpha = inputdata.alpha
+
+# Time
+time_simulation = inputdata.time_simulation # Total time of simulation (s)
 
 
 # Mesh (Triangles elements)

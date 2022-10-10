@@ -1,3 +1,5 @@
+# Input model for src_akantu
+
 # Material
 E = 275.0*10**9     # Young's module (Pa)
 rho = 2750.0        # Density (kg/m3)
@@ -13,7 +15,9 @@ n_el = 10           # Number of elements (n_el)
 hun = L/(n_el*0.5)  # Size of the elements (h) for a uniform mesh (un) 
 
 # Load
-strain_rate = 10.0**5
-# Contact pemnalty
+strain_rate = 10.0**5  #(s-1)
+# Contact penalty
 alpha = (stress_critical**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
 
+# Time
+time_simulation = 6.0*10**-7        # Total time of simulation (s)
