@@ -16,17 +16,19 @@ aka.parseInput('LOG/material.dat')
 spatial_dimension = 2
 mesh = aka.Mesh(spatial_dimension)
 mesh.read('LOG/bar.msh')
+
 # Get connectivity list
 connect = mesh.getConnectivity(aka._triangle_3)
 # Get coordinates 
 coords = mesh.getNodes()
 
 
-
 # Create model
 model = aka.SolidMechanicsModelCohesive(mesh)
 model.initFull(_analysis_method=aka._static, _is_extrinsic=True)
 
+cohesive_inserter = model.getElementInserter()
+facets = cohesive_inserter.getCheckFacets()
 
 
 # Configure static solver
@@ -36,8 +38,16 @@ solver.set('threshold', 1e-10)
 solver.set("convergence_type", aka.SolveConvergenceCriteria.residual)
 # Solver (explicit Newmark with lumped mass)
 model.initNewSolver(aka._explicit_lumped_mass)
+
+
 # Dynamic insertion of cohesive elements
 model.updateAutomaticInsertion()
+
+# Get facets
+mesh_facets = mesh.getMeshFacets()
+conn_facets = mesh_facets.getConnectivities()
+
+
 
 
 
@@ -120,28 +130,13 @@ avg_stress = np.zeros(n_steps)      # Average stress in the whole bar
 nfrag = np.zeros(n_steps)           # Number of fragments  
 mean_nelfrag = np.zeros(n_steps)    # Mean number of elements per fragment
 sfrag = DFMesh2d.L                  # Mean size of fragment
-mean_sfrag = np.zeros(n_steps)      # Mean fragment size
+avg_sfrag = np.zeros(n_steps)      # Mean fragment size
 datahist = []                       # Data of histogram of fragment size
 mean_velfrag = np.zeros(n_steps)    # Mean fragments velocity
 
 
 
-# Create files to save outputs
-# Save mean size of fragment
-f = str(mean_sfrag)
-average_fragment_size = f
-with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
-    f.write("--\n")
-# Save data of histogram of size of fragments
-f = str(datahist)
-average_fragment_size = f
-with open('LOG/avgsize_fragments_dynfrag_akantu.txt','w') as f: 
-    f.write("--\n")
-# Save number of fragments
-f = str(nfrag)
-number_fragments = f
-with open('LOG/number_fragments_dynfrag_akantu.txt','w') as f: 
-    f.write("--\n")
+
 
 
 
@@ -199,7 +194,7 @@ for n in range(n_steps):
     # Fragments size (assuming uniform mesh)
     sfrag = np.zeros(fragmentdata.getNbFragment())                      
     sfrag = fragmentdata.getNbElementsPerFragment() * DFMesh2d.hun      # Sizes of all fragments 
-    mean_sfrag[n] = (mean_nelfrag[n]%2 + (mean_nelfrag[n] - mean_nelfrag[n]%2)/2 ) * DFMesh2d.hun                      # Mean size of fragments 
+    avg_sfrag[n] = (mean_nelfrag[n]%2 + (mean_nelfrag[n] - mean_nelfrag[n]%2)/2 ) * DFMesh2d.hun                      # Mean size of fragments 
     datahist = plt.hist(sfrag,10)
 
 
@@ -242,82 +237,54 @@ PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Eki
 
 
 
-# Plots and results 
-
-# Number of fragments
-with open('LOG/number_fragments_5000_test.pickle', 'wb') as handle:
-    pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-# Average stress for the bar 
-# DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
-# f = str(avg_stress)
-# average_stress = f
-# with open('LOG/average_stress_dynfrag_akantu.txt','w') as f: 
-#     f.write(average_stress)
-
-# # Energy and variation of energy 
-# DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, time_simulation, n_steps)
-# DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
-# DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
-
-# f = str(Epot)
-# potential_energy = f
-# with open('LOG/energy_pot_dynfrag_akantu.txt','w') as f: 
-#     f.write(potential_energy)
-
-# f = str(varEpot)
-# potential_varenergy = f
-# with open('LOG/varenergy_pot_dynfrag_akantu.txt','w') as f: 
-#     f.write(potential_varenergy)
-
-# f = str(Ekin)
-# kinetic_energy = f
-# with open('LOG/energy_kin_dynfrag_akantu.txt','w') as f: 
-#     f.write(kinetic_energy)
-
-# f = str(varEkin)
-# kinetic_varenergy = f
-# with open('LOG/varenergy_kin_dynfrag_akantu.txt','w') as f: 
-#     f.write(kinetic_varenergy)
-
-# f = str(Edis)
-# dissipated_energy = f
-# with open('LOG/energy_diss_dynfrag_akantu.txt','w') as f: 
-#     f.write(dissipated_energy)
-
-# f = str(varEdis)
-# dissipated_varenergy = f
-# with open('LOG/varenergy_diss_dynfrag_akantu.txt','w') as f: 
-#     f.write(dissipated_varenergy)
-
-# f = str(Econ)
-# contact_energy = f
-# with open('LOG/energy_con_dynfrag_akantu.txt','w') as f: 
-#     f.write(contact_energy)
-
-# f = str(varEcon)
-# contact_varenergy = f
-# with open('LOG/varenergy_con_dynfrag_akantu.txt','w') as f: 
-#     f.write(contact_varenergy)
-
-# f = str(Wext)
-# external_energy = f
-# with open('LOG/energy_external_dynfrag_akantu.txt','w') as f: 
-#     f.write(external_energy)
-
-# f = str(varWext)
-# external_varenergy = f
-# with open('LOG/varenergy_external_dynfrag_akantu.txt','w') as f: 
-#     f.write(external_varenergy)
-
-
-# Plots and results fragmentation data
-
-# Number of fragments
+# Plots 
+DFPlot2d.PlotAverageStressBar(avg_stress, time_simulation, n_steps)
+DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, time_simulation, n_steps)
+DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, time_simulation, n_steps)
+DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, time_simulation, n_steps)
 DFPlot2d.PlotNumberFragments(nfrag, time_simulation, n_steps)
-# Histogram final size fragments 
 DFPlot2d.PlotFragmentSizeHistogram(sfrag)
+
+
+# Save results 
+# Number of fragments
+with open('LOG/src_akantu_number_fragments.pickle', 'wb') as handle:
+    pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# Average fragment size
+with open('LOG/src_akantu_average_fragment_size.pickle', 'wb') as handle:
+    pickle.dump(avg_sfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# Histogram fragment size
+with open('LOG/src_akantu_datahist_fragment_size.pickle', 'wb') as handle:
+    pickle.dump(datahist, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# Average stress for the bar 
+with open('LOG/src_akantu_avg_stress.pickle', 'wb') as handle:
+    pickle.dump(avg_stress, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# Energy
+with open('LOG/src_akantu_epot.pickle', 'wb') as handle:
+    pickle.dump(Epot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_ekin.pickle', 'wb') as handle:
+    pickle.dump(Ekin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_edis.pickle', 'wb') as handle:
+    pickle.dump(Edis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_erev.pickle', 'wb') as handle:
+    pickle.dump(Erev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_econ.pickle', 'wb') as handle:
+    pickle.dump(Econ, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_wext.pickle', 'wb') as handle:
+    pickle.dump(Wext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# Variation of energy
+with open('LOG/src_akantu_var_epot.pickle', 'wb') as handle:
+    pickle.dump(varEpot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_var_ekin.pickle', 'wb') as handle:
+    pickle.dump(varEkin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_var_edis.pickle', 'wb') as handle:
+    pickle.dump(varEdis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_var_erev.pickle', 'wb') as handle:
+    pickle.dump(varErev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_var_econ.pickle', 'wb') as handle:
+    pickle.dump(varEcon, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('LOG/src_akantu_var_wext.pickle', 'wb') as handle:
+    pickle.dump(varWext, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
