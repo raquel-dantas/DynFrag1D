@@ -64,17 +64,9 @@ model.applyBC(aka.FixedValue(0., aka._y), 'YBlocked')
 
 
 
-# Applied strain rate (s-1)
-# strain_rate = 10.0**2
-# strain_rate = 10.0**3
-strain_rate = 10.0**4
-# strain_rate = 10.0**5
-
-
-
 # Set velocity applied at the boundaries
 # Value of the velocity at the bounary
-vel = strain_rate*DFMesh2d.L/2 
+vel = DFMesh2d.strain_rate * DFMesh2d.L/2 
 # Apply constant velocity at the boundaries
 functor_left = DFModel.FixedVelocity(aka._x, -vel)
 functor_right = DFModel.FixedVelocity(aka._x, vel)
@@ -88,7 +80,7 @@ n_nodes = mesh.getNbNodes()     # Number of nodes of the mesh
 u0 = model.getDisplacement()    # Initial displacement
 v0 = model.getVelocity()        # Initial velocity
 # Set initial velocity profile
-v0[:,0] = np.array([strain_rate * x for x,y in mesh.getNodes()])
+v0[:,0] = np.array([DFMesh2d.strain_rate * x for x,y in mesh.getNodes()])
 # DFPlot2d.PlotByCoord(v0[:,0],mesh,'initial vel')
 # Apply initial velocity values
 model.getVelocity()[:] = v0
@@ -133,10 +125,6 @@ sfrag = DFMesh2d.L                  # Mean size of fragment
 avg_sfrag = np.zeros(n_steps)      # Mean fragment size
 datahist = []                       # Data of histogram of fragment size
 mean_velfrag = np.zeros(n_steps)    # Mean fragments velocity
-
-
-
-
 
 
 
@@ -200,33 +188,14 @@ for n in range(n_steps):
 
     # Fragments velocities
     velfrag = np.zeros(fragmentdata.getNbFragment())
-    velfrag = fragmentdata.getVelocity()                                # Velocities of all fragments 
-    mean_velfrag[n] = np.mean(velfrag)                                  # Mean velocity of fragments
+    velfrag = fragmentdata.getVelocity()                # Velocities of all fragments 
+    mean_velfrag[n] = np.mean(velfrag)                  # Mean velocity of fragments
     
     # Fragments mass
     mfrag = np.zeros(fragmentdata.getNbFragment())
-    mfrag = fragmentdata.getMass()                                      # Fragments mass of all fragments
+    mfrag = fragmentdata.getMass()                      # Fragments mass of all fragments
 
 
-
-    # write outputs in .txt
-    # f = str(datahist)
-    # datahist = f
-    # with open('LOG/datahist_dynfrag_akantu.txt','a') as f: 
-    #     f.write(datahist + "\n")
-    
-    # f = str(mean_sfrag[n])
-    # avgsize_fragments = f
-    # with open('LOG/avgsize_fragments_dynfrag_akantu.txt','a') as f: 
-    #     f.write(avgsize_fragments + "\n")
-
-    # f = str(nfrag[n])
-    # number_fragments = f
-    # with open('LOG/number_fragments_dynfrag_akantu.txt','a') as f: 
-    #     f.write("["+number_fragments+"],")
-
-
-    
 
 
 # Variation of energy [Energy, time] returns the difference of energy value between time t and t0 

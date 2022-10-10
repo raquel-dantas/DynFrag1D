@@ -1,23 +1,25 @@
 import akantu as aka
 import numpy as np
 import subprocess
+import input_examples.DFInputModel as inputdata
 
 
 # Material
-E = 275.0*10**9     # Young's module (Pa)
-rho = 2750.0        # Density (kg/m3)
-Gc = 100.0          # Fracture energy (N/m)
-stress_critical = 300.0*10**6   # Limit stress / critical stress (Pa)
-# Geometry
-A = 1*10**-3        # Cross sectional area (m2)
-L = 50*10**-3       # Lenght of the bar (m)
-x0 = -0.5*L         # Left extremitiy x coordinate / 0-initial
-xf = 0.5*L          # Rigth extremitiy x coordinate / f-final
-n_el = 100          # Number of elements (n_el)
-hun = L/(n_el*0.5)  # Size of the elements (h) for a uniform mesh (un) 
+E = inputdata.E            # Young's module (Pa)
+rho = inputdata.rho        # Density (kg/m3)
+Gc = inputdata.Gc          # Fracture energy (N/m)
+stress_critical = inputdata.stress_critical   # Limit stress / critical stress (Pa)
 
-strain_rate = 10.0**5
-alpha = (stress_critical**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
+# Geometry
+A = inputdata.A         # Cross sectional area (m2)
+L = inputdata.L         # Lenght of the bar (m)
+x0 = inputdata.x0       # Left extremitiy x coordinate / 0-initial
+xf = inputdata.xf       # Rigth extremitiy x coordinate / f-final
+n_el = inputdata.n_el   # Number of elements (n_el)
+hun = inputdata.hun     # Size of the elements (h) for a uniform mesh (un) 
+
+strain_rate = inputdata.strain_rate
+alpha = inputdata.alpha
 
 
 # Mesh (Triangles elements)
