@@ -1,32 +1,27 @@
 import numpy as np
 import itertools
 import copy
+import input_examples.DFInputModel as inputdata
 
 
 # Material
-E = 275.0*10**9     # Young's module (Pa)
-rho = 2750.0        # Density (kg/m3)
-Gc = 100.0          # Fracture energy (N/m)
-stress_critical = 300.0*10**6   # Limit stress / critical stress (Pa)
+E = inputdata.E            # Young's module (Pa)
+rho = inputdata.rho        # Density (kg/m3)
+Gc = inputdata.Gc          # Fracture energy (N/m)
+stress_critical = inputdata.stress_critical   # Limit stress / critical stress (Pa)
+
 # Geometry
-A = 1*10**-3        # Cross sectional area (m2)
-L = 50*10**-3       # Lenght of the bar (m)
-x0 = -0.5*L         # Left extremitiy x coordinate / 0-initial
-xf = 0.5* L         # Rigth extremitiy x coordinate / f-final
-n_el = 10           # Number of linear elements (n_el)
-hun = L/n_el        # Size of the elemenets (h) for a uniform mesh (un) 
+A = inputdata.A         # Cross sectional area (m2)
+L = inputdata.L         # Lenght of the bar (m)
+x0 = inputdata.x0       # Left extremitiy x coordinate / 0-initial
+xf = inputdata.xf       # Rigth extremitiy x coordinate / f-final
+n_el = inputdata.n_el   # Number of elements (n_el)
+hun = inputdata.hun     # Size of the elements (h) for a uniform mesh (un) 
 
-
+# Load
+strain_rate = inputdata.strain_rate
 
 # Set applied velocity 
-
-# Applied strain rate (s-1)
-# strain_rate = 10.0**2
-# strain_rate = 10.0**3
-# strain_rate = 10.0**4
-strain_rate = 10.0**5
-
-# Applied velocity (vel)
 vel = strain_rate*L/2
 
 
@@ -34,7 +29,7 @@ vel = strain_rate*L/2
 # Set BC's
 
 # Material id convention:
-# 0 : line elemnt
+# 0 : line element
 # 1 : interface element
 # 2 : Support left node
 # 3 : Support right node
@@ -66,8 +61,11 @@ node_id.append([n_el])      # Applied velocity at right boundary
 # Connectivity | connect : returns the DOF of all elements
 connect = copy.deepcopy(node_id)
 
-n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1      # Number of degree of freedom | n_dofs
-n_points = n_dofs                                                   # Number of geometric points in the mesh | n_points
+# Number of degree of freedom | n_dofs
+n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1  
+
+# Number of geometric points in the mesh | n_points
+n_points = n_dofs   
 
 # Points coordinates | node_coord: returns the coodinate for a uniform mesh
 l = np.linspace(x0, xf, n_points)
@@ -81,8 +79,9 @@ node_coord[n_el] = xf
 
 
 # Interface parameters
-
-delta_critical = (2.0*Gc)/stress_critical       # Limit crack oppening
+# Limit crack oppening
+delta_critical = (2.0*Gc)/stress_critical   
+# Contact penalty 
 alpha_critical = (stress_critical**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
 
 # sigmac returns a array with an random distribution of critical stress at the interface elements in order to consider heterogeneities 
@@ -99,9 +98,8 @@ delta_max = np.zeros((len(materials)*2))
 
 # Set time increment
 
-dt_crit = 0.2*hun/((E/rho)**0.5)                        # Critical time step
-dt = dt_crit*0.4                                        # Adopted time step (s)
-time_simulation = 4.0*10**-7                            # Total time of simulation (s)
+dt = inputdata.dt                                       # Adopted time step (s)
+time_simulation = inputdata.time_simulation             # Total time of simulation (s)
 n_steps = int(time_simulation/dt)                       # Number of time-steps 
 time_peakstress = stress_critical / (E * strain_rate)   # Time peak stress 
 nstep_peak = int(time_peakstress/dt)                    # Time-step to peak stress 
@@ -110,8 +108,7 @@ nstep_peak = int(time_peakstress/dt)                    # Time-step to peak stre
 
 # Set initial values
 
-
-v0 = np.array([strain_rate*x for x in node_coord])  # Initial velocity velocity profile | v0
+v0 = np.array([strain_rate*x for x in node_coord])  # Initial velocity velocity | v0
 acel0 = np.zeros((n_dofs))                          # Initial acceleration | acel0
 p = np.zeros((n_steps+1, n_dofs))                   # External forces | p
 C = np.zeros((n_dofs, n_dofs))                      # Damping | C
