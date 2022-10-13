@@ -1,12 +1,13 @@
+from platform import node
 import akantu as aka
 import numpy as np
 import subprocess
 
 
 # Material parameters
-E = 275.0 * 10**9           # Young's module (Pa)
-rho = 27.500                # Density (kg/m3)
-stress_c = 300.0 * 10**8    # Limit stress / critical stress (stress_c) (Pa)
+E = 275.0*10**9         # Young's module (Pa)
+rho = 27.500            # Density (kg/m3)
+stress_c = 300.0*10**7  # Limit stress / critical stress (stress_c) (Pa)
 
 # Material file
 material_file = f"""
@@ -82,13 +83,15 @@ mesh.read("LOG/bar.msh")
 
 # Create model
 model = aka.SolidMechanicsModelCohesive(mesh)
-model.initFull(_analysis_method=aka._explicit_lumped_mass, _is_extrinsic=True)
+model.initFull(_analysis_method=aka._static, _is_extrinsic=True)
+
 
 cohesive_inserter = model.getElementInserter()
+# model.updateAutomaticInsertion()
 check_facets = cohesive_inserter.getCheckFacets()
 
 # Configure solver
-model.initNewSolver(aka._static)
+model.initNewSolver(aka._explicit_lumped_mass)
 solver = model.getNonLinearSolver("static")
 solver.set("max_iterations", 100)
 solver.set("threshold", 1e-10)
@@ -100,6 +103,16 @@ mesh_facets = mesh.getMeshFacets()
 nodes = mesh.getNodes()
 up = np.array([0.0, 1.0])
 connectivities = mesh_facets.getConnectivities()
+# smallnumber = 0.000000001
+
+# for facet_type in connectivities.elementTypes(dim=(spatial_dimension - 1)):
+#     connectivity = connectivities(facet_type)
+#     check_facet = check_facets(facet_type)
+#     for el, conn in enumerate(connectivity):
+#         if abs(nodes[conn[1],0] - nodes[conn[0],0]) > smallnumber:
+#             check_facet[el] = False
+#         else:
+#             print(f"{el} -> {conn} : {check_facet[el]}")
 
 for facet_type in connectivities.elementTypes(dim=(spatial_dimension - 1)):
     connectivity = connectivities(facet_type)
@@ -112,10 +125,13 @@ for facet_type in connectivities.elementTypes(dim=(spatial_dimension - 1)):
         else:
             print(f"{el} -> {conn} : {check_facet[el]}")
 
+
+
+
 dt_crit = model.getStableTimeStep()     # Critical time step
 dt = dt_crit * 0.1                      # Adopted time step
 model.setTimeStep(dt)
-time_simulation = 6.0 * 10**-6          # Total time of simulation (s)
+time_simulation = 2.0 * 10**-4          # Total time of simulation (s)
 n_steps = int(time_simulation / dt)     # Number of time steps
 
 # Apply Dirichlet BC to block displacements at y direction on top and bottom
