@@ -87,20 +87,20 @@ model.getVelocity()[:] = v0
 
 
 # # VTK plot
-# model.setBaseName('bar')
-# model.addDumpFieldVector('displacement')
-# model.addDumpFieldVector('velocity')
-# model.addDumpField('strain')
-# model.addDumpField('stress')
-# model.addDumpField('blocked_dofs')
-# model.addDumpField('material_index')
+model.setBaseName('bar')
+model.addDumpFieldVector('displacement')
+model.addDumpFieldVector('velocity')
+model.addDumpField('strain')
+model.addDumpField('stress')
+model.addDumpField('blocked_dofs')
+model.addDumpField('material_index')
 
 # # VTK plot for Cohesive model
-# model.setBaseNameToDumper('cohesive elements', 'cohesive')
-# model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
-# model.addDumpFieldToDumper('cohesive elements', 'damage')
-# model.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
-# model.addDumpFieldVectorToDumper('cohesive elements', 'opening')
+model.setBaseNameToDumper('cohesive elements', 'cohesive')
+model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
+model.addDumpFieldToDumper('cohesive elements', 'damage')
+model.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
+model.addDumpFieldVectorToDumper('cohesive elements', 'opening')
 
 
 
@@ -138,8 +138,9 @@ for n in range(n_steps):
     model.applyBC(functor_right, 'right')
 
     # VTK files
-    # model.dump()
-    # model.dump('cohesive elements')
+    if n%100 == 0:
+        model.dump()
+        model.dump('cohesive elements')
 
     # Run simulation
     model.checkCohesiveStress()
