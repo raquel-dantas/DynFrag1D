@@ -26,28 +26,40 @@ coords = mesh.getNodes()
 # Create model
 model = aka.SolidMechanicsModelCohesive(mesh)
 model.initFull(_analysis_method=aka._static, _is_extrinsic=True)
-
-cohesive_inserter = model.getElementInserter()
-facets = cohesive_inserter.getCheckFacets()
-
-
 # Configure static solver
 solver = model.getNonLinearSolver('static')
 solver.set('max_iterations', 100)
 solver.set('threshold', 1e-10)
 solver.set("convergence_type", aka.SolveConvergenceCriteria.residual)
-# Solver (explicit Newmark with lumped mass)
+# Add solver 
 model.initNewSolver(aka._explicit_lumped_mass)
 
 
-# Dynamic insertion of cohesive elements
-model.updateAutomaticInsertion()
+# Insertion of cohesive elements
+# Use automatic insertion
+# model.updateAutomaticInsertion()
 
-# Get facets
+# Configure the insertion
+
+# Facets mesh and connectivity
 mesh_facets = mesh.getMeshFacets()
-conn_facets = mesh_facets.getConnectivities()
+connect_facets = mesh_facets.getConnectivities()
 
-
+# Get the cohesive inserter and check facets
+cohesive_inserter = model.getElementInserter()
+check_facets = cohesive_inserter.getCheckFacets()
+up = np.array([0.0, 1.0])
+# Loop by all facet types used in the simulation 
+for facet_type in connect_facets.elementTypes(dim=(spatial_dimension - 1)):
+    conn_facettype = connect_facets(facet_type)
+    check_facettype = check_facets(facet_type)
+    for el, conn_facettype in enumerate(conn_facettype):
+        # Check the direction of the vector 
+        dir_vec = coords[conn_facettype[1], :] - coords[conn_facettype[0], :]
+        direction = (dir_vec / np.linalg.norm(dir_vec)).dot(up)
+        # If the direction is not 1 it means that is a diagonal facet, then assign False
+        if abs(direction) < 0.9:
+            check_facettype[el] = False
 
 
 
@@ -86,7 +98,7 @@ model.getVelocity()[:] = v0
 
 
 
-# # VTK plot
+# VTK plot
 model.setBaseName('bar')
 model.addDumpFieldVector('displacement')
 model.addDumpFieldVector('velocity')
@@ -95,7 +107,7 @@ model.addDumpField('stress')
 model.addDumpField('blocked_dofs')
 model.addDumpField('material_index')
 
-# # VTK plot for Cohesive model
+# VTK plot for Cohesive model
 model.setBaseNameToDumper('cohesive elements', 'cohesive')
 model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
 model.addDumpFieldToDumper('cohesive elements', 'damage')
