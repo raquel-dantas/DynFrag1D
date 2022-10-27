@@ -17,19 +17,19 @@ import pickle
 # sim4 -- src_akantu_10000el
 # sim5 -- scr_akantu_14000el
 
-time_simulation = 7.0*10**-7
-n_steps_sim1 = 1386
-n_steps_sim2 = 6932
-n_steps_sim3 = 9705
-n_steps_sim4 = 13864
-n_steps_sim5 = 19410
+time_simulation = 6.0*10**-7
+n_steps_sim1 = 1188
+n_steps_sim2 = 5941
+n_steps_sim3 = 8318
+n_steps_sim4 = 11883
+n_steps_sim5 = 17825
 
 
-n_steps_sim6 = 874
-n_steps_sim7 = 1749
-n_steps_sim8 = 3499
-n_steps_sim9 = 4374
-n_steps_sim10 = 5249
+# n_steps_sim6 = 874
+# n_steps_sim7 = 1749
+# n_steps_sim8 = 3499
+# n_steps_sim9 = 4374
+# n_steps_sim10 = 5249
 
 avg_stress_bar_sim1 = []
 avg_stress_bar_sim2 = []
@@ -63,20 +63,20 @@ with open('LOG/number_fragments_7000.pickle', 'rb') as handle:
     nfrag_sim3 = pickle.load(handle)
 with open('LOG/number_fragments_10000.pickle', 'rb') as handle:
     nfrag_sim4 = pickle.load(handle)
-with open('LOG/number_fragments_14000.pickle', 'rb') as handle:
+with open('LOG/number_fragments_15000.pickle', 'rb') as handle:
     nfrag_sim5 = pickle.load(handle)
 
 
-with open('LOG/number_fragments_500_czmint.pickle', 'rb') as handle:
-    nfrag_sim6 = pickle.load(handle)
-with open('LOG/number_fragments_1000_czmint.pickle', 'rb') as handle:
-    nfrag_sim7 = pickle.load(handle)
-with open('LOG/number_fragments_2000_czmint.pickle', 'rb') as handle:
-    nfrag_sim8 = pickle.load(handle)
-with open('LOG/number_fragments_2500_czmint.pickle', 'rb') as handle:
-    nfrag_sim9 = pickle.load(handle)
-with open('LOG/number_fragments_3000_czmint.pickle', 'rb') as handle:
-    nfrag_sim10 = pickle.load(handle)
+# with open('LOG/number_fragments_500_czmint.pickle', 'rb') as handle:
+#     nfrag_sim6 = pickle.load(handle)
+# with open('LOG/number_fragments_1000_czmint.pickle', 'rb') as handle:
+#     nfrag_sim7 = pickle.load(handle)
+# with open('LOG/number_fragments_2000_czmint.pickle', 'rb') as handle:
+#     nfrag_sim8 = pickle.load(handle)
+# with open('LOG/number_fragments_2500_czmint.pickle', 'rb') as handle:
+#     nfrag_sim9 = pickle.load(handle)
+# with open('LOG/number_fragments_3000_czmint.pickle', 'rb') as handle:
+#     nfrag_sim10 = pickle.load(handle)
 
 
 
@@ -86,11 +86,11 @@ print(nfrag_sim3[n_steps_sim3-1])
 print(nfrag_sim4[n_steps_sim4-1])
 print(nfrag_sim5[n_steps_sim5-1])
 
-print(nfrag_sim6[n_steps_sim6-1])
-print(nfrag_sim7[n_steps_sim7-1])
-print(nfrag_sim8[n_steps_sim8-1])
-print(nfrag_sim9[n_steps_sim9-1])
-print(nfrag_sim10[n_steps_sim10-1])
+# print(nfrag_sim6[n_steps_sim6-1])
+# print(nfrag_sim7[n_steps_sim7-1])
+# print(nfrag_sim8[n_steps_sim8-1])
+# print(nfrag_sim9[n_steps_sim9-1])
+# print(nfrag_sim10[n_steps_sim10-1])
 
 
 sfrag_sim1 = []
