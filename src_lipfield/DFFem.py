@@ -4,7 +4,7 @@ import DFMesh
 
 
 k_elem = DFMesh.E*DFMesh.A* np.array([[1.0, -1.0], [-1.0, 1.0]])
-m_elem = DFMesh.rho*DFMesh.A/2 * np.diag([1,1])
+m_elem = DFMesh.rho*DFMesh.A*0.5 * np.diag([1,1])
 # Element load vector
 f_elem = np.array([0.0, 0.0])
 M = np.diag(np.zeros(DFMesh.n_el*2))

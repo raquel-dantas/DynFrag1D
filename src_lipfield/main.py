@@ -7,6 +7,7 @@ import DFNewmark
 import DFInterface
 import DFPlot
 import DFFragmentation
+import DFDamage
 import numpy as np
 import progressbar
 
@@ -34,6 +35,8 @@ def Run_simulation(strain_rate):
     av_stress_bar = np.zeros((DFMesh.n_steps))
     up_bc_left = np.array([0,0])
     up_bc_right = np.array([0,0])
+    dp_bc_left = 0.0
+    dp_bc_right = 0.0
 
     nfrag = np.zeros((DFMesh.n_steps))
     avg_fraglen = np.zeros((DFMesh.n_steps))
@@ -44,26 +47,18 @@ def Run_simulation(strain_rate):
 
         progress = int(bar.maxval*float(n/DFMesh.n_steps))
         bar.update(progress)
-
-        # Plots at each time step
-        # DFPlot.PlotByDOF(v)
-        # DFPlot.PlotByElement(stress)
-        # DFPlot.PlotByInterface(D)
-
-
+        
         # Post process (stress, strain, energies)
-        strain, stress, average_stress = DFPostprocess.PostProcess(u)
+        strain, stress, average_stress = DFPostprocess.PostProcess(u, d)
 
-        # D returns a vector contained damage parameter for cohesive elements
-        D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
         # nfrag retuns a vector contained the number of fragments 
-        nfrag[n] = DFFragmentation.NumberFragments(D)
-        fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)
+        nfrag[n] = DFFragmentation.NumberFragments(d)
+        fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(d)
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
         av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
         Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,
-        up_bc_right, u, v, stress, work)
+        up_bc_right, u, v, stress, work, d, dp_bc_left, dp_bc_right)
         work =  Wext[n]
 
         # DFPlot.PlotVTK('animation/test',n,u,stress)
@@ -79,20 +74,14 @@ def Run_simulation(strain_rate):
                 if DFMesh.materials[bc] == 4:
                     elbc = 0
                     up_bc_left = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
+                    dp_bc_left = d[elbc]
                 else:
                     elbc = DFMesh.n_el - 1
                     up_bc_right = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
-
+                    dp_bc_right = d[elbc]
         # u,v,acel returns a vector for u,v and acel at every dof at the n step
-        u, v, acel = DFNewmark.Newmark_exp(M, u, v, acel, F, DFMesh.dt)
-
-        # Check limit stress for possible insertion of interface elements
-        for el in range(DFMesh.n_el-1):
-            if average_stress[el] > DFMesh.diststress_c[el]:
-                # Fracture happens: creat new interface element
-                u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
-                els_step = els_step + 1
-
+        u, v, acel, d = DFNewmark.Newmark_exp(M, u, v, acel, d, F, DFMesh.dt, strain)
+       
     
     bar.finish()
     print('\n')

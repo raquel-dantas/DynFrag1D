@@ -3,9 +3,13 @@ from scipy.optimize import minimize
 import DFMesh
 import DFInterface
 import DFFem
+import DFDamage
+import scipy
+from scipy.optimize import minimize
+from scipy.optimize import LinearConstraint
 
 
-def Newmark_exp(M, u, v, acel, d, p_next, dt):
+def Newmark_exp(M, u, v, acel, d, p_next, dt, strain):
     """Apply Newmarks explicity integration scheme. Returns vectors with displacement, velocity and aceleration in all dofs for the next time step.\n
     Arguments: \n
     K -- Global stiffness matrix; \n
@@ -26,7 +30,7 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     # Initiation of variables
     u_next = np.zeros((dofs))
     vp = np.zeros((dofs))
-    dp = np.zeros((DFMesh.n_el))
+    # dp = np.zeros((DFMesh.n_el))
     d_next = np.zeros((DFMesh.n_el))
     acel_next = np.zeros((dofs))
     v_next = np.zeros((dofs))
@@ -37,14 +41,39 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     # Velocity predictor
     vp = v + (1 - gamma)*dt*acel
 
+    # Compute damage next time-step
+    def func(d): return DFDamage.w*sum([
+            (0.5*(1. - d[el])** 2 * 
+            DFMesh.E*strain[el]**2 + 
+            DFDamage.Yc[el] * 
+            DFDamage.h(DFDamage.lamb[el], d[el])) * 
+            DFMesh.hun/2.
+            for el in range(DFMesh.n_el)
+            ])
+
+    A = scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el) - scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el, 1)
+    b = DFMesh.hun/DFDamage.l
+    const = LinearConstraint(A, -b * np.ones(DFMesh.n_el-1), b * np.ones(DFMesh.n_el-1))
+
+    dlip_opt = minimize(
+        fun=func,
+        x0=d,
+        method='SLSQP',
+        bounds=zip(d, [1.]*DFMesh.n_el),
+        tol=1e-9,
+        constraints=const,
+    )
+    d_next = dlip_opt.x
+    # print(dlip_opt)
+
     # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
-    f_int = DFInterface.InternalForce(u_next)
+    f_int = DFInterface.InternalForce(u_next, d_next)
     inertia = p_next - f_int
     acel_next = np.linalg.solve(M[:dofs, :dofs], inertia)
 
     # v_next returns a vector with the velocity in all dofs for the next time step
     v_next = v + (1 - gamma)*dt*acel + gamma*dt*acel_next
-
+    
     # If there is a dirichlet conditions apply:
     for i_el in range(len(DFMesh.connect)):
         if DFMesh.materials[i_el] == 2:
@@ -55,4 +84,4 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
                 acel_next[i_dof] = 0.0
                 v_next[i_dof] = 0.0
 
-    return u_next, v_next, acel_next
+    return u_next, v_next, acel_next, d_next

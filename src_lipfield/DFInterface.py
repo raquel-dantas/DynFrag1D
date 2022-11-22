@@ -86,18 +86,20 @@ def ForceInterface(u):
     return flambda
 
 
-def InternalForce(u):
+def InternalForce(u, d):
     """ Returns the internal force vector (ku + flambda)\n
     Arguments:\n
-    u -- displacemnt vector for all dofs."""
+    u -- displacemnt vector for all dofs; \n
+    d -- for all elements"""
     
     n_dofs = u.shape[0]
     fint = np.zeros(n_dofs)
 
     for el in range(DFMesh.n_el):
+        g = (1. - d[el])**2
         # u_loc returns a vector contained u for a local dof
         u_loc = np.array([u[DFFem.Gl_index(el, 0)], u[DFFem.Gl_index(el, 1)]])
-        fint_loc = np.matmul(DFFem.k_elem, u_loc)/DFMesh.ElemLength(el)
+        fint_loc = np.matmul(DFFem.k_elem*g, u_loc)/DFMesh.ElemLength(el) 
         # Contribution of each dof in the internal force vector
         for i_loc in range(2):
             i_gl = DFFem.Gl_index(el, i_loc)

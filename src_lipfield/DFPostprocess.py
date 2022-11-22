@@ -3,9 +3,10 @@ import numpy as np
 import DFMesh
 import DFInterface
 import DFFem
+import DFDamage
 
 
-def PostProcess(u):
+def PostProcess(u, d):
     """ Returns the strain for linear elements, the stress vector for all elements, and the average stress vector between two consecutives line elements.\n
     Arguments:\n
     u -- displacemnt vector."""
@@ -19,10 +20,11 @@ def PostProcess(u):
     for el in range(numel):
 
         if DFMesh.materials[el] == 0:
+            g = (1. - d[el])**2
             # Strain[u,L] returns the strain value at each linear element 'el' 
             strain[el] = (u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]) / DFMesh.ElemLength(el)
             # Stress[strain] retuns the stress value at each linear element 'el' 
-            stress[el] = DFMesh.E * strain[el]
+            stress[el] = DFMesh.E * g * strain[el]
     
         elif DFMesh.materials[el] == 1:
             # jump_u returns the jump in the displacement between two consecutive linear elements 
@@ -66,7 +68,7 @@ def StressBar(current_stress, els_step):
     return av_stress_bar
 
 
-def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
+def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step, d, dp_bc_left, dp_bc_right):
     """Returns potential, kinetic, dissipated, reversible, contact and external energies.\n
     Arguments:\n
     up_bc_left -- displacement from previous time step at left boundary element;\n
@@ -79,7 +81,7 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
     # Initial energy values for the current time step
     Epot = 0.0
     Ekin = 0.0
-    Edis = 0.0
+    # Edis = 0.0
     Erev = 0.0
     Econ = 0.0
     Wext = work_previous_step
@@ -88,31 +90,31 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
 
         if DFMesh.materials[el] == 0:
             # Element siffness and mass matrix
-
+            g = (1. - d[el])**2
             # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
             uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
             vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
 
             # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
-            Epot += (0.5*np.dot(np.matmul(DFFem.k_elem, uloc), uloc))/(DFMesh.A*DFMesh.ElemLength(el))
+            Epot += (0.5*np.dot(np.matmul(DFFem.k_elem*g, uloc), uloc))/(DFMesh.A*DFMesh.ElemLength(el))
 
             # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
             Ekin += (0.5*np.dot(np.matmul(DFFem.m_elem, vloc), vloc))/(DFMesh.A)*DFMesh.ElemLength(el)
+            
+        # if DFMesh.materials[el] == 1:
 
-        if DFMesh.materials[el] == 1:
+        #     # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
+        #     Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
 
-            # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
-            Edis += 0.5*DFMesh.stress_c*DFMesh.delta_max[el]
-
-            # jump_u returns the jump in the displacement between two consecutive linear elements 
-            jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
-            # stress_coh returns the stress in the cohesive elements give by an cohesive law 
-            stress_coh = stress[el]
-            if jump_u >= 0:
-                # Erev returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
-                Erev += 0.5*stress_coh*jump_u
-            else:
-                Econ += 0.5*DFMesh.alpha*jump_u**2
+        #     # jump_u returns the jump in the displacement between two consecutive linear elements 
+        #     jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
+        #     # stress_coh returns the stress in the cohesive elements give by an cohesive law 
+        #     stress_coh = stress[el]
+        #     if jump_u >= 0:
+        #         # Erev returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
+        #         Erev += 0.5*stress_coh*jump_u
+        #     else:
+        #         Econ += 0.5*DFMesh.alpha*jump_u**2
 
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
@@ -120,24 +122,26 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
             # elbc is the element index of the applied velocity
             # uploc is the local displacement of elbc from the previous time step 
 
-
             if DFMesh.materials[el] == 4:
                 vo = np.array([-DFMesh.vel, 0])
                 elbc = 0
+                g = (1. - d[elbc])**2
                 uploc = up_bc_left
+                gp = (1. - dp_bc_left)**2
                 
             else:
                 vo = np.array([0, DFMesh.vel])
                 elbc = DFMesh.n_el - 1
                 uploc = up_bc_right
+                gp = (1. - dp_bc_right)**2
             
-            h = DFMesh.ElemLength(elbc)
+            helbc = DFMesh.ElemLength(elbc)
             # uloc,vloc[u,v,elbc] returns vectors contained u and v for local dofs of elbc
             uloc = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
             # fn is the internal force on the current time step
-            fn = np.matmul(DFFem.k_elem, uloc)/h
+            fn = np.matmul(DFFem.k_elem*g, uloc)/helbc
             # fp is the internal force on the previous time step 
-            fp = np.matmul(DFFem.k_elem, uploc)/h
+            fp = np.matmul(DFFem.k_elem*gp, uploc)/helbc
             # The reaction force is taken as an average between fn and fp
             fr = (fn+fp)*0.5
             # Stress on the boundary
@@ -147,6 +151,8 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
             work = np.dot(stress_bound,vo)*DFMesh.dt
             Wext += work 
 
+    Edis = DFDamage.DissipatedEnergy(d)
+    # print(Edis)
     return Epot, Ekin, Edis, Erev, Econ, Wext
 
 
