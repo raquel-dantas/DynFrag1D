@@ -2,6 +2,7 @@ import numpy as np
 import itertools
 import copy
 import input_examples.DFInputModel as inputdata
+# import input_examples.input_paper as inputdata
 
 
 # Material
@@ -36,6 +37,7 @@ vel = strain_rate*L/2
 # 4 : Velocity applied left node
 # 5 : Velocity applied right node
 materials = [0] * n_el
+# materials.append(4)
 materials.append(4)
 materials.append(5)
 
@@ -77,6 +79,8 @@ node_coord = l
 node_coord[0] = x0
 node_coord[n_el] = xf
 
+# Coordenates of integration points
+x = [hun*i + hun*0.5 for i in range(n_el)]
 
 
 
@@ -87,7 +91,8 @@ delta_critical = (2.0*Gc)/stress_critical
 alpha_critical = (stress_critical**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
 
 # sigmac returns a array with an random distribution of critical stress at the interface elements in order to consider heterogeneities 
-sigmac = np.random.uniform(low=stress_critical-1, high=stress_critical+1, size=(n_el))
+sigmac = np.random.uniform(low=stress_critical-20, high=stress_critical+20, size=(n_el))
+# sigmac = np.array([stress_critical, stress_critical/10., stress_critical])
 deltac = [(2.0*Gc)/sigmac[i] for i in range(n_el-1)]
 
 # Contact penalty
@@ -110,16 +115,17 @@ nstep_peak = int(time_peakstress/dt)                    # Time-step to peak stre
 
 # Set initial values
 
-v0 = np.array([strain_rate*x for x in node_coord])  # Initial velocity velocity | v0
+v0 = np.array([strain_rate*i for i in node_coord])  # Initial velocity velocity | v0
 acel0 = np.zeros((n_dofs))                          # Initial acceleration | acel0
 d0 = np.zeros((n_el))                          # Initial acceleration | acel0
 p = np.zeros((n_steps+1, n_dofs))                   # External forces | p
 C = np.zeros((n_dofs, n_dofs))                      # Damping | C
+Eg = np.zeros(n_el)
 
 # Initial displacement
 # Apply initial displacement neq zero to save computational time during pre-crack phase for low strain-rates
 if strain_rate < 5.0 * 10.0**3:
-    u0 = np.array([0.98*stress_critical*x / E for x in node_coord])
+    u0 = np.array([0.98*stress_critical*i / E for i in node_coord])
 else:
     u0 = np.zeros((n_dofs))
 

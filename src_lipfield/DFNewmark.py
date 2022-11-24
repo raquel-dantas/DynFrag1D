@@ -1,15 +1,13 @@
 import numpy as np
-from scipy.optimize import minimize
-import DFMesh
-import DFInterface
-import DFFem
-import DFDamage
 import scipy
 from scipy.optimize import minimize
 from scipy.optimize import LinearConstraint
+import DFMesh
+import DFFem
+import DFDamage
 
 
-def Newmark_exp(M, u, v, acel, d, p_next, dt, strain):
+def Newmark_exp(M, u, v, acel, d, p_next, dt):
     """Apply Newmarks explicity integration scheme. Returns vectors with displacement, velocity and aceleration in all dofs for the next time step.\n
     Arguments: \n
     K -- Global stiffness matrix; \n
@@ -35,11 +33,15 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt, strain):
     acel_next = np.zeros((dofs))
     v_next = np.zeros((dofs))
 
+
     # u_next returns a vector with the displacement in all dofs for the next time step
     u_next = u + dt*v + ((1.0/2.0)*dt**2)*acel
 
     # Velocity predictor
-    vp = v + (1 - gamma)*dt*acel
+    vp = v + (1. - gamma)*dt*acel
+
+    # Strain for u_next
+    strain = [(u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]]) / DFMesh.ElemLength(el) for el in range(DFMesh.n_el)]
 
     # Compute damage next time-step
     def func(d): return DFDamage.w*sum([
@@ -60,19 +62,21 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt, strain):
         x0=d,
         method='SLSQP',
         bounds=zip(d, [1.]*DFMesh.n_el),
-        tol=1e-9,
+        tol=1e-6,
         constraints=const,
     )
     d_next = dlip_opt.x
-    # print(dlip_opt)
+
+    if np.linalg.norm(d_next)>0:
+        pass
 
     # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
-    f_int = DFInterface.InternalForce(u_next, d_next)
+    f_int = DFFem.InternalForce(u_next, d_next)
     inertia = p_next - f_int
     acel_next = np.linalg.solve(M[:dofs, :dofs], inertia)
-
+    # print(acel_next)
     # v_next returns a vector with the velocity in all dofs for the next time step
-    v_next = v + (1 - gamma)*dt*acel + gamma*dt*acel_next
+    v_next = vp + gamma*dt*acel_next
     
     # If there is a dirichlet conditions apply:
     for i_el in range(len(DFMesh.connect)):

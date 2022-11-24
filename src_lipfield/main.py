@@ -1,15 +1,11 @@
-from matplotlib.pyplot import connect
-from matplotlib import pyplot as plt
+import numpy as np
+import progressbar
 import DFMesh
 import DFFem
 import DFPostprocess
 import DFNewmark
-import DFInterface
 import DFPlot
 import DFFragmentation
-import DFDamage
-import numpy as np
-import progressbar
 
 
 def Run_simulation(strain_rate):
@@ -30,6 +26,7 @@ def Run_simulation(strain_rate):
     Econ = np.zeros((DFMesh.n_steps))
     Wext = np.zeros((DFMesh.n_steps))
     work = 0.0
+    Edis_prev = 0.0
     els_step = DFMesh.n_el
     stress_evl = np.zeros((2*len(DFMesh.materials),DFMesh.n_steps))
     av_stress_bar = np.zeros((DFMesh.n_steps))
@@ -40,7 +37,6 @@ def Run_simulation(strain_rate):
 
     nfrag = np.zeros((DFMesh.n_steps))
     avg_fraglen = np.zeros((DFMesh.n_steps))
-    # fraglen = np.zeros((DFMesh.n_steps, DFMesh.n_el),dtype=float)
 
 
     for n in range(DFMesh.n_steps):        
@@ -48,6 +44,8 @@ def Run_simulation(strain_rate):
         progress = int(bar.maxval*float(n/DFMesh.n_steps))
         bar.update(progress)
         
+        # DFPlot.PlotByDOF(v)
+
         # Post process (stress, strain, energies)
         strain, stress, average_stress = DFPostprocess.PostProcess(u, d)
 
@@ -57,11 +55,13 @@ def Run_simulation(strain_rate):
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
         av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
-        Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,
-        up_bc_right, u, v, stress, work, d, dp_bc_left, dp_bc_right)
+        Epot[n], Ekin[n], Edis[n], Wext[n] = DFPostprocess.Energy(up_bc_left,
+        up_bc_right, u, v, stress, work, d, dp_bc_left, dp_bc_right, Edis_prev)
         work =  Wext[n]
+        Edis_prev = Edis[n]
 
         # DFPlot.PlotVTK('animation/test',n,u,stress)
+
         # Get K, M and F
         M, F = DFFem.GlobalSystem()
 
@@ -80,53 +80,29 @@ def Run_simulation(strain_rate):
                     up_bc_right = np.array([u[DFMesh.connect[elbc][0]], u[DFMesh.connect[elbc][1]]])
                     dp_bc_right = d[elbc]
         # u,v,acel returns a vector for u,v and acel at every dof at the n step
-        u, v, acel, d = DFNewmark.Newmark_exp(M, u, v, acel, d, F, DFMesh.dt, strain)
-       
+        u, v, acel, d = DFNewmark.Newmark_exp(M, u, v, acel, d, F, DFMesh.dt)
+        print(d)
     
     bar.finish()
     print('\n')
 
 
     # Variation of energy [Energy, time] returns the difference of energy value between time t and t0 
-    varEkin, varEpot, varEdis, varErev, varEcon, varWext, varEtot = DFPostprocess.VarEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-
+    varEkin, varEpot, varEdis, varWext, varEtot = DFPostprocess.VarEnergy(Epot, Ekin, Edis, Wext)
     # Power [Energy, time] returns the energy difference between consecutive time steps
-    PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPostprocess.Power(Epot, Ekin, Edis, Erev, Econ, Wext)
-
+    PEkin, PEpot, PEdis, PWext, PEtot = DFPostprocess.Power(Epot, Ekin, Edis, Wext)
 
 
     # Plots for the whole simulation
-
     DFPlot.PlotAverageStressBar(av_stress_bar)
-
-    DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-
-    DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-
-    DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
-
+    # DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
+    DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varWext, varEtot)
+    DFPlot.PlotPower(PEpot, PEkin, PEdis, PWext, PEtot)
     DFPlot.PlotNumberFragments(nfrag)
-
-    DFPlot.PlotAvgFragmentSize(avg_fraglen)
-
-    DFPlot.PlotFragmentSizeHistogram(fraglen)
+    # DFPlot.PlotAvgFragmentSize(avg_fraglen)
+    # DFPlot.PlotFragmentSizeHistogram(fraglen)    
     
-    
-    # Save average fragment size and number of fragment
-    f = str(avg_fraglen[n])
-    average_fragment_size = f
-    with open('LOG/average_fraglen.txt','w') as f: 
-        f.write(average_fragment_size)
-        
-    f = str(nfrag[n])
-    number_fragments = f
-    with open('LOG/number_fragments.txt','w') as f: 
-        f.write(number_fragments)
-
-    f = str(Edis[n])
-    Edis = f
-    with open('LOG/final_diss_energy.txt','w') as f: 
-        f.write(Edis)
+  
 
 if __name__ == '__main__':
     Run_simulation(DFMesh.strain_rate)

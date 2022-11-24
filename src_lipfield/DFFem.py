@@ -5,14 +5,12 @@ import DFMesh
 
 k_elem = DFMesh.E*DFMesh.A* np.array([[1.0, -1.0], [-1.0, 1.0]])
 m_elem = DFMesh.rho*DFMesh.A*0.5 * np.diag([1,1])
-# Element load vector
 f_elem = np.array([0.0, 0.0])
 M = np.diag(np.zeros(DFMesh.n_el*2))
 
 def LocalSystem(elem_index):
     """Returns local stifness and mass matrices.
     """
-    
     # Size of linear elements
     # h = DFMesh.ElemLength(elem_index)
     # # Local stifness and mass matrix
@@ -96,4 +94,26 @@ def GlobalSystem():
     #         Apply_bc(M, F, i_el)
 
     return M, F
+
+
+def InternalForce(u, d):
+    """ Returns the internal force vector (kd(d)u)\n
+    Arguments:\n
+    u -- displacemnt vector for all dofs; \n
+    d -- for all elements"""
+    
+    n_dofs = u.shape[0]
+    fint = np.zeros(n_dofs)
+
+    for el in range(DFMesh.n_el):
+        g = (1. - d[el])**2
+        # u_loc returns a vector contained u for a local dof
+        u_loc = np.array([u[Gl_index(el, 0)], u[Gl_index(el, 1)]])
+        fint_loc = np.matmul(g*k_elem, u_loc)/DFMesh.ElemLength(el) 
+        # Contribution of each dof in the internal force vector
+        for i_loc in range(2):
+            i_gl = Gl_index(el, i_loc)
+            fint[i_gl] += fint_loc[i_loc]
+    
+    return fint
 
