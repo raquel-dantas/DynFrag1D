@@ -45,13 +45,14 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
 
     # Compute damage next time-step
     def func(d): return DFDamage.w*sum([
-            (0.5*(1. - d[el])** 2 * 
+            (0.5*(1. - d[el])**2 * 
             DFMesh.E*strain[el]**2 + 
             DFDamage.Yc[el] * 
             DFDamage.h(DFDamage.lamb[el], d[el])) * 
-            DFMesh.hun/2.
+            DFMesh.hun*0.5
             for el in range(DFMesh.n_el)
             ])
+    
 
     A = scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el) - scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el, 1)
     b = DFMesh.hun/DFDamage.l
@@ -66,6 +67,9 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
         constraints=const,
     )
     d_next = dlip_opt.x
+    
+    if dlip_opt.success == False:
+        raise Exception('optimization failed')
 
     if np.linalg.norm(d_next)>0:
         pass

@@ -87,13 +87,14 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step, d, dp_bc_l
             vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
 
             # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
-            Epot += (0.5*np.dot(np.matmul(g*DFFem.k_elem, uloc), uloc))/DFMesh.ElemLength(el)
+            Epot += (0.5*g*np.dot(np.matmul(DFFem.k_elem, uloc), uloc))/DFMesh.ElemLength(el)
 
             # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
             Ekin += (0.5*np.dot(np.matmul(DFFem.m_elem, vloc), vloc))*DFMesh.ElemLength(el)
 
             # Dissipated energy
-            Edis += 0.5 * DFDamage.Yc[el] * DFDamage.h(DFDamage.lamb[el],d[el]) * DFMesh.A  * DFMesh.ElemLength(el)
+            # Edis += 0.5 * DFDamage.Yc[el] * DFDamage.h(DFDamage.lamb[el],d[el]) * DFMesh.A  * DFMesh.ElemLength(el)
+            Edis += DFDamage.Yc[el] * DFDamage.h(DFDamage.lamb[el],d[el]) * DFMesh.A  * DFMesh.ElemLength(el)
             
        
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:

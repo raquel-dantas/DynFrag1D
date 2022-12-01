@@ -60,7 +60,7 @@ def Run_simulation(strain_rate):
         work =  Wext[n]
         Edis_prev = Edis[n]
 
-        # DFPlot.PlotVTK('animation/test',n,u,stress)
+        DFPlot.PlotVTK('LOG/animation_lipfield/test',n,u,stress)
 
         # Get K, M and F
         M, F = DFFem.GlobalSystem()
@@ -81,7 +81,6 @@ def Run_simulation(strain_rate):
                     dp_bc_right = d[elbc]
         # u,v,acel returns a vector for u,v and acel at every dof at the n step
         u, v, acel, d = DFNewmark.Newmark_exp(M, u, v, acel, d, F, DFMesh.dt)
-        print(d)
     
     bar.finish()
     print('\n')

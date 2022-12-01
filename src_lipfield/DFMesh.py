@@ -91,9 +91,9 @@ delta_critical = (2.0*Gc)/stress_critical
 alpha_critical = (stress_critical**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc)
 
 # sigmac returns a array with an random distribution of critical stress at the interface elements in order to consider heterogeneities 
-sigmac = np.random.uniform(low=stress_critical-20, high=stress_critical+20, size=(n_el))
+sigmac = np.random.uniform(low=stress_critical-50.*10**6, high=stress_critical+50.*10**6, size=(n_el))
 # sigmac = np.array([stress_critical, stress_critical/10., stress_critical])
-deltac = [(2.0*Gc)/sigmac[i] for i in range(n_el-1)]
+deltac = [(2.0*Gc)/sigmac[i] for i in range(n_el)]
 
 # Contact penalty
 alpha = [(sigmac[i]**2 + 4.5 * strain_rate**(2/3) * E * Gc**(2/3) * rho**(1/3)) / (4.5 * Gc) for i in range(n_el-1)]
