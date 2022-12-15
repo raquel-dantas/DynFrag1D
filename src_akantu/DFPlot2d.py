@@ -171,9 +171,9 @@ def PlotFragmentSizeHistogram(frag_sizes):
     axes.grid(True, which='both')
     axes.axhline(y=0, color='k')
     plt.title("Fragment size distribution")
-    plt.xlabel("Fragment size (m)")
+    plt.xlabel("Fragment size (mm)")
     plt.ylabel("Number of fragments")
-    plt.hist(frag_sizes,10)
+    plt.hist(frag_sizes*10**3,5) # Usinf mm
     plt.savefig("LOG/fragment_size_distribution_dynfrag_akantu.svg")
     plt.show()
 

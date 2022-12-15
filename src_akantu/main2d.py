@@ -99,20 +99,20 @@ model.getVelocity()[:] = v0
 
 
 # VTK plot
-model.setBaseName('bar')
-model.addDumpFieldVector('displacement')
-model.addDumpFieldVector('velocity')
-model.addDumpField('strain')
-model.addDumpField('stress')
-model.addDumpField('blocked_dofs')
-model.addDumpField('material_index')
+# model.setBaseName('bar')
+# model.addDumpFieldVector('displacement')
+# model.addDumpFieldVector('velocity')
+# model.addDumpField('strain')
+# model.addDumpField('stress')
+# model.addDumpField('blocked_dofs')
+# model.addDumpField('material_index')
 
-# VTK plot for Cohesive model
-model.setBaseNameToDumper('cohesive elements', 'cohesive')
-model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
-model.addDumpFieldToDumper('cohesive elements', 'damage')
-model.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
-model.addDumpFieldVectorToDumper('cohesive elements', 'opening')
+# # VTK plot for Cohesive model
+# model.setBaseNameToDumper('cohesive elements', 'cohesive')
+# model.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
+# model.addDumpFieldToDumper('cohesive elements', 'damage')
+# model.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
+# model.addDumpFieldVectorToDumper('cohesive elements', 'opening')
 
 
 
@@ -149,10 +149,10 @@ for n in range(n_steps):
     model.applyBC(functor_left, 'left')
     model.applyBC(functor_right, 'right')
 
-    # VTK files
-    if n%100 == 0:
-        model.dump()
-        model.dump('cohesive elements')
+    # # VTK files
+    # if n%100 == 0:
+    #     model.dump()
+    #     model.dump('cohesive elements')
 
     # Run simulation
     model.checkCohesiveStress()
@@ -220,52 +220,54 @@ PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot = DFPosprocess2d.Power(Epot, Eki
 
 # Plots 
 DFPlot2d.PlotAverageStressBar(avg_stress, DFMesh2d.time_simulation, n_steps)
-DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, DFMesh2d.time_simulation, n_steps)
+# DFPlot2d.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext, DFMesh2d.time_simulation, n_steps)
 DFPlot2d.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot, DFMesh2d.time_simulation, n_steps)
-DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, DFMesh2d.time_simulation, n_steps)
+# DFPlot2d.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot, DFMesh2d.time_simulation, n_steps)
 DFPlot2d.PlotNumberFragments(nfrag, DFMesh2d.time_simulation, n_steps)
-DFPlot2d.PlotFragmentSizeHistogram(sfrag)
+# DFPlot2d.PlotFragmentSizeHistogram(sfrag)
 
 
-# Save results 
-# Number of fragments
-with open('LOG/src_akantu_number_fragments.pickle', 'wb') as handle:
-    pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
-# Average fragment size
-with open('LOG/src_akantu_average_fragment_size.pickle', 'wb') as handle:
-    pickle.dump(avg_sfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
-# Histogram fragment size
-with open('LOG/src_akantu_datahist_fragment_size.pickle', 'wb') as handle:
-    pickle.dump(datahist, handle, protocol=pickle.HIGHEST_PROTOCOL)
-# Average stress for the bar 
-with open('LOG/src_akantu_avg_stress.pickle', 'wb') as handle:
-    pickle.dump(avg_stress, handle, protocol=pickle.HIGHEST_PROTOCOL)
-# Energy
-with open('LOG/src_akantu_epot.pickle', 'wb') as handle:
-    pickle.dump(Epot, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_ekin.pickle', 'wb') as handle:
-    pickle.dump(Ekin, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_edis.pickle', 'wb') as handle:
-    pickle.dump(Edis, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_erev.pickle', 'wb') as handle:
-    pickle.dump(Erev, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_econ.pickle', 'wb') as handle:
-    pickle.dump(Econ, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_wext.pickle', 'wb') as handle:
-    pickle.dump(Wext, handle, protocol=pickle.HIGHEST_PROTOCOL)
-# Variation of energy
-with open('LOG/src_akantu_var_epot.pickle', 'wb') as handle:
-    pickle.dump(varEpot, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_var_ekin.pickle', 'wb') as handle:
-    pickle.dump(varEkin, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_var_edis.pickle', 'wb') as handle:
-    pickle.dump(varEdis, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_var_erev.pickle', 'wb') as handle:
-    pickle.dump(varErev, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_var_econ.pickle', 'wb') as handle:
-    pickle.dump(varEcon, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('LOG/src_akantu_var_wext.pickle', 'wb') as handle:
-    pickle.dump(varWext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# # Save results 
+# # Number of fragments
+# with open('LOG/src_akantu_number_fragments.pickle', 'wb') as handle:
+#     pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# # Average fragment size
+# with open('LOG/src_akantu_average_fragment_size.pickle', 'wb') as handle:
+#     pickle.dump(avg_sfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_fragment_size.pickle', 'wb') as handle:
+#     pickle.dump(sfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# # Histogram fragment size
+# with open('LOG/src_akantu_datahist_fragment_size.pickle', 'wb') as handle:
+#     pickle.dump(datahist, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# # Average stress for the bar 
+# with open('LOG/src_akantu_avg_stress.pickle', 'wb') as handle:
+#     pickle.dump(avg_stress, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# # Energy
+# with open('LOG/src_akantu_epot.pickle', 'wb') as handle:
+#     pickle.dump(Epot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_ekin.pickle', 'wb') as handle:
+#     pickle.dump(Ekin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_edis.pickle', 'wb') as handle:
+#     pickle.dump(Edis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_erev.pickle', 'wb') as handle:
+#     pickle.dump(Erev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_econ.pickle', 'wb') as handle:
+#     pickle.dump(Econ, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_wext.pickle', 'wb') as handle:
+#     pickle.dump(Wext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# # Variation of energy
+# with open('LOG/src_akantu_var_epot.pickle', 'wb') as handle:
+#     pickle.dump(varEpot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_var_ekin.pickle', 'wb') as handle:
+#     pickle.dump(varEkin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_var_edis.pickle', 'wb') as handle:
+#     pickle.dump(varEdis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_var_erev.pickle', 'wb') as handle:
+#     pickle.dump(varErev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_var_econ.pickle', 'wb') as handle:
+#     pickle.dump(varEcon, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('LOG/src_akantu_var_wext.pickle', 'wb') as handle:
+#     pickle.dump(varWext, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
