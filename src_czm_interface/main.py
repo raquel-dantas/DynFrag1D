@@ -117,45 +117,45 @@ def Run_simulation(strain_rate):
     DFPlot.PlotNumberFragments(nfrag)
     DFPlot.PlotFragmentSizeHistogram(fraglen)
 
-    # Save results 
-    # Number of fragments
-    with open('LOG/src_czm_interface_number_fragments.pickle', 'wb') as handle:
-        pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # Average fragment size
-    with open('LOG/src_czm_interface_average_fragment_size.pickle', 'wb') as handle:
-        pickle.dump(avg_sfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # Histogram fragment size
-    with open('LOG/src_czm_interface_datahist_fragment_size.pickle', 'wb') as handle:
-        pickle.dump(datahist, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # Average stress for the bar 
-    with open('LOG/src_czm_interface_avg_stress.pickle', 'wb') as handle:
-        pickle.dump(avg_stress, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # Energy
-    with open('LOG/src_czm_interface_epot.pickle', 'wb') as handle:
-        pickle.dump(Epot, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_ekin.pickle', 'wb') as handle:
-        pickle.dump(Ekin, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_edis.pickle', 'wb') as handle:
-        pickle.dump(Edis, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_erev.pickle', 'wb') as handle:
-        pickle.dump(Erev, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_econ.pickle', 'wb') as handle:
-        pickle.dump(Econ, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_wext.pickle', 'wb') as handle:
-        pickle.dump(Wext, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # Variation of energy
-    with open('LOG/src_czm_interface_var_epot.pickle', 'wb') as handle:
-        pickle.dump(varEpot, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_var_ekin.pickle', 'wb') as handle:
-        pickle.dump(varEkin, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_var_edis.pickle', 'wb') as handle:
-        pickle.dump(varEdis, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_var_erev.pickle', 'wb') as handle:
-        pickle.dump(varErev, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_var_econ.pickle', 'wb') as handle:
-        pickle.dump(varEcon, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('LOG/src_czm_interface_var_wext.pickle', 'wb') as handle:
-        pickle.dump(varWext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Save results 
+    # # Number of fragments
+    # with open('LOG/src_czm_interface_number_fragments.pickle', 'wb') as handle:
+    #     pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Average fragment size
+    # with open('LOG/src_czm_interface_average_fragment_size.pickle', 'wb') as handle:
+    #     pickle.dump(avg_sfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Histogram fragment size
+    # with open('LOG/src_czm_interface_datahist_fragment_size.pickle', 'wb') as handle:
+    #     pickle.dump(datahist, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Average stress for the bar 
+    # with open('LOG/src_czm_interface_avg_stress.pickle', 'wb') as handle:
+    #     pickle.dump(avg_stress, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Energy
+    # with open('LOG/src_czm_interface_epot.pickle', 'wb') as handle:
+    #     pickle.dump(Epot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_ekin.pickle', 'wb') as handle:
+    #     pickle.dump(Ekin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_edis.pickle', 'wb') as handle:
+    #     pickle.dump(Edis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_erev.pickle', 'wb') as handle:
+    #     pickle.dump(Erev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_econ.pickle', 'wb') as handle:
+    #     pickle.dump(Econ, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_wext.pickle', 'wb') as handle:
+    #     pickle.dump(Wext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Variation of energy
+    # with open('LOG/src_czm_interface_var_epot.pickle', 'wb') as handle:
+    #     pickle.dump(varEpot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_ekin.pickle', 'wb') as handle:
+    #     pickle.dump(varEkin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_edis.pickle', 'wb') as handle:
+    #     pickle.dump(varEdis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_erev.pickle', 'wb') as handle:
+    #     pickle.dump(varErev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_econ.pickle', 'wb') as handle:
+    #     pickle.dump(varEcon, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_wext.pickle', 'wb') as handle:
+    #     pickle.dump(varWext, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     
 
