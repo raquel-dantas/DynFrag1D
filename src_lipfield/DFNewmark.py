@@ -26,53 +26,25 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     dofs = u.shape[0]
 
     # Initiation of variables
-    u_next = np.zeros((dofs))
-    vp = np.zeros((dofs))
-    # dp = np.zeros((DFMesh.n_el))
-    d_next = np.zeros((DFMesh.n_el))
-    acel_next = np.zeros((dofs))
-    v_next = np.zeros((dofs))
+    u_next = np.zeros(dofs)
+    vp = np.zeros(dofs)
+    v_next = np.zeros(dofs)
+    d_next = np.zeros(DFMesh.n_el)
+    acel_next = np.zeros(dofs)
+    region_opt = []
+    dn_region_opt = []
+    small_number = 10e-5
 
 
-    # u_next returns a vector with the displacement in all dofs for the next time step
+    # Compute displacement at next time-step (u_next)
     u_next = u + dt*v + ((1.0/2.0)*dt**2)*acel
 
-    # Velocity predictor
+    # Compute velocity predictor (vp)
     vp = v + (1. - gamma)*dt*acel
 
-    # Strain for u_next
-    strain = [(u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]]) / DFMesh.ElemLength(el) for el in range(DFMesh.n_el)]
-
-    # Compute damage next time-step
-    def func(d): return DFDamage.w*sum([
-            (0.5*(1. - d[el])**2 * 
-            DFMesh.E*strain[el]**2 + 
-            DFDamage.Yc[el] * 
-            DFDamage.h(DFDamage.lamb[el], d[el])) * 
-            DFMesh.hun*0.5
-            for el in range(DFMesh.n_el)
-            ])
-    
-
-    A = scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el) - scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el, 1)
-    b = DFMesh.hun/DFDamage.l
-    const = LinearConstraint(A, -b * np.ones(DFMesh.n_el-1), b * np.ones(DFMesh.n_el-1))
-
-    dlip_opt = minimize(
-        fun=func,
-        x0=d,
-        method='SLSQP',
-        bounds=zip(d, [1.]*DFMesh.n_el),
-        tol=1e-6,
-        constraints=const,
-    )
-    d_next = dlip_opt.x
-    
-    if dlip_opt.success == False:
-        raise Exception('optimization failed')
-
-    if np.linalg.norm(d_next)>0:
-        pass
+    # Compute damage at the next time-step (d_next)
+    d_next = DFDamage.computeDamageNextTimeStep(u_next, d)   
+     
 
     # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
     f_int = DFFem.InternalForce(u_next, d_next)
