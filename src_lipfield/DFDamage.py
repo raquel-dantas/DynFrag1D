@@ -119,3 +119,39 @@ def computeProjections(damage_prediction):
         lower[el] = lower_opt.fun
     
     return upper, lower
+
+
+
+def computeDamageLipConstraint(strain, region_optimization, dn):
+    """Returns an array with the damage at the next time-step for one subdomain imposing the Lipischitz constraint.\n
+    Arguments: 
+    strain -- array with the strain for next time-step for all the elements;\n
+    region_optimization -- an array with the indexes of elements in one subdomain; \n 
+    dn -- damage for all of the domain at time-step (n)."""
+    
+    functional = getFunctionalSubdomain(strain, region_optimization)
+    # Size of the domain
+    size = len(region_optimization)
+    # Inputs for LinearConstraint
+    A = scipy.sparse.eye(size - 1, size) - scipy.sparse.eye(size - 1, size, 1)
+    b = DFMesh.hun/l
+    constraints = LinearConstraint(A, -b * np.ones(size-1), b * np.ones(size-1))
+    # Bounds
+    bound_inf = [dn[region_optimization[i]] for i in range(size)]
+    bound_sup = [1. for i in range(size)]
+
+    dlip_opt = minimize(
+        fun=functional,
+        x0=bound_inf,
+        method='SLSQP',
+        bounds=zip(bound_inf, bound_sup),
+        tol=1e-6,
+        constraints=constraints,
+    )
+    print(dlip_opt)
+    if dlip_opt.success == False:
+        raise Exception('optimization failed')
+        
+    dlip = dlip_opt.x
+    
+    return dlip
