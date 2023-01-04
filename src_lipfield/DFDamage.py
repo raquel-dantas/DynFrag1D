@@ -63,3 +63,59 @@ def getFunctionalSubdomain(strain, region_optimization):
         ])
     
     return functional_subdomain
+
+
+def computeDamagePredictor(u_next, dn):
+    """Returns an array with the damage predictor for the whole domain.\n
+    Arguments: \n
+    u_next -- displacement at the next time-step(n+1); \n
+    dn -- damage at time-step(n)"""
+
+    functional = getFunctional(u_next)
+
+    damage_predictor_opt = minimize(
+        fun=functional,
+        x0=dn,
+        method='SLSQP',
+        bounds=zip(dn, [1.]*DFMesh.n_el),
+        tol=1e-6,
+    )
+    if damage_predictor_opt.success == False:
+        raise Exception('optimization damage predictor failed')
+
+    damage_predictor = damage_predictor_opt.x
+
+    return damage_predictor
+
+
+
+def computeProjections(damage_prediction):
+    """Returns the damage prediction upper and lower projections."""
+    
+    lower = np.zeros(DFMesh.n_el)
+    upper = np.zeros(DFMesh.n_el)
+
+    for el in range(DFMesh.n_el):
+        upper_opt = minimize(
+            lambda y: -damage_prediction[np.searchsorted(DFMesh.node_coord, y[0])-1] + abs(DFMesh.x[el]-y[0])/l,
+            x0=0.5*DFMesh.L,
+            method='SLSQP',
+            bounds=[(DFMesh.x0, DFMesh.xf)],
+            tol=1e-6
+        )
+        if upper_opt.success == False:
+            raise Exception('upper projection of damage predictor failed')
+        upper[el] = - upper_opt.fun
+
+        lower_opt = minimize(
+            lambda y: damage_prediction[np.searchsorted(DFMesh.node_coord, y[0])-1] + abs(DFMesh.x[el]-y[0])/l,
+            x0=0.5*DFMesh.L,
+            method='SLSQP',
+            bounds=[(DFMesh.x0, DFMesh.xf)],
+            tol=1e-6
+        )
+        if lower_opt.success == False:
+            raise Exception('lower projection of damage predictor failed')
+        lower[el] = lower_opt.fun
+    
+    return upper, lower
