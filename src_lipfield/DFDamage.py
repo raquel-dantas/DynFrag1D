@@ -155,3 +155,50 @@ def computeDamageLipConstraint(strain, region_optimization, dn):
     dlip = dlip_opt.x
     
     return dlip
+
+
+def computeDamageNextTimeStep(u_next, dn):
+    """Returns the damage at the next time-step (n+1) for all the domain.\n
+    Arguments:\n
+    u_next -- displacement at the next time-step (n+1);\n
+    dn -- damage at time-step (n)."""
+
+    d_next = np.zeros(DFMesh.n_el)
+    region_lip = []
+    small_number = 10e-5
+
+    # Compute strain using u_next
+    strain = [(u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]]) 
+                / DFMesh.ElemLength(el) for el in range(DFMesh.n_el)]
+
+    # Compute damage predictor (dp) -- Only imposition of D space 
+    dp = computeDamagePredictor(strain,dn)
+
+    # Compute upper and lower projections of the damage predictor
+    upper, lower = computeProjections(dp)
+
+    # Verify if the projections are supperposed
+    for el in range(DFMesh.n_el):
+
+        # If projections are superposed
+        if (upper[el] - lower[el] < small_number):
+            d_next[el] = dp[el]
+
+        else:
+            # Add element to region to impose the Lipschitz constraint
+            region_lip.append(el)
+    
+    # Separate the consecutive elements in subregions
+    regions = []
+    if region_lip:
+        for i, subgroup in groupby(enumerate(region_lip), lambda index: index[0] - index[1]):
+            regions.append(list(map(itemgetter(1), subgroup)))
+
+        # Solve the optimization problem for each subregion
+        for subregion in range(len(regions)):
+            region_optimization = regions[subregion]
+            dlip = computeDamageLipConstraint(strain, region_optimization, dn)
+            for i in range(len(region_optimization)):
+                d_next[region_lip[i]] = dlip[i]
+
+    return d_next
