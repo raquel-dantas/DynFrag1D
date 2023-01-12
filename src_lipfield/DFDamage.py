@@ -54,7 +54,7 @@ def getFunctionalSubdomain(strain, region_optimization):
     region -- an array with the element indexes of the subdomain to compute damage at next time-step(n+1)."""
 
     functional_subdomain = lambda damage: w*sum([
-        (0.5*(1. - damage[region_optimization[i]])**2 * 
+        (0.5*(1. - damage[i])**2 * 
         DFMesh.E*strain[region_optimization[i]]**2 + 
         Yc[region_optimization[i]] * 
         h(lamb[region_optimization[i]], damage[i])) * 
@@ -156,6 +156,11 @@ def computeDamageLipConstraint(strain, region_optimization, dn):
     
     return dlip
 
+def groupSubregion(region_lip):
+    regions = []
+    for i, subgroup in groupby(enumerate(region_lip), lambda index: index[0] - index[1]):
+            regions.append(list(map(itemgetter(1), subgroup)))
+    return regions
 
 def computeDamageNextTimeStep(u_next, dn):
     """Returns the damage at the next time-step (n+1) for all the domain.\n
@@ -188,17 +193,14 @@ def computeDamageNextTimeStep(u_next, dn):
             # Add element to region to impose the Lipschitz constraint
             region_lip.append(el)
     
-    # Separate the consecutive elements in subregions
-    regions = []
     if region_lip:
-        for i, subgroup in groupby(enumerate(region_lip), lambda index: index[0] - index[1]):
-            regions.append(list(map(itemgetter(1), subgroup)))
+        # Separate the consecutive elements in subregions
+        regions = groupSubregion(region_lip)
 
         # Solve the optimization problem for each subregion
-        for subregion in range(len(regions)):
-            region_optimization = regions[subregion]
-            dlip = computeDamageLipConstraint(strain, region_optimization, dn)
-            for i in range(len(region_optimization)):
-                d_next[region_lip[i]] = dlip[i]
+        for subregion in regions:
+            dlip = computeDamageLipConstraint(strain, subregion, dn)
+            for intpoint in subregion:
+                d_next[intpoint] = dlip[intpoint]
 
     return d_next
