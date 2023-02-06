@@ -87,22 +87,24 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
     for el in range(len(DFMesh.materials)):
 
         if DFMesh.materials[el] == 0:
-            # Element siffness and mass matrix
 
             # uloc,vloc[u,v,el] returns vectors contained u and v for local dof
             uloc = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
             vloc = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
 
             # Epot[kelem,uloc] returns the sum of strain energy values calculate per linear element
-            Epot += (0.5*np.dot(np.matmul(DFFem.k_elem, uloc), uloc))/(DFMesh.A*DFMesh.ElemLength(el))
+            # Epot += (0.5*np.dot(np.matmul(DFFem.k_elem, uloc), uloc))/(DFMesh.A*DFMesh.ElemLength(el))
+            Epot += (0.5*np.dot(np.matmul(DFFem.k_elem, uloc), uloc))/DFMesh.ElemLength(el)
 
             # Ekin[melem,vloc] returns the sum of kinetic energy values calculate per linear element
-            Ekin += (0.5*np.dot(np.matmul(DFFem.m_elem, vloc), vloc))/(DFMesh.A)*DFMesh.ElemLength(el)
+            # Ekin += (0.5*np.dot(np.matmul(DFFem.m_elem, vloc), vloc))/(DFMesh.A)*DFMesh.ElemLength(el)
+            Ekin += (0.5*np.dot(np.matmul(DFFem.m_elem, vloc), vloc))*DFMesh.ElemLength(el)
 
         if DFMesh.materials[el] == 1:
 
             # Edis[stress_c, delta_max] returns the sum of dissipated energy caulate  per cohesive element
-            Edis += 0.5*DFMesh.stress_critical*DFMesh.delta_max[el]
+            # Edis += 0.5*DFMesh.stress_critical*DFMesh.delta_max[el]
+            Edis += 0.5*DFMesh.stress_critical*DFMesh.delta_max[el]*DFMesh.A
 
             # jump_u returns the jump in the displacement between two consecutive linear elements 
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
@@ -110,10 +112,12 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
             stress_coh = stress[el]
             if jump_u >= 0:
                 # Erev returns the sum of reversible energy caulate per cohesive element for closing cracks (jump_u < delta_max) 
-                Erev += 0.5*stress_coh*jump_u
+                # Erev += 0.5*stress_coh*jump_u
+                Erev += 0.5*stress_coh*jump_u*DFMesh.A
             else:
                 i = DFMesh.connect[el][0]-1
-                Econ += 0.5*DFMesh.alpha[i]*jump_u**2
+                # Econ += 0.5*DFMesh.alpha[i]*jump_u**2
+                Econ += 0.5*DFMesh.alpha[i]*jump_u**2*DFMesh.A
 
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
@@ -145,7 +149,8 @@ def Energy(up_bc_left, up_bc_right, u, v, stress, work_previous_step):
             stress_bound = fr/DFMesh.A
 
             # Work is power integrated in time
-            work = np.dot(stress_bound,vo)*DFMesh.dt
+            # work = np.dot(stress_bound,vo)*DFMesh.dt
+            work = np.dot(stress_bound,vo)*DFMesh.dt*DFMesh.A
             Wext += work 
 
     return Epot, Ekin, Edis, Erev, Econ, Wext

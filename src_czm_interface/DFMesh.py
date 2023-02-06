@@ -71,7 +71,7 @@ n_points = n_dofs
 l = np.linspace(x0, xf, n_points)
 node_coord = l
 # Points coordinates | node_coord: returns the coodinate for a non-uniform mesh
-node_coord = np.array([x + np.random.uniform(low=-0.4, high=0.4) * hun for x in l])
+# node_coord = np.array([x + np.random.uniform(low=-0.4, high=0.4) * hun for x in l])
 # Secure extremities at coordinate x0 and xf
 node_coord[0] = x0
 node_coord[n_el] = xf
