@@ -71,7 +71,7 @@ model solid_mechanics_model_cohesive [
         name = linear
         rho = {rho} # Density (kg/m3)
         E = {E}  # Young's module (Pa)
-        nu = 0.3  
+        nu = 0.  
         finite_deformation = true
     ]
 
