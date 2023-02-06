@@ -42,8 +42,40 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     # Compute velocity predictor (vp)
     vp = v + (1. - gamma)*dt*acel
 
-    # Compute damage at the next time-step (d_next)
-    d_next = DFDamage.computeDamageNextTimeStep(u_next, d)   
+    # Compute strain using u_next
+    strain = [(u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]]) 
+                / DFMesh.ElemLength(el) for el in range(DFMesh.n_el)]
+
+    # # Compute damage at the next time-step (d_next)
+    # d_next = DFDamage.computeDamageNextTimeStep(u_next, d)   
+
+        # Compute damage next time-step
+    def func(d): return DFDamage.w*sum([
+            (0.5*(1. - d[el])**2 * 
+            DFMesh.E*strain[el]**2 + 
+            DFDamage.Yc[el] * 
+            DFDamage.h(DFDamage.lamb[el], d[el])) * 
+            DFMesh.hun*0.5
+            for el in range(DFMesh.n_el)
+            ])
+
+
+    A = scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el) - scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el, 1)
+    b = DFMesh.hun/DFDamage.l
+    const = LinearConstraint(A, -b * np.ones(DFMesh.n_el-1), b * np.ones(DFMesh.n_el-1))
+
+    dlip_opt = minimize(
+        fun=func,
+        x0=d,
+        method='SLSQP',
+        bounds=zip(d, [1.]*DFMesh.n_el),
+        tol=1e-6,
+        constraints=const,
+    )
+    d_next = dlip_opt.x
+
+    if dlip_opt.success == False:
+        raise Exception('optimization failed')
      
 
     # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step

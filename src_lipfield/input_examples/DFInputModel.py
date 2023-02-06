@@ -7,12 +7,12 @@ Gc = 100.0          # Fracture energy (N/m)
 stress_critical = 300.0*10**6   # Limit stress / critical stress (Pa)
 
 # Geometry
-A = 1        # Cross sectional area (m2)
 L = 5*10**-3       # Lenght of the bar (m)
 x0 = -0.5*L         # Left extremitiy x coordinate / 0-initial
 xf = 0.5* L         # Rigth extremitiy x coordinate / f-final
-n_el = 300          # Number of linear elements (n_el)
+n_el = 250          # Number of linear elements (n_el)
 hun = L/n_el        # Size of the elemenets (h) for a uniform mesh (un) 
+A = hun        # Cross sectional area (m2)
 
 # Load
 strain_rate = 10.0**4   #(s-1)
