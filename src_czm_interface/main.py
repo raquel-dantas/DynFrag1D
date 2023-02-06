@@ -1,5 +1,6 @@
 from matplotlib.pyplot import connect
 from matplotlib import pyplot as plt
+import pickle
 import DFMesh
 import DFFem
 import DFPostprocess
@@ -30,13 +31,15 @@ def Run_simulation(strain_rate):
     work = 0.0
     els_step = DFMesh.n_el
     stress_evl = np.zeros((2*len(DFMesh.materials),DFMesh.n_steps))
-    av_stress_bar = np.zeros((DFMesh.n_steps))
+    avg_stress = np.zeros((DFMesh.n_steps))
     up_bc_left = np.array([0,0])
     up_bc_right = np.array([0,0])
 
     nfrag = np.zeros((DFMesh.n_steps))
-    avg_fraglen = np.zeros((DFMesh.n_steps))
+    avg_sfrag = np.zeros((DFMesh.n_steps))
     # fraglen = np.zeros((DFMesh.n_steps, DFMesh.n_el),dtype=float)
+    datahist = []
+
 
 
     for n in range(DFMesh.n_steps):        
@@ -47,20 +50,20 @@ def Run_simulation(strain_rate):
         # Plots at each time step
         # DFPlot.PlotByDOF(v)
         # DFPlot.PlotByElement(stress)
-        # DFPlot.PlotByInterface(D)
-
 
         # Post process (stress, strain, energies)
         strain, stress, average_stress = DFPostprocess.PostProcess(u)
 
         # D returns a vector contained damage parameter for cohesive elements
         D = [DFInterface.DamageParameter(el) for el in range(len(DFMesh.materials))]
+        # DFPlot.PlotByInterface(D)
         # nfrag retuns a vector contained the number of fragments 
         nfrag[n] = DFFragmentation.NumberFragments(D)
-        fraglen, avg_fraglen[n] = DFFragmentation.SizeFragments(D)
+        fraglen, avg_sfrag[n] = DFFragmentation.SizeFragments(D)
+        datahist = plt.hist(fraglen,10)
 
         stress_evl = DFPostprocess.LogStress(n,stress_evl,stress)
-        av_stress_bar[n] = DFPostprocess.StressBar(stress, els_step)
+        avg_stress[n] = DFPostprocess.StressBar(stress, els_step)
         Epot[n], Ekin[n], Edis[n], Erev[n], Econ[n], Wext[n] = DFPostprocess.Energy(up_bc_left,
         up_bc_right, u, v, stress, work)
         work =  Wext[n]
@@ -87,10 +90,11 @@ def Run_simulation(strain_rate):
 
         # Check limit stress for possible insertion of interface elements
         for el in range(DFMesh.n_el-1):
-            if average_stress[el] > DFMesh.diststress_c[el]:
+            if average_stress[el] > DFMesh.sigmac[el]:
                 # Fracture happens: creat new interface element
                 u, v, acel = DFInterface.InsertInterface(el, el+1, u, v, acel)
                 els_step = els_step + 1
+    
 
     
     bar.finish()
@@ -105,38 +109,55 @@ def Run_simulation(strain_rate):
 
 
 
-    # Plots for the whole simulation
-
-    DFPlot.PlotAverageStressBar(av_stress_bar)
-
+    # Plots
+    DFPlot.PlotAverageStressBar(avg_stress)
     DFPlot.PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext)
-
     DFPlot.PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
-
     DFPlot.PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot)
-
     DFPlot.PlotNumberFragments(nfrag)
-
-    DFPlot.PlotAvgFragmentSize(avg_fraglen)
-
     DFPlot.PlotFragmentSizeHistogram(fraglen)
-    
-    
-    # Save average fragment size and number of fragment
-    f = str(avg_fraglen[n])
-    average_fragment_size = f
-    with open('LOG/average_fraglen.txt','w') as f: 
-        f.write(average_fragment_size)
-        
-    f = str(nfrag[n])
-    number_fragments = f
-    with open('LOG/number_fragments.txt','w') as f: 
-        f.write(number_fragments)
 
-    f = str(Edis[n])
-    Edis = f
-    with open('LOG/final_diss_energy.txt','w') as f: 
-        f.write(Edis)
+    # # Save results 
+    # # Number of fragments
+    # with open('LOG/src_czm_interface_number_fragments.pickle', 'wb') as handle:
+    #     pickle.dump(nfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Average fragment size
+    # with open('LOG/src_czm_interface_average_fragment_size.pickle', 'wb') as handle:
+    #     pickle.dump(avg_sfrag, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Histogram fragment size
+    # with open('LOG/src_czm_interface_datahist_fragment_size.pickle', 'wb') as handle:
+    #     pickle.dump(datahist, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Average stress for the bar 
+    # with open('LOG/src_czm_interface_avg_stress.pickle', 'wb') as handle:
+    #     pickle.dump(avg_stress, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Energy
+    # with open('LOG/src_czm_interface_epot.pickle', 'wb') as handle:
+    #     pickle.dump(Epot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_ekin.pickle', 'wb') as handle:
+    #     pickle.dump(Ekin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_edis.pickle', 'wb') as handle:
+    #     pickle.dump(Edis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_erev.pickle', 'wb') as handle:
+    #     pickle.dump(Erev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_econ.pickle', 'wb') as handle:
+    #     pickle.dump(Econ, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_wext.pickle', 'wb') as handle:
+    #     pickle.dump(Wext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # Variation of energy
+    # with open('LOG/src_czm_interface_var_epot.pickle', 'wb') as handle:
+    #     pickle.dump(varEpot, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_ekin.pickle', 'wb') as handle:
+    #     pickle.dump(varEkin, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_edis.pickle', 'wb') as handle:
+    #     pickle.dump(varEdis, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_erev.pickle', 'wb') as handle:
+    #     pickle.dump(varErev, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_econ.pickle', 'wb') as handle:
+    #     pickle.dump(varEcon, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('LOG/src_czm_interface_var_wext.pickle', 'wb') as handle:
+    #     pickle.dump(varWext, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    
 
 if __name__ == '__main__':
     Run_simulation(DFMesh.strain_rate)

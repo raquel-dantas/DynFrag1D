@@ -1,39 +1,37 @@
-import akantu as aka
-import numpy as np
 import subprocess
+import input_examples.DFInputModel as inputdata
 
 
-# Geometry parameters
+# Material
+E = inputdata.E            # Young's module (Pa)
+rho = inputdata.rho        # Density (kg/m3)
+Gc = inputdata.Gc          # Fracture energy (N/m)
+stress_critical = inputdata.stress_critical   # Limit stress / critical stress (Pa)
 
-# Lenght of the bar (m)
-L = 50*10**-3  
-x0 = -L/2
-xf = L/2
-# Number of triangular elements (n_el)
-n_el = 2
-# Lenght of each linear element (h)
-h = L/(n_el/2)
-# Cross sectional area (m2)
-A = 1*10**-3 
+# Geometry
+A = inputdata.A         # Cross sectional area (m2)
+L = inputdata.L         # Lenght of the bar (m)
+x0 = inputdata.x0       # Left extremitiy x coordinate / 0-initial
+xf = inputdata.xf       # Rigth extremitiy x coordinate / f-final
+n_el = inputdata.n_el   # Number of elements (n_el)
+hun = inputdata.hun     # Size of the elements (h) for a uniform mesh (un) 
 
-# Material parameters
+# Load
+strain_rate = inputdata.strain_rate
+# Contact penalty
+alpha = inputdata.alpha
 
-# Young's module (Pa)
-E = 275.0*10**9  
-# Density (kg/m3)
-rho = 2750.0  
-# Limit stress / critical stress (stress_c) (Pa)
-stress_c = 300.0*10**6
-
+# Time
+time_simulation = inputdata.time_simulation # Total time of simulation (s)
 
 
 # Mesh (Triangles elements)
 
 geometry_file = f"""
-Point(1) = {{ {x0}, 0, 0, {h} }};
-Point(2) = {{ {xf}, 0, 0, {h} }};
-Point(3) = {{ {xf}, {h}, 0, {h} }};
-Point(4) = {{ {x0}, {h}, 0, {h} }};
+Point(1) = {{ {x0}, 0, 0, {hun} }};
+Point(2) = {{ {xf}, 0, 0, {hun} }};
+Point(3) = {{ {xf}, {hun}, 0, {hun} }};
+Point(4) = {{ {x0}, {hun}, 0, {hun} }};
 
 Line(1) = {{1,2}};
 Line(2) = {{2,3}};
@@ -73,16 +71,16 @@ model solid_mechanics_model_cohesive [
         name = linear
         rho = {rho} # Density (kg/m3)
         E = {E}  # Young's module (Pa)
-        nu = 0.3  
+        nu = 0.  
         finite_deformation = true
     ]
 
     material cohesive_linear [
         name = insertion
-        sigma_c = {stress_c} uniform [-1e6, 1e6] # critical stress (Pa)
-        G_c = 100.0 # Fracture energy (N/m)
+        sigma_c = {stress_critical} uniform [-1e6, 1e6] # critical stress (Pa)
+        G_c = {Gc} # Fracture energy (N/m)
         beta = 0.
-        penalty = 1e11
+        penalty = {alpha}
     ]
 ]
 """

@@ -5,3 +5,6 @@ animation
 videos
 LOG
 paraview*
+*.txt
+*.svg
+*.pdf

@@ -13,7 +13,9 @@ def Plot(x, y, labelx, labely, title):
     plt.title(str(title))
     plt.xlabel(str(labelx))
     plt.ylabel(str(labely))
-    plt.plot(x, y)
+    # for col in range(len(y)):
+    #     plt.plot(x, y[col])
+    plt.plot(x,y)
     plt.show()
 
 def Plotlog(x, y, labelx, labely, title):
@@ -127,7 +129,7 @@ def PlotStressByTime(stress_evl):
 
 
 
-def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
+def PlotEnergy(Epot, Ekin, Edis, Wext):
     """Plot energies values per time"""
 
     fig, axes = plt.subplots()
@@ -141,8 +143,6 @@ def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
     plt.plot(x, Epot, label='Epot')
     plt.plot(x, Ekin, label='Ekin')
     plt.plot(x, Edis, label='Edis')
-    plt.plot(x, Erev, label='Erev')
-    plt.plot(x, Econ, label='Econ')
     plt.plot(x, Wext, label='Wext')
     plt.legend()
     plt.savefig("LOG/energies.svg")
@@ -150,7 +150,7 @@ def PlotEnergy(Epot, Ekin, Edis, Erev, Econ, Wext):
 
 
 
-def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot):
+def PlotVarEnergy(varEpot, varEkin, varEdis, varWext, varEtot):
     """Plot variation of energy from time t to t0."""
 
     fig, axes = plt.subplots()
@@ -164,8 +164,6 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
     plt.plot(x, varEpot, label='varEpot')
     plt.plot(x, varEkin, label='varEkin')
     plt.plot(x, varEdis, label='varEdis')
-    plt.plot(x, varErev, label='varErev')
-    plt.plot(x, varEcon, label='varEcon')
     plt.plot(x, -varWext, label='-varWext')
     plt.plot(x, varEtot, label='varEtot')
     plt.legend()
@@ -174,7 +172,7 @@ def PlotVarEnergy(varEpot, varEkin, varEdis, varErev, varEcon, varWext, varEtot)
 
 
 
-def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
+def PlotPower(PEpot, PEkin, PEdis, PWext, PEtot):
     """Plot variation of energy between time steps"""
 
     fig, axes = plt.subplots()
@@ -188,8 +186,6 @@ def PlotPower(PEpot, PEkin, PEdis, PErev, PEcon, PWext, PEtot):
     plt.plot(x, PEpot, label='varEpot')
     plt.plot(x, PEkin, label='varEkin')
     plt.plot(x, PEdis, label='varEdis')
-    plt.plot(x, PErev, label='varErev')
-    plt.plot(x, PEcon, label='varEcon')
     plt.plot(x, -PWext, label='-varWext')
     plt.plot(x, PEtot, label='varEtot')
     plt.legend()

@@ -20,7 +20,7 @@ def SizeFragments(damage):
     coord = DFMesh.ListDofCoord()
     lastrup = DFMesh.x0
     j = 0
-    for i in range(len(DFMesh.materials)):
+    for i in range(DFMesh.n_el - 1):
         if damage[i] > 0.999:
             fraglen[j] = coord[DFFem.Gl_index(i,0) , 0] - lastrup
             lastrup = coord[DFFem.Gl_index(i,1) , 0]
