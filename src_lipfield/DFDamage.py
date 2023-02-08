@@ -148,7 +148,6 @@ def computeDamageLipConstraint(strain, region_optimization, dn):
         tol=1e-6,
         constraints=constraints,
     )
-    print(dlip_opt)
     if dlip_opt.success == False:
         raise Exception('optimization failed')
         
@@ -199,8 +198,11 @@ def computeDamageNextTimeStep(u_next, dn):
 
         # Solve the optimization problem for each subregion
         for subregion in regions:
-            dlip = computeDamageLipConstraint(strain, subregion, dn)
-            for intpoint in subregion:
-                d_next[intpoint] = dlip[intpoint]
+            if len(subregion) > 1:
+                dlip = computeDamageLipConstraint(strain, subregion, dn)
+                i = 0
+                for intpoint in subregion:
+                    d_next[intpoint] = dlip[i]
+                    i =+ 1
 
     return d_next
