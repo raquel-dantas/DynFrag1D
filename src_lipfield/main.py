@@ -7,6 +7,7 @@ import DFNewmark
 import DFPlot
 import DFFragmentation
 import pickle
+import time
 
 def Run_simulation(strain_rate):
 
@@ -128,4 +129,6 @@ def Run_simulation(strain_rate):
     #     pickle.dump(varWext, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == '__main__':
+    start_time = time.time()
     Run_simulation(DFMesh.strain_rate)
+    print("--- %s seconds ---" % (time.time() - start_time))
