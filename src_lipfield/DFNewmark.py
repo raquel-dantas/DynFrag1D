@@ -35,30 +35,31 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     dn_region_opt = []
     small_number = 10e-5
 
-
     # Compute displacement at next time-step (u_next)
-    u_next = u + dt*v + ((1.0/2.0)*dt**2)*acel
+    u_next = u + dt * v + ((1.0 / 2.0) * dt**2) * acel
 
     # Compute velocity predictor (vp)
-    vp = v + (1. - gamma)*dt*acel
+    vp = v + (1.0 - gamma) * dt * acel
 
     # Compute strain using u_next
-    strain = [(u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]]) 
-                / DFMesh.ElemLength(el) for el in range(DFMesh.n_el)]
+    strain = [
+        (u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]])
+        / DFMesh.ElemLength(el)
+        for el in range(DFMesh.n_el)
+    ]
 
     # # Compute damage at the next time-step (d_next)
-    d_next = DFDamage.computeDamageNextTimeStep(u_next, d)   
+    d_next = DFDamage.computeDamageNextTimeStep(u_next, d)
 
     # Compute damage next time-step
     # def func(d): return DFDamage.w*sum([
-    #         (0.5*(1. - d[el])**2 * 
-    #         DFMesh.E*strain[el]**2 + 
-    #         DFDamage.Yc[el] * 
-    #         DFDamage.h(DFDamage.lamb[el], d[el])) * 
+    #         (0.5*(1. - d[el])**2 *
+    #         DFMesh.E*strain[el]**2 +
+    #         DFDamage.Yc[el] *
+    #         DFDamage.h(DFDamage.lamb[el], d[el])) *
     #         DFMesh.hun*0.5
     #         for el in range(DFMesh.n_el)
     #         ])
-
 
     # A = scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el) - scipy.sparse.eye(DFMesh.n_el-1, DFMesh.n_el, 1)
     # b = DFMesh.hun/DFDamage.l
@@ -76,7 +77,6 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
 
     # if dlip_opt.success == False:
     #     raise Exception('optimization failed')
-     
 
     # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
     f_int = DFFem.InternalForce(u_next, d_next)
@@ -84,8 +84,8 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     acel_next = np.linalg.solve(M[:dofs, :dofs], inertia)
     # print(acel_next)
     # v_next returns a vector with the velocity in all dofs for the next time step
-    v_next = vp + gamma*dt*acel_next
-    
+    v_next = vp + gamma * dt * acel_next
+
     # If there is a dirichlet conditions apply:
     for i_el in range(len(DFMesh.connect)):
         if DFMesh.materials[i_el] == 2:
