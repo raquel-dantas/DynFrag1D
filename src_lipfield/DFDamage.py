@@ -8,7 +8,7 @@ from operator import itemgetter
 
 
 # Regularization inputs
-n_element_reg = 10  # Nb elem in the reg length
+n_element_reg = 10              # Nb elem in the reg length
 l = n_element_reg * DFMesh.hun  # Regularization length
 w = 2.0  # Weight quadrature
 
@@ -23,6 +23,9 @@ lamb_czm = [
 ]
 # lamb = lamb_czm
 lamb = lamb_lip
+
+if max(lamb) > 1./3.:
+    raise Exception("lambda > 1/3 -> h(d) not convex!")
 
 # Softening function
 def h_lip(lamb, d):
@@ -45,10 +48,8 @@ def getFunctional(strain):
 
     functional_whole_domain = lambda damage: w * sum(
         [
-            (
-                0.5 * (1.0 - damage[el]) ** 2 * DFMesh.E * strain[el] ** 2
-                + Yc[el] * h(lamb[el], damage[el])
-            )
+            (0.5 * (1.0 - damage[el]) ** 2 * DFMesh.E * strain[el] ** 2
+            + Yc[el] * h(lamb[el], damage[el]))
             * DFMesh.hun
             * 0.5
             for el in range(DFMesh.n_el)
@@ -116,7 +117,8 @@ def computeProjections(damage_prediction):
         upper_opt = minimize(
             lambda y: -damage_prediction[np.searchsorted(DFMesh.node_coord, y[0]) - 1]
             + abs(DFMesh.x[el] - y[0]) / l,
-            x0=0.5 * DFMesh.L,
+            # x0=0.5 * DFMesh.L,
+            x0=0.,
             method="SLSQP",
             bounds=[(DFMesh.x0, DFMesh.xf)],
             tol=1e-6,
@@ -124,18 +126,31 @@ def computeProjections(damage_prediction):
         if upper_opt.success == False:
             raise Exception("upper projection of damage predictor failed")
         upper[el] = -upper_opt.fun
+        
 
         lower_opt = minimize(
-            lambda y: damage_prediction[np.searchsorted(DFMesh.node_coord, y[0]) - 1]
-            + abs(DFMesh.x[el] - y[0]) / l,
-            x0=0.5 * DFMesh.L,
-            method="SLSQP",
+            lambda y: damage_prediction[np.searchsorted(DFMesh.node_coord, y[0])-1] + abs(DFMesh.x[el]-y[0])/l,
+            x0=0.,
+            method='SLSQP',
             bounds=[(DFMesh.x0, DFMesh.xf)],
-            tol=1e-6,
+            tol=1e-6
         )
         if lower_opt.success == False:
-            raise Exception("lower projection of damage predictor failed")
+            raise Exception('lower projection damage predictor failed')
         lower[el] = lower_opt.fun
+
+        # lower_opt = minimize(
+        #     lambda y: damage_prediction[np.searchsorted(DFMesh.node_coord, y[0]) - 1]
+        #     + abs(DFMesh.x[el] - y[0]) / l,
+        #     # x0=0.5 * DFMesh.L,
+        #     x0=0.,
+        #     method="SLSQP",
+        #     bounds=[(DFMesh.x0, DFMesh.xf)],
+        #     tol=1e-6,
+        # )
+        # if lower_opt.success == False:
+        #     raise Exception("lower projection of damage predictor failed")
+        # lower[el] = lower_opt.fun
 
     return upper, lower
 
