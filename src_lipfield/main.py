@@ -29,11 +29,11 @@ def Run_simulation(strain_rate):
     Wext = np.zeros((DFMesh.n_steps))
     work = 0.0
     Edis_prev = 0.0
-    els_step = DFMesh.n_el
+    els_step = DFMesh.n_el # Number of elements at the current time-step
     stress_evl = np.zeros((2 * len(DFMesh.materials), DFMesh.n_steps))
     av_stress_bar = np.zeros((DFMesh.n_steps))
-    up_bc_left = np.array([0, 0])
-    up_bc_right = np.array([0, 0])
+    up_bc_left = np.array([0, 0]) # displacement at the previous time-step at the left node of application of BC
+    up_bc_right = np.array([0, 0]) # displacement at the previous time-step at the left node of application of BC
     dp_bc_left = 0.0
     dp_bc_right = 0.0
 
