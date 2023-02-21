@@ -48,8 +48,8 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
         for el in range(DFMesh.n_el)
     ]
 
-    # # Compute damage at the next time-step (d_next)
-    d_next = DFDamage.computeDamageNextTimeStep(u_next, d)
+    # Compute damage at the next time-step (d_next)
+    d_next = DFDamage.computeDamageNextTimeStep(u_next, d, use_FM=True)
 
     # Compute damage next time-step
     # def func(d): return DFDamage.w*sum([
