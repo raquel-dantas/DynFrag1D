@@ -5,6 +5,7 @@ from scipy.optimize import minimize
 from scipy.optimize import LinearConstraint
 from itertools import groupby
 from operator import itemgetter
+from sortedcontainers import SortedList
 
 
 # Regularization inputs
@@ -117,7 +118,6 @@ def computeProjections(damage_prediction):
         upper_opt = minimize(
             lambda y: -damage_prediction[np.searchsorted(DFMesh.node_coord, y[0]) - 1]
             + abs(DFMesh.x[el] - y[0]) / l,
-            # x0=0.5 * DFMesh.L,
             x0=0.,
             method="SLSQP",
             bounds=[(DFMesh.x0, DFMesh.xf)],
@@ -139,20 +139,62 @@ def computeProjections(damage_prediction):
             raise Exception('lower projection damage predictor failed')
         lower[el] = lower_opt.fun
 
-        # lower_opt = minimize(
-        #     lambda y: damage_prediction[np.searchsorted(DFMesh.node_coord, y[0]) - 1]
-        #     + abs(DFMesh.x[el] - y[0]) / l,
-        #     # x0=0.5 * DFMesh.L,
-        #     x0=0.,
-        #     method="SLSQP",
-        #     bounds=[(DFMesh.x0, DFMesh.xf)],
-        #     tol=1e-6,
-        # )
-        # if lower_opt.success == False:
-        #     raise Exception("lower projection of damage predictor failed")
-        # lower[el] = lower_opt.fun
 
     return upper, lower
+
+def get_neighbour(index):
+    if index == 0:
+        return [0]
+    if index == DFMesh.n_el - 1:
+        return [index - 1]
+    return [index - 1, index + 1]
+
+
+def computeProjectionsUsingFM_lip_projector_1D(damage_predictor, regularization_lenght, flank):
+    
+    # Let's assume initially the projection equal to the damage predictor
+    projection = damage_predictor.copy()
+
+    # Configure key for trial set according to the projection if upper (flank=max) or lower (flank=min)
+    if flank == "min":
+        trial_set = SortedList(key=lambda x: (-x[0], x[1]))
+    else:
+        trial_set = SortedList()
+
+    # Add all elements to the trial set
+    for index, projection_value in enumerate(projection):
+        trial_set.add((projection_value, index))
+
+    # Initialize the frozen set 
+    frozen_set = set()
+
+    while len(trial_set) > 0:
+
+        projection_current_index, index = trial_set.pop()
+        frozen_set.add(index)
+        neighbours = get_neighbour(index)
+
+        for index_neighbour in neighbours:
+            if index_neighbour not in frozen_set:      
+                update_projection_value = False
+
+                delta_projection = (projection[index_neighbour] - projection_current_index) / DFMesh.hun * regularization_lenght 
+
+                if delta_projection < -1.0:
+                    update_projection_value = True
+                    new_projection = projection_current_index - DFMesh.hun /  regularization_lenght
+
+                elif delta_projection > 1.0:
+                    update_projection_value = True
+                    new_projection = projection_current_index + DFMesh.hun / regularization_lenght
+
+                if update_projection_value == True:
+                    projection[index_neighbour] = new_projection
+                    trial_set.discard((projection[index_neighbour], index_neighbour))
+                    trial_set.add((new_projection, index_neighbour))
+
+    return projection
+
 
 
 def computeDamageLipConstraint(strain, region_optimization, dn):
@@ -198,7 +240,7 @@ def groupSubregion(region_lip):
     return regions
 
 
-def computeDamageNextTimeStep(u_next, dn):
+def computeDamageNextTimeStep(u_next, dn, use_FM=False):
     """Returns the damage at the next time-step (n+1) for all the domain.\n
     Arguments:\n
     u_next -- displacement at the next time-step (n+1);\n
@@ -219,8 +261,12 @@ def computeDamageNextTimeStep(u_next, dn):
     dp = computeDamagePredictor(strain, dn)
 
     # Compute upper and lower projections of the damage predictor
-    upper, lower = computeProjections(dp)
-
+    if use_FM == True:
+        upper = computeProjectionsUsingFM_lip_projector_1D(dp, l, flank="max")
+        lower = computeProjectionsUsingFM_lip_projector_1D(dp, l, flank="min")
+    else:
+        upper, lower = computeProjections(dp)
+    
     # Verify if the projections are supperposed
     for el in range(DFMesh.n_el):
 
@@ -235,6 +281,7 @@ def computeDamageNextTimeStep(u_next, dn):
     if region_lip:
         # Separate the consecutive elements in subregions
         regions = groupSubregion(region_lip)
+        # print(region_lip)
 
         # Solve the optimization problem for each subregion
         for subregion in regions:
@@ -246,3 +293,7 @@ def computeDamageNextTimeStep(u_next, dn):
                     i = +1
 
     return d_next
+
+
+
+    
