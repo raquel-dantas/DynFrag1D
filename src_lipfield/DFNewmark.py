@@ -49,9 +49,9 @@ def Newmark_exp(M, u, v, acel, d, p_next, dt):
     ]
 
     # Compute damage at the next time-step (d_next)
-    d_next = DFDamage.computeDamageNextTimeStep(u_next, d, use_FM=True)
+    d_next = DFDamage.computeDamageNextTimeStep(u_next, d, use_FM=False)
 
-    # Compute damage next time-step
+    # # Compute damage next time-step
     # def func(d): return DFDamage.w*sum([
     #         (0.5*(1. - d[el])**2 *
     #         DFMesh.E*strain[el]**2 +
