@@ -121,7 +121,7 @@ def computeProjections(damage_prediction):
             x0=0.,
             method="SLSQP",
             bounds=[(DFMesh.x0, DFMesh.xf)],
-            tol=1e-6,
+            tol=1e-5
         )
         if upper_opt.success == False:
             raise Exception("upper projection of damage predictor failed")
@@ -133,7 +133,7 @@ def computeProjections(damage_prediction):
             x0=0.,
             method='SLSQP',
             bounds=[(DFMesh.x0, DFMesh.xf)],
-            tol=1e-6
+            tol=1e-5
         )
         if lower_opt.success == False:
             raise Exception('lower projection damage predictor failed')
