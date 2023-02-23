@@ -154,7 +154,7 @@ def computeProjectionsUsingFM_lip_projector_1D(damage_predictor, regularization_
     
     # Let's assume initially the projection equal to the damage predictor
     projection = damage_predictor.copy()
-
+    slope_limit = 1. / regularization_lenght
     # Configure key for trial set according to the projection if upper (flank=max) or lower (flank=min)
     if flank == "min":
         trial_set = SortedList(key=lambda x: (-x[0], x[1]))
@@ -178,13 +178,13 @@ def computeProjectionsUsingFM_lip_projector_1D(damage_predictor, regularization_
             if index_neighbour not in frozen_set:      
                 update_projection_value = False
 
-                delta_projection = (projection[index_neighbour] - projection_current_index) / DFMesh.hun * regularization_lenght 
+                delta_projection = (projection[index_neighbour] - projection_current_index) / DFMesh.hun 
 
-                if delta_projection < -1.0:
+                if delta_projection < -slope_limit:
                     update_projection_value = True
                     new_projection = projection_current_index - DFMesh.hun /  regularization_lenght
 
-                elif delta_projection > 1.0:
+                elif delta_projection > slope_limit:
                     update_projection_value = True
                     new_projection = projection_current_index + DFMesh.hun / regularization_lenght
 
