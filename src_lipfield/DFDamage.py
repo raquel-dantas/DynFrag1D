@@ -189,9 +189,9 @@ def computeProjectionsUsingFM_lip_projector_1D(damage_predictor, regularization_
                     new_projection = projection_current_index + DFMesh.hun / regularization_lenght
 
                 if update_projection_value == True:
-                    projection[index_neighbour] = new_projection
                     trial_set.discard((projection[index_neighbour], index_neighbour))
                     trial_set.add((new_projection, index_neighbour))
+                    projection[index_neighbour] = new_projection
 
     return projection
 
