@@ -6,7 +6,7 @@ import DFInterface
 import DFDiffuseDamage
 
 
-def Newmark_exp(M, u, v, acel, d, p_next, dt):
+def explicitScheme(M, u, v, acel, d, p_next, dt):
     """Apply Newmarks explicity integration scheme. Returns vectors with displacement, velocity and aceleration in all dofs for the next time step.\n
     Arguments: \n
     M -- Global mass matrix; \n
