@@ -5,7 +5,7 @@ import time
 
 import DFMesh
 import DFFem
-import src.DFPostProcess as DFPostProcess
+import DFPostProcess
 import DFNewmark
 import DFInterface
 import DFPlot
@@ -216,7 +216,9 @@ def runSimulation(strain_rate):
         power_kinetic,
         power_dissipated,
         power_external_work,
-        power_total = DFPostProcess.computePowerLipfield(energy_potential, energy_kinetic, energy_dissipated, external_work)
+        power_total = DFPostProcess.computePowerLipfield(
+            energy_potential, energy_kinetic, energy_dissipated, external_work
+        )
 
         DFPlot.plotEnergiesLipfield(
             energy_potential, energy_kinetic, energy_dissipated, external_work
@@ -267,7 +269,6 @@ def runSimulation(strain_rate):
         DFPlot.saveResultsCZM(power_contact)
         DFPlot.saveResultsCZM(power_external_work)
 
-
     if DFMesh.use_lipfield == True:
 
         DFPlot.saveResultsLipfield(n_fragments)
@@ -290,8 +291,6 @@ def runSimulation(strain_rate):
         DFPlot.saveResultsLipfield(power_kinetic)
         DFPlot.saveResultsLipfield(power_dissipated)
         DFPlot.saveResultsLipfield(power_external_work)
-
-    
 
 
 if __name__ == "__main__":
