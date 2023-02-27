@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import inspect
+import pickle
 
 import DFMesh
 import DFFem
@@ -124,7 +125,7 @@ def plotAverageStressBar(average_stress_bar):
 
     plt.plot(x, y)
     plt.savefig("LOG/average_stress_bar.svg")
-    plt.show()
+    # plt.show()
 
 
 def plotStressByTime(stress_evolution):
@@ -164,7 +165,7 @@ def plotEnergiesCZM(energy_potential, energy_kinetic, energy_dissipated, energy_
     plt.plot(x, external_work, label="Wext")
     plt.legend()
     plt.savefig("LOG/energies_CZM.svg")
-    plt.show()
+    # plt.show()
 
 
 
@@ -190,7 +191,7 @@ def plotEnergiesLipfield(
     plt.plot(x, external_work, label="Wext")
     plt.legend()
     plt.savefig("LOG/energies_Lipfield.svg")
-    plt.show()
+    # plt.show()
 
 
 def plotVarEnergiesCZM(var_energy_potential, var_energy_kinetic, var_energy_dissipated, var_energy_reversible, var_energy_contact, var_external_work, var_energy_total):
@@ -213,7 +214,7 @@ def plotVarEnergiesCZM(var_energy_potential, var_energy_kinetic, var_energy_diss
     plt.plot(x, var_energy_total, label="varEtot")
     plt.legend()
     plt.savefig("LOG/var_energies_CZM.svg")
-    plt.show()
+    # plt.show()
 
 
 def plotVarEnergiesLipfield(
@@ -241,7 +242,7 @@ def plotVarEnergiesLipfield(
     plt.plot(x, var_energy_total, label="varEtot")
     plt.legend()
     plt.savefig("LOG/var_energies_Lipfield.svg")
-    plt.show()
+    # plt.show()
 
 
 
@@ -267,7 +268,7 @@ def plotPowerCZM(power_potential, power_kinetic, power_dissipated, power_reversi
     plt.plot(x, power_total, label="pEtot")
     plt.legend()
     plt.savefig("LOG/power_CZM.svg")
-    plt.show()
+    # plt.show()
 
 
 def plotPowerLipfield(power_potential, power_kinetic, power_dissipated, power_external_work, power_total):
@@ -288,7 +289,7 @@ def plotPowerLipfield(power_potential, power_kinetic, power_dissipated, power_ex
     plt.plot(x, power_total, label="pEtot")
     plt.legend()
     plt.savefig("LOG/power_Lipfield.svg")
-    plt.show()
+    # plt.show()
 
 
 def plotNumberFragments(nfrag):
@@ -306,7 +307,7 @@ def plotNumberFragments(nfrag):
 
     plt.plot(x, y)
     plt.savefig("LOG/number_fragments.svg")
-    plt.show()
+    # plt.show()
 
 
 def plotAvgFragmentSize(avg_frag_sizes):
@@ -324,10 +325,10 @@ def plotAvgFragmentSize(avg_frag_sizes):
 
     plt.plot(x, y)
     plt.savefig("LOG/size_fragments.svg")
-    plt.show()
+    # plt.show()
 
 
-def plotFragmentSizeHistogram(frag_sizes):
+def plotFragmentSizeHistogram(frag_sizes, n_columns):
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -336,9 +337,9 @@ def plotFragmentSizeHistogram(frag_sizes):
     plt.xlabel("Fragment size (m)")
     plt.ylabel("Number of fragments")
 
-    plt.hist(frag_sizes, 10)
+    plt.hist(frag_sizes,  n_columns)
     plt.savefig("LOG/fragment_size_distribution.svg")
-    plt.show()
+    # plt.show()
 
 
 def plotVTK(prefix, timestep, u, stress):
@@ -509,3 +510,13 @@ def plotLogAnalyticals(grady, gc, zmr, values_strainrate):
 
     plt.legend()
     plt.show()
+
+
+
+def saveResultsCZM(variable_name):
+    with open('LOG/czm_' + variable_name + '.pickle', 'wb') as handle:
+        pickle.dump(variable_name, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+def saveResultsLipfield(variable_name):
+    with open('LOG/lipfield_' + variable_name + '.pickle', 'wb') as handle:
+        pickle.dump(variable_name, handle, protocol=pickle.HIGHEST_PROTOCOL)
