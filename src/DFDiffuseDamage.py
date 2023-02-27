@@ -27,8 +27,8 @@ lamb_lip = [
     for el in range(DFMesh.n_elements)
 ]
 lamb_czm_mimic = [
-    DFMesh.sigmac[el] * DFMesh.hun / (DFMesh.E * DFMesh.deltac[el])
-    for el in range(DFMesh.n_el)
+    DFMesh.stress_critical[el] * DFMesh.h_uniform / (DFMesh.young_modulus * DFMesh.crack_critical[el])
+    for el in range(DFMesh.n_elements)
 ]
 lamb_const = lamb_lip
 if max(lamb_const) > 1.0 / 3.0:
