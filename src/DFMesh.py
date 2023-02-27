@@ -13,6 +13,7 @@ young_modulus = inputdata.young_modulus
 rho = inputdata.density
 fracture_energy = inputdata.fracture_energy
 stress_limit = inputdata.stress_limit
+generate_limit_stress_variation = inputdata.generate_limit_stress_variation
 
 # Assign geometry
 area = inputdata.area
@@ -94,7 +95,7 @@ if create_mesh:
         node_coord = np.array(
             [
                 x + np.random.uniform(low=-0.4, high=0.4) * h_uniform
-                for x in uniform_mesh
+                for x in uniform_coord
             ]
         )
         node_coord[0] = x0
@@ -102,7 +103,7 @@ if create_mesh:
 
 else:
     # import the coordinates from a picke file
-    with open("input_files/mesh.pickle", "rb") as handle:
+    with open("src/input_files/non_uniform_mesh.pickle", "rb") as handle:
         node_coord = pickle.load(handle)
 
 # intpoit_coord: returns the coordinates of integration points
@@ -123,11 +124,16 @@ contact_penalty_limit = (
 ) / (4.5 * fracture_energy)
 
 # stress_critical: returns a random distribution of limit stress at the interface elements 
-stress_critical = np.random.uniform(
-    low=stress_limit - 1.0 * 10**6,
-    high=stress_limit + 1.0 * 10**6,
-    size=(n_elements),
-)
+if generate_limit_stress_variation == True:
+    stress_critical = np.random.uniform(
+        low=stress_limit - 1.0 * 10**6,
+        high=stress_limit + 1.0 * 10**6,
+        size=(n_elements),
+    )
+else:
+    with open("src/input_files/random_stress_critical.pickle", "rb") as handle:
+        stress_critical = pickle.load(handle)
+
 # crack_critical: returns the critical crack opening for the values in stress_critical
 crack_critical = [(2.0 * fracture_energy) / stress_critical[i] for i in range(n_elements)]
 
