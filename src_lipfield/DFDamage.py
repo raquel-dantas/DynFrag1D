@@ -28,7 +28,7 @@ lamb = lamb_lip
 if max(lamb) > 1./3.:
     raise Exception("lambda > 1/3 -> h(d) not convex!")
 
-# Softening function
+# Softening function (h)
 def h_lip(lamb, d):
     return (2.0 * d - d**2) / (1.0 - d + lamb * d**2) ** 2
 
@@ -197,7 +197,7 @@ def computeProjectionsUsingFM_lip_projector_1D(damage_predictor, regularization_
 
 
 
-def computeDamageLipConstraint(strain, region_optimization, dn):
+def computeDamageLipConstraint(strain, region_optimization, dn, upper, lower):
     """Returns an array with the damage at the next time-step for one subdomain imposing the Lipischitz constraint.\n
     Arguments:
     strain -- array with the strain for next time-step for all the elements;\n
@@ -212,8 +212,10 @@ def computeDamageLipConstraint(strain, region_optimization, dn):
     b = DFMesh.hun / l
     constraints = LinearConstraint(A, -b * np.ones(size - 1), b * np.ones(size - 1))
     # Bounds
-    bound_inf = [dn[region_optimization[i]] for i in range(size)]
-    bound_sup = [1.0 for i in range(size)]
+    # bound_inf = [dn[region_optimization[i]] for i in range(size)]
+    bound_inf = [lower[region_optimization[i]] for i in range(size)]
+    # bound_sup = [1.0 for i in range(size)]
+    bound_sup = [upper[region_optimization[i]] for i in range(size)]
 
     dlip_opt = minimize(
         fun=functional,
@@ -266,17 +268,24 @@ def computeDamageNextTimeStep(u_next, dn, use_FM=False):
         lower = computeProjectionsUsingFM_lip_projector_1D(dp, l, flank="min")
     else:
         upper, lower = computeProjections(dp)
-    
+
+
     # Verify if the projections are supperposed
     for el in range(DFMesh.n_el):
 
-        # If projections are superposed
-        if upper[el] - lower[el] < small_number:
-            d_next[el] = dp[el]
+        d_next[el] = dp[el]
 
-        else:
-            # Add element to region to impose the Lipschitz constraint
+        if upper[el] - lower[el] > small_number:
             region_lip.append(el)
+
+        # If projections are superposed
+        # if upper[el] - lower[el] < small_number:
+        #     d_next[el] = dp[el]
+        #     d_next[el] = dp[el]
+
+        # else:
+        #     # Add element to region to impose the Lipschitz constraint
+        #     region_lip.append(el)
 
     if region_lip:
         # Separate the consecutive elements in subregions
@@ -286,7 +295,7 @@ def computeDamageNextTimeStep(u_next, dn, use_FM=False):
         # Solve the optimization problem for each subregion
         for subregion in regions:
             if len(subregion) > 1:
-                dlip = computeDamageLipConstraint(strain, subregion, dn)
+                dlip = computeDamageLipConstraint(strain, subregion, dn, upper, lower)
                 i = 0
                 for intpoint in subregion:
                     d_next[intpoint] = dlip[i]
