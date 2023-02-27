@@ -44,12 +44,12 @@ def contributeEl(M, F, elem_index):
     i_loc = 0
     i_gl = getGlobalIndex(elem_index, i_loc)
     F[i_gl] += f_elem[i_loc]
-    M[i_gl, i_gl] += m_elem[i_loc, i_loc] * DFMesh.ElemLength(elem_index)
+    M[i_gl, i_gl] += m_elem[i_loc, i_loc] * DFMesh.getElemLength(elem_index)
 
     i_loc = 1
     i_gl = getGlobalIndex(elem_index, i_loc)
     F[i_gl] += f_elem[i_loc]
-    M[i_gl, i_gl] += m_elem[i_loc, i_loc] * DFMesh.ElemLength(elem_index)
+    M[i_gl, i_gl] += m_elem[i_loc, i_loc] * DFMesh.getElemLength(elem_index)
 
 
 def Contribute(M, F, elem_index):

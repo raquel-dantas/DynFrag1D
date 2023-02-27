@@ -31,8 +31,8 @@ lamb_czm_mimic = [
     for el in range(DFMesh.n_elements)
 ]
 lamb_const = lamb_lip
-if max(lamb_const) > 1.0 / 3.0:
-    raise Exception("lambda > 1/3 -> h(d) not convex!")
+# if max(lamb_const) > 1.0 / 3.0:
+#     raise Exception("lambda > 1/3 -> h(d) not convex!")
 
 # Softening function of damage h(d)
 def h_lip(lamb, d):
@@ -55,10 +55,10 @@ def getFunctionalWholeDomain(strain):
     functional_whole_domain = lambda damage: weight_quadrature * sum(
         [
             (
-                0.5 * (1.0 - damage[el]) ** 2 * DFMesh.E * strain[el] ** 2
+                0.5 * (1.0 - damage[el]) ** 2 * DFMesh.young_modulus * strain[el] ** 2
                 + Yc[el] * h(lamb_const[el], damage[el])
             )
-            * DFMesh.ElemLength(el)
+            * DFMesh.getElemLength(el)
             * 0.5
             for el in range(DFMesh.n_elements)
         ]
@@ -78,7 +78,7 @@ def getFunctionalSubdomain(strain, region_lip_optimization):
             (
                 0.5
                 * (1.0 - damage[i]) ** 2
-                * DFMesh.E
+                * DFMesh.young_modulus
                 * strain[region_lip_optimization[i]] ** 2
                 + Yc[region_lip_optimization[i]]
                 * h(lamb_const[region_lip_optimization[i]], damage[i])
@@ -152,7 +152,7 @@ def computeProjections(damage_prediction):
 def get_neighbour(index):
     if index == 0:
         return [0]
-    if index == DFMesh.n_el - 1:
+    if index == DFMesh.n_elements - 1:
         return [index - 1]
     return [index - 1, index + 1]
 
@@ -269,7 +269,7 @@ def computeDamageNextTimeStep(u_next, dn, use_FM=False):
     # Compute strain using u_next
     strain = [
         (u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]])
-        / DFMesh.ElemLength(el)
+        / DFMesh.getElemLength(el)
         for el in range(DFMesh.n_el)
     ]
 
@@ -324,7 +324,7 @@ def internalForce(u, d):
         g = (1.0 - d[el]) ** 2
         # u_loc returns a vector contained u for a local dof
         u_loc = np.array([u[DFFem.getGlobalIndex(el, 0)], u[DFFem.getGlobalIndex(el, 1)]])
-        fint_loc = g * np.matmul(DFFem.k_elem, u_loc) / DFMesh.ElemLength(el)
+        fint_loc = g * np.matmul(DFFem.k_elem, u_loc) / DFMesh.getElemLength(el)
         # Contribution of each dof in the internal force vector
         for i_loc in range(2):
             i_gl = DFFem.getGlobalIndex(el, i_loc)

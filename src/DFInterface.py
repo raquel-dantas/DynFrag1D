@@ -101,11 +101,11 @@ def internalForce(u):
 
     for el in range(DFMesh.n_elements):
         # u_loc returns a vector contained u the current element
-        u_loc = np.array([u[DFFem.Gl_index(el, 0)], u[DFFem.Gl_index(el, 1)]])
-        fint_loc = np.matmul(DFFem.k_elem, u_loc) / DFMesh.ElemLength(el)
+        u_loc = np.array([u[DFFem.getGlobalIndex(el, 0)], u[DFFem.getGlobalIndex(el, 1)]])
+        fint_loc = np.matmul(DFFem.k_elem, u_loc) / DFMesh.getElemLength(el)
         # Contribution of each dof in the internal force vector
         for i_loc in range(2):
-            i_gl = DFFem.Gl_index(el, i_loc)
+            i_gl = DFFem.getGlobalIndex(el, i_loc)
             fint[i_gl] += fint_loc[i_loc]
 
     # The internal force is the sum of the force from the linear and interface elements

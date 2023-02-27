@@ -28,7 +28,7 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
     u_next = np.zeros(dofs)
     vp = np.zeros(dofs)
     v_next = np.zeros(dofs)
-    d_next = np.zeros(DFMesh.n_el)
+    d_next = np.zeros(DFMesh.n_elements)
     acel_next = np.zeros(dofs)
 
     # Compute displacement at next time-step 

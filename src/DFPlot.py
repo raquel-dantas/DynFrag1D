@@ -368,9 +368,9 @@ DATASET UNSTRUCTURED_GRID
 
     cells = (
         "\nCELLS "
-        + str(DFMesh.n_el)
+        + str(DFMesh.n_elements)
         + " "
-        + str(DFMesh.n_el * 3)
+        + str(DFMesh.n_elements * 3)
         + "\n"
         + np.array2string(cellist).replace("[", "").replace("]", "")
         + "\n"

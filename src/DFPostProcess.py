@@ -26,21 +26,21 @@ def postProcess(u, d):
                 g = (1.0 - d[el]) ** 2
                 strain[el] = (
                     u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
-                ) / DFMesh.ElemLength(el)
-                stress[el] = DFMesh.E * g * strain[el]
+                ) / DFMesh.getElemLength(el)
+                stress[el] = DFMesh.young_modulus * g * strain[el]
 
         else:
             if DFMesh.materials[el] == 0:
                 strain[el] = (
                     u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
-                ) / DFMesh.ElemLength(el)
-                stress[el] = DFMesh.E * strain[el]
+                ) / DFMesh.getElemLength(el)
+                stress[el] = DFMesh.young_modulus * strain[el]
 
             elif DFMesh.materials[el] == 1:
                 # jump_u returns the jump in the displacement between two consecutive linear elements
                 jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
                 # Stress retuns the stress value at each cohesive el
-                stress[el] = DFInterface.CohesiveLaw(jump_u, el)
+                stress[el] = DFInterface.stressCohesiveLaw(jump_u, el)
 
     # average_stress returns the average stress between two consecutive linear elements
     average_stress = (
@@ -48,7 +48,7 @@ def postProcess(u, d):
         if DFMesh.connect[el][1] == DFMesh.connect[el + 1][0]
         else 0
     )
-    average_stress_neighbors = [average_stress(el) for el in range(DFMesh.n_el - 1)]
+    average_stress_neighbors = [average_stress(el) for el in range(DFMesh.n_elements - 1)]
 
     return strain, stress, average_stress_neighbors
 
@@ -110,16 +110,16 @@ def computeEnergiesCZM(
 
             energy_potential += (
                 0.5 * np.dot(np.matmul(DFFem.k_elem, u_local), u_local)
-            ) / DFMesh.ElemLength(el)
+            ) / DFMesh.getElemLength(el)
 
             energy_kinetic += (
                 0.5 * np.dot(np.matmul(DFFem.m_elem, v_local), v_local)
-            ) * DFMesh.ElemLength(el)
+            ) * DFMesh.getElemLength(el)
 
         if DFMesh.materials[el] == 1:
 
             energy_dissipated += (
-                0.5 * DFMesh.stress_critical * DFMesh.delta_max[el] * DFMesh.area
+                0.5 * DFMesh.stress_limit * DFMesh.jump_max[el] * DFMesh.area
             )
 
             # Get jump in displacment and current stress
@@ -130,7 +130,7 @@ def computeEnergiesCZM(
                 energy_reversible += 0.5 * stress_cohesive * jump_u * DFMesh.area
             else:
                 i = DFMesh.connect[el][0] - 1
-                energy_contact += 0.5 * DFMesh.alpha[i] * jump_u**2 * DFMesh.area
+                energy_contact += 0.5 * DFMesh.contact_penalty[i] * jump_u**2 * DFMesh.area
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
             # vel_extremity is the velocity applied on the extremity
@@ -138,12 +138,12 @@ def computeEnergiesCZM(
             # uprvious_local is the local displacement of el_bc from the previous time step
 
             if DFMesh.materials[el] == 4:
-                vel_extremity = np.array([-DFMesh.vel, 0])
+                vel_extremity = np.array([-DFMesh.applied_vel, 0])
                 el_bc = 0
                 uprevious_local = uprevious_bc_left
 
             else:
-                vel_extremity = np.array([0, DFMesh.vel])
+                vel_extremity = np.array([0, DFMesh.applied_vel])
                 el_bc = DFMesh.n_elements - 1
                 uprevious_local = uprevious_bc_right
 
@@ -210,11 +210,11 @@ def computeEnergiesLipfield(
 
             energy_potential += (
                 0.5 * g * np.dot(np.matmul(DFFem.k_elem, u_local), u_local)
-            ) / DFMesh.ElemLength(el)
+            ) / DFMesh.getElemLength(el)
 
             energy_kinetic += (
                 0.5 * np.dot(np.matmul(DFFem.m_elem, v_local), v_local)
-            ) * DFMesh.ElemLength(el)
+            ) * DFMesh.getElemLength(el)
 
             energy_dissipated += (
                 DFDiffuseDamage.Yc[el]
@@ -229,14 +229,14 @@ def computeEnergiesLipfield(
             # uprevious_local is the local displacement of el_bc from the previous time step
 
             if DFMesh.materials[el] == 4:
-                vel_extremity = np.array([-DFMesh.vel, 0])
+                vel_extremity = np.array([-DFMesh.applied_vel, 0])
                 el_bc = 0
                 g = (1.0 - d[el_bc]) ** 2
                 uprevious_local = uprevious_bc_left
                 gprevious = (1.0 - dprevious_bc_left) ** 2
 
             else:
-                vel_extremity = np.array([0, DFMesh.vel])
+                vel_extremity = np.array([0, DFMesh.applied_vel])
                 el_bc = DFMesh.n_elements - 1
                 g = (1.0 - d[el_bc]) ** 2
                 uprevious_local = uprevious_bc_right
@@ -256,7 +256,7 @@ def computeEnergiesLipfield(
             stress_boundary = freact / DFMesh.area
 
             # Work is power integrated in time
-            work = np.dot(stress_boundary, vel_extremity) * DFMesh.dt * DFMesh.are
+            work = np.dot(stress_boundary, vel_extremity) * DFMesh.dt * DFMesh.area
             external_work += work
 
     return energy_potential, energy_kinetic, energy_dissipated, external_work

@@ -11,13 +11,13 @@ def getNumberFragments(damage):
     return 1 + sum(1 for D in damage if D > 0.999)
 
 
-def getFragmentsSize(damage):
+def getFragmentSizes(damage):
     """Returns an array of fragment sizes and its average."""
 
     n_fragments = getNumberFragments(damage)
     fragments_lengths = np.zeros(n_fragments, dtype=float)
 
-    coord = DFMesh.getListDofCoord()
+    coord = DFMesh.listDofCoord()
     previous_crack_coord = DFMesh.x0
     j = 0
     for i in range(len(DFMesh.materials)):
@@ -51,8 +51,8 @@ def GradyFragSize(strainrate):
         [
             epsilon
             / (
-                ((DFMesh.E / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
-                / (DFMesh.E**2 * DFMesh.Gc)
+                ((DFMesh.young_modulus / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
+                / (DFMesh.young_modulus**2 * DFMesh.Gc)
             )
             for epsilon in strainrate
         ]
@@ -60,7 +60,7 @@ def GradyFragSize(strainrate):
     norm_s = np.array(
         [(24.0 / (normepsilon**2)) ** (1 / 3) for normepsilon in norm_strainrate]
     )
-    # norm_s = s / (DFMesh.E * DFMesh.Gc / DFMesh.stress_critical**2)
+    # norm_s = s / (DFMesh.young_modulus * DFMesh.Gc / DFMesh.stress_critical**2)
 
     return s, norm_s
 
@@ -73,8 +73,8 @@ def GlenChudnoviskFragSize(strainrate):
         [
             epsilon
             / (
-                ((DFMesh.E / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
-                / (DFMesh.E**2 * DFMesh.Gc)
+                ((DFMesh.young_modulus / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
+                / (DFMesh.young_modulus**2 * DFMesh.Gc)
             )
             for epsilon in strainrate
         ]
@@ -87,7 +87,7 @@ def GlenChudnoviskFragSize(strainrate):
             for normepsilon in norm_strainrate
         ]
     )
-    # norm_s = s / (DFMesh.E * DFMesh.Gc / DFMesh.stress_critical**2)
+    # norm_s = s / (DFMesh.young_modulus * DFMesh.Gc / DFMesh.stress_critical**2)
 
     return norm_s
 
@@ -100,8 +100,8 @@ def ZhouMolinariRameshFragSize(strainrate):
         [
             epsilon
             / (
-                ((DFMesh.E / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
-                / (DFMesh.E**2 * DFMesh.Gc)
+                ((DFMesh.young_modulus / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
+                / (DFMesh.young_modulus**2 * DFMesh.Gc)
             )
             for epsilon in strainrate
         ]

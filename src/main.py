@@ -29,7 +29,7 @@ def runSimulation(strain_rate):
     energy_dissipated = np.zeros(DFMesh.n_steps)
     external_work = np.zeros(DFMesh.n_steps)
     work_previous_step = 0.0
-    els_step = DFMesh.n_el
+    els_step = DFMesh.n_elements
     stress_evolution = np.zeros((2 * len(DFMesh.materials), DFMesh.n_steps))
     avg_stress_bar = np.zeros(DFMesh.n_steps)
     uprevious_bc_left = np.array([0, 0])
@@ -117,16 +117,16 @@ def runSimulation(strain_rate):
                         [u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]]
                     )
                 else:
-                    el_bc = DFMesh.n_el - 1
+                    el_bc = DFMesh.n_elements - 1
                     uprevious_bc_right = np.array(
                         [u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]]
                     )
 
         # Time integration
-        u, v, acel = DFNewmark.explicitScheme(M, u, v, acel, d, F, DFMesh.dt)
+        u, v, acel, d = DFNewmark.explicitScheme(M, u, v, acel, d, F, DFMesh.dt)
 
         if DFMesh.use_1d_cohesive_elements == True:
-            for el in range(DFMesh.n_el - 1):
+            for el in range(DFMesh.n_elements - 1):
                 if average_stress_neighbors[el] > DFMesh.stress_critical[el]:
                     # Fracture happens: creat new interface element
                     u, v, acel = DFInterface.insertInterface(el, el + 1, u, v, acel)
