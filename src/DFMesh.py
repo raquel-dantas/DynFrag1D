@@ -16,7 +16,7 @@ stress_limit = inputdata.stress_limit
 
 # Assign geometry
 area = inputdata.area
-bar_length = inputdata.barlength
+bar_length = inputdata.bar_length
 x0 = inputdata.x0
 xf = inputdata.xf
 
@@ -89,7 +89,7 @@ n_points = n_dofs
 if create_mesh:
     # uniform_coord: returns the points coodinate for a uniform mesh
     uniform_coord = np.linspace(x0, xf, n_points)
-    node_coord = uniform_mesh
+    node_coord = uniform_coord
     if uniform_mesh == False:
         node_coord = np.array(
             [
@@ -102,7 +102,7 @@ if create_mesh:
 
 else:
     # import the coordinates from a picke file
-    with open("mesh.pickle", "rb") as handle:
+    with open("input_files/mesh.pickle", "rb") as handle:
         node_coord = pickle.load(handle)
 
 # intpoit_coord: returns the coordinates of integration points
@@ -154,7 +154,7 @@ dt_crit = smallest_element / ((young_modulus / rho) ** 0.5)
 dt = dt_crit * 0.1  # Adopted time step (s)
 
 n_steps = int(time_simulation / dt)  # Number of time-steps
-time_peakstress = stress_critical / (young_modulus * strain_rate)  # Time peak stress
+time_peakstress = stress_limit / (young_modulus * strain_rate)  # Time peak stress
 nstep_peak = int(time_peakstress / dt)  # Time-step to peak stress
 
 
@@ -162,8 +162,8 @@ nstep_peak = int(time_peakstress / dt)  # Time-step to peak stress
 
 v0 = np.array([strain_rate * i for i in node_coord])  # Initial velocity 
 acel0 = np.zeros(n_dofs) # Initial acceleration 
-p = np.zeros(n_steps + 1, n_dofs)  # External forces 
-C = np.zeros(n_dofs, n_dofs)  # Damping 
+p = np.zeros((n_steps + 1, n_dofs))  # External forces 
+C = np.zeros((n_dofs, n_dofs))  # Damping 
 Eg = np.zeros(n_elements)
 if use_lipfield == True:
     d0 = np.zeros(n_elements)  # Initial damage
