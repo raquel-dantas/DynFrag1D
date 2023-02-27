@@ -10,15 +10,16 @@ import DFDiffuseDamage
 def postProcess(u, d):
     """Returns the strain for linear elements, the stress vector for all elements, and the average stress vector between two consecutives line elements.\n
     Arguments:\n
-    u -- displacemnt vector."""
+    u -- displacemnt vector; \n 
+    d -- damage field."""
 
     # Total number of elements (linear + cohesive)
-    numel = len(DFMesh.materials)
+    n_elements = len(DFMesh.materials)
     # Initiation of variables
-    strain = np.zeros(numel)
-    stress = np.zeros(numel)
+    strain = np.zeros(n_elements)
+    stress = np.zeros(n_elements)
 
-    for el in range(numel):
+    for el in range(n_elements):
 
         if DFMesh.use_lipfield == True:
             if DFMesh.materials[el] == 0:
@@ -42,41 +43,41 @@ def postProcess(u, d):
                 stress[el] = DFInterface.CohesiveLaw(jump_u, el)
 
     # average_stress returns the average stress between two consecutive linear elements
-    average = (
+    average_stress = (
         lambda el: (stress[el] + stress[el + 1]) / 2.0
         if DFMesh.connect[el][1] == DFMesh.connect[el + 1][0]
         else 0
     )
-    average_stress = [average(el) for el in range(DFMesh.n_el - 1)]
+    average_stress_neighbors = [average_stress(el) for el in range(DFMesh.n_el - 1)]
 
-    return strain, stress, average_stress
+    return strain, stress, average_stress_neighbors
 
 
-def logStress(time_step, stress_evl, current_stress):
-    """Returns a matrix that contains the stress for all elements (lin) at all time steps (cols).\n
+def logStress(time_step, stress_evolution, current_stress):
+    """Returns a matrix that contains the stress for all elements at all time steps (cols).\n
     Arguments:\n
     time_step: current time step of the analysis;\n
-    stress_evl: current stress evolution matrix;\n
+    stress_evolution: stress evolution array;\n
     current_stress: the stress vector of the current time step."""
 
-    numel = len(DFMesh.materials)
-    for el in range(numel):
-        stress_evl[el, time_step] = current_stress[el]
+    n_elements = len(DFMesh.materials)
+    for el in range(n_elements):
+        stress_evolution[el, time_step] = current_stress[el]
 
-    return stress_evl
+    return stress_evolution
 
 
-def stressBar(current_stress, els_step):
+def stressBar(current_stress, nelements_at_current_step):
     """Returns the average stress at the whole bar at each time step.\n
     Arguments:\n
     current_stress: the stress vector of the current time step.\n
     els_step: number of elements (linear + cohesive) at the current time step."""
 
     sum_stress = 0.0
-    numel = len(DFMesh.materials)
-    for el in range(numel):
+    n_elements = len(DFMesh.materials)
+    for el in range(n_elements):
         sum_stress += current_stress[el]
-    avg_stress_bar = sum_stress / els_step
+    avg_stress_bar = sum_stress / nelements_at_current_step
 
     return avg_stress_bar
 
@@ -188,6 +189,9 @@ def computeEnergiesLipfield(
     uprevious_bc_right -- displacement from previous time step at right boundary element;\n
     u -- displacements vector;\n
     v -- velocities vector;\n
+    d -- damage field;
+    dprevious_bc_left -- damage from previous time step at left boundary element;\n
+    dprevious_bc_right -- damage from previous time step at right boundary element;\n
     work_previous_step -- external energy from the previous time step."""
 
     energy_potential = 0.0
@@ -262,7 +266,7 @@ def computeVarEnergyCZM(
     energy_potential,
     energy_kinetic,
     energy_dissipated,
-    Erev,
+    energy_reversible,
     energy_contact,
     external_work,
 ):
@@ -272,22 +276,22 @@ def computeVarEnergyCZM(
     var_energy_kinetic = np.zeros(DFMesh.n_steps)
     var_energy_dissipated = np.zeros(DFMesh.n_steps)
     var_energy_contact = np.zeros(DFMesh.n_steps)
-    varErev = np.zeros(DFMesh.n_steps)
-    varEtot = np.zeros(DFMesh.n_steps)
+    var_energy_reversible = np.zeros(DFMesh.n_steps)
+    var_energy_total = np.zeros(DFMesh.n_steps)
     var_external_work = np.zeros(DFMesh.n_steps)
 
     for n in range(1, DFMesh.n_steps):
         var_energy_potential[n] = energy_potential[n] - energy_potential[0]
         var_energy_kinetic[n] = energy_kinetic[n] - energy_kinetic[0]
         var_energy_dissipated[n] = energy_dissipated[n] - energy_dissipated[0]
-        varErev[n] = Erev[n] - Erev[0]
+        var_energy_reversible[n] = energy_reversible[n] - energy_reversible[0]
         var_energy_contact[n] = energy_contact[n] - energy_contact[0]
         var_external_work[n] = external_work[n] - external_work[0]
-        varEtot[n] = var_external_work[n] - (
+        var_energy_total[n] = var_external_work[n] - (
             var_energy_potential[n]
             + var_energy_kinetic[n]
             + var_energy_dissipated[n]
-            + varErev[n]
+            + var_energy_reversible[n]
             + var_energy_contact[n]
         )
 
@@ -295,10 +299,10 @@ def computeVarEnergyCZM(
         var_energy_potential,
         var_energy_kinetic,
         var_energy_dissipated,
-        varErev,
+        var_energy_reversible,
         var_energy_contact,
         var_external_work,
-        varEtot,
+        var_energy_total,
     )
 
 
@@ -331,41 +335,74 @@ def computeVarEnergyLipfield(
     )
 
 
-def PowerCZM(Epot, Ekin, Edis, Erev, Econ, Wext):
+def computePowerCZM(
+    energy_potential,
+    energy_kinetic,
+    energy_dissipated,
+    energy_reversible,
+    energy_contact,
+    external_work,
+):
     """Returns the variation of energies between two consecutives time steps."""
 
-    PEkin = np.zeros((DFMesh.n_steps))
-    PEpot = np.zeros((DFMesh.n_steps))
-    PEdis = np.zeros((DFMesh.n_steps))
-    PWext = np.zeros((DFMesh.n_steps))
-    PErev = np.zeros((DFMesh.n_steps))
-    PEcon = np.zeros((DFMesh.n_steps))
-    PEtot = np.zeros((DFMesh.n_steps))
+    power_potential = np.zeros(DFMesh.n_steps)
+    power_kinetic = np.zeros(DFMesh.n_steps)
+    power_dissipated = np.zeros(DFMesh.n_steps)
+    power_reversible = np.zeros(DFMesh.n_steps)
+    power_contact = np.zeros(DFMesh.n_steps)
+    power_external_work = np.zeros(DFMesh.n_steps)
+    power_total = np.zeros(DFMesh.n_steps)
+
     for n in range(1, DFMesh.n_steps):
-        PEpot[n] = Epot[n] - Epot[n - 1]
-        PEkin[n] = Ekin[n] - Ekin[n - 1]
-        PEdis[n] = Edis[n] - Edis[n - 1]
-        PErev[n] = Erev[n] - Erev[n - 1]
-        PEcon[n] = Econ[n] - Econ[n - 1]
-        PWext[n] = Wext[n] - Wext[n - 1]
-        PEtot[n] = PWext[n] - (PEpot[n] + PEkin[n] + PEdis[n] + PErev[n] + PEcon[n])
+        power_potential[n] = energy_potential[n] - energy_potential[n - 1]
+        power_kinetic[n] = energy_kinetic[n] - energy_kinetic[n - 1]
+        power_dissipated[n] = energy_dissipated[n] - energy_dissipated[n - 1]
+        power_reversible[n] = energy_reversible[n] - energy_reversible[n - 1]
+        power_contact[n] = energy_contact[n] - energy_contact[n - 1]
+        power_external_work[n] = external_work[n] - external_work[n - 1]
+        power_total[n] = power_external_work[n] - (
+            power_potential[n]
+            + power_kinetic[n]
+            + power_dissipated[n]
+            + power_reversible[n]
+            + power_contact[n]
+        )
 
-    return PEkin, PEpot, PEdis, PErev, PEcon, PWext, PEtot
+    return (
+        power_potential,
+        power_kinetic,
+        power_dissipated,
+        power_reversible,
+        power_contact,
+        power_external_work,
+        power_total,
+    )
 
 
-def PowerLipfield(Epot, Ekin, Edis, Wext):
+def computePowerLipfield(
+    energy_potential, energy_kinetic, energy_dissipated, external_work
+):
     """Returns the variation of energies between two consecutives time steps."""
 
-    PEkin = np.zeros((DFMesh.n_steps))
-    PEpot = np.zeros((DFMesh.n_steps))
-    PEdis = np.zeros((DFMesh.n_steps))
-    PWext = np.zeros((DFMesh.n_steps))
-    PEtot = np.zeros((DFMesh.n_steps))
-    for n in range(1, DFMesh.n_steps):
-        PEpot[n] = Epot[n] - Epot[n - 1]
-        PEkin[n] = Ekin[n] - Ekin[n - 1]
-        PEdis[n] = Edis[n] - Edis[n - 1]
-        PWext[n] = Wext[n] - Wext[n - 1]
-        PEtot[n] = PWext[n] - (PEpot[n] + PEkin[n] + PEdis[n])
+    power_potential = np.zeros(DFMesh.n_steps)
+    power_kinetic = np.zeros(DFMesh.n_steps)
+    power_dissipated = np.zeros(DFMesh.n_steps)
+    power_external_work = np.zeros(DFMesh.n_steps)
+    power_total = np.zeros(DFMesh.n_steps)
 
-    return PEkin, PEpot, PEdis, PWext, PEtot
+    for n in range(1, DFMesh.n_steps):
+        power_potential[n] = energy_potential[n] - energy_potential[n - 1]
+        power_kinetic[n] = energy_kinetic[n] - energy_kinetic[n - 1]
+        power_dissipated[n] = energy_dissipated[n] - energy_dissipated[n - 1]
+        power_external_work[n] = external_work[n] - external_work[n - 1]
+        power_total[n] = power_external_work[n] - (
+            power_potential[n] + power_kinetic[n] + power_dissipated[n]
+        )
+
+    return (
+        power_potential,
+        power_kinetic,
+        power_dissipated,
+        power_external_work,
+        power_total,
+    )
