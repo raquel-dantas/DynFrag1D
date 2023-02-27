@@ -8,8 +8,8 @@ use_lipfield = False
 
 
 # Type of mesh
-uniform_mesh = True
-create_mesh = True
+uniform_mesh = False
+create_mesh = False
 # if there is an mesh file for input set create_mesh = False
 
 
@@ -17,7 +17,9 @@ create_mesh = True
 young_modulus = 275.0 * 10**9  # (Pa)
 density = 2750.0  # (kg/m3)
 fracture_energy = 100.0  # (N/m)
-stress_limit = 300.0 * 10**6  # Limit stress (Pa)
+stress_limit = 300.0 * 10**6  # (Pa)
+generate_limit_stress_variation = False
+# if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 
 
 # Geometry
