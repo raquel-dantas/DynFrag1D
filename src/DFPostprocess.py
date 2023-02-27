@@ -81,7 +81,9 @@ def stressBar(current_stress, els_step):
     return avg_stress_bar
 
 
-def computeEnergiesCZM(uprevious_bc_left, uprevious_bc_right, u, v, stress, work_previous_step):
+def computeEnergiesCZM(
+    uprevious_bc_left, uprevious_bc_right, u, v, stress, work_previous_step
+):
     """Returns potential, kinetic, dissipated, reversible, contact and external energies.\n
     Arguments:\n
     uprevious_bc_left -- displacement from previous time step at left boundary element;\n
@@ -90,7 +92,6 @@ def computeEnergiesCZM(uprevious_bc_left, uprevious_bc_right, u, v, stress, work
     v -- velocities vector;\n
     work_previous_step -- external energy from the previous time step."""
 
-
     energy_potential = 0.0
     energy_kinetic = 0.0
     energy_dissipated = 0.0
@@ -98,13 +99,11 @@ def computeEnergiesCZM(uprevious_bc_left, uprevious_bc_right, u, v, stress, work
     energy_contact = 0.0
     external_work = work_previous_step
 
-
     for el in range(len(DFMesh.materials)):
 
-        
         if DFMesh.materials[el] == 0:
-            
-            # Get local displacement and velocity 
+
+            # Get local displacement and velocity
             u_local = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
             v_local = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
 
@@ -116,10 +115,11 @@ def computeEnergiesCZM(uprevious_bc_left, uprevious_bc_right, u, v, stress, work
                 0.5 * np.dot(np.matmul(DFFem.m_elem, v_local), v_local)
             ) * DFMesh.ElemLength(el)
 
-
         if DFMesh.materials[el] == 1:
 
-            energy_dissipated += 0.5 * DFMesh.stress_critical * DFMesh.delta_max[el] * DFMesh.area
+            energy_dissipated += (
+                0.5 * DFMesh.stress_critical * DFMesh.delta_max[el] * DFMesh.area
+            )
 
             # Get jump in displacment and current stress
             jump_u = u[DFMesh.connect[el][1]] - u[DFMesh.connect[el][0]]
@@ -130,7 +130,6 @@ def computeEnergiesCZM(uprevious_bc_left, uprevious_bc_right, u, v, stress, work
             else:
                 i = DFMesh.connect[el][0] - 1
                 energy_contact += 0.5 * DFMesh.alpha[i] * jump_u**2 * DFMesh.area
-
 
         if DFMesh.materials[el] == 4 or DFMesh.materials[el] == 5:
             # vel_extremity is the velocity applied on the extremity
@@ -148,7 +147,9 @@ def computeEnergiesCZM(uprevious_bc_left, uprevious_bc_right, u, v, stress, work
                 uprevious_local = uprevious_bc_right
 
             hel_bc = DFMesh.getElemLength(el_bc)
-            u_local = np.array([u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]])
+            u_local = np.array(
+                [u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]]
+            )
 
             fint_current_step = np.matmul(DFFem.k_elem, u_local) / hel_bc
             fint_previous_step = np.matmul(DFFem.k_elem, uprevious_local) / hel_bc
@@ -161,10 +162,26 @@ def computeEnergiesCZM(uprevious_bc_left, uprevious_bc_right, u, v, stress, work
             work = np.dot(stress_boundary, vel_extremity) * DFMesh.dt * DFMesh.area
             external_work += work
 
-    return energy_potential, energy_kinetic, energy_dissipated, energy_reversible, energy_contact, external_work
+    return (
+        energy_potential,
+        energy_kinetic,
+        energy_dissipated,
+        energy_reversible,
+        energy_contact,
+        external_work,
+    )
 
 
-def computeEnergiesLipfield(uprevious_bc_left, uprevious_bc_right, u, v, d, dprevious_bc_left, dprevious_bc_right, work_previous_step):
+def computeEnergiesLipfield(
+    uprevious_bc_left,
+    uprevious_bc_right,
+    u,
+    v,
+    d,
+    dprevious_bc_left,
+    dprevious_bc_right,
+    work_previous_step,
+):
     """Returns potential, kinetic, dissipated, reversible, contact and external energies.\n
     Arguments:\n
     uprevious_bc_left -- displacement from previous time step at left boundary element;\n
@@ -178,12 +195,11 @@ def computeEnergiesLipfield(uprevious_bc_left, uprevious_bc_right, u, v, d, dpre
     energy_dissipated = 0.0
     external_work = work_previous_step
 
-
     for el in range(len(DFMesh.materials)):
 
         if DFMesh.materials[el] == 0:
 
-            # Get local displacement and velocity 
+            # Get local displacement and velocity
             g = (1.0 - d[el]) ** 2
             u_local = np.array([u[DFMesh.connect[el][0]], u[DFMesh.connect[el][1]]])
             v_local = np.array([v[DFMesh.connect[el][0]], v[DFMesh.connect[el][1]]])
@@ -223,9 +239,13 @@ def computeEnergiesLipfield(uprevious_bc_left, uprevious_bc_right, u, v, d, dpre
                 gprevious = (1.0 - dprevious_bc_right) ** 2
 
             hel_bc = DFMesh.getElemLength(el_bc)
-            u_local = np.array([u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]])
+            u_local = np.array(
+                [u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]]
+            )
             fint_current_step = np.matmul(g * DFFem.k_elem, u_local) / hel_bc
-            fint_previous_step = np.matmul(gprevious * DFFem.k_elem, uprevious_local) / hel_bc
+            fint_previous_step = (
+                np.matmul(gprevious * DFFem.k_elem, uprevious_local) / hel_bc
+            )
             # The reaction force is taken as an average between the internal force in the current and previous time-set
             freact = (fint_current_step + fint_previous_step) * 0.5
             # Stress on the boundary
@@ -238,9 +258,14 @@ def computeEnergiesLipfield(uprevious_bc_left, uprevious_bc_right, u, v, d, dpre
     return energy_potential, energy_kinetic, energy_dissipated, external_work
 
 
-
-
-def computeVarEnergyCZM(energy_potential, energy_kinetic, energy_dissipated, Erev, energy_contact, external_work):
+def computeVarEnergyCZM(
+    energy_potential,
+    energy_kinetic,
+    energy_dissipated,
+    Erev,
+    energy_contact,
+    external_work,
+):
     """Returns the variation of energies between the current time step and the time step 0."""
 
     var_energy_potential = np.zeros(DFMesh.n_steps)
@@ -250,7 +275,7 @@ def computeVarEnergyCZM(energy_potential, energy_kinetic, energy_dissipated, Ere
     varErev = np.zeros(DFMesh.n_steps)
     varEtot = np.zeros(DFMesh.n_steps)
     var_external_work = np.zeros(DFMesh.n_steps)
-    
+
     for n in range(1, DFMesh.n_steps):
         var_energy_potential[n] = energy_potential[n] - energy_potential[0]
         var_energy_kinetic[n] = energy_kinetic[n] - energy_kinetic[0]
@@ -259,29 +284,51 @@ def computeVarEnergyCZM(energy_potential, energy_kinetic, energy_dissipated, Ere
         var_energy_contact[n] = energy_contact[n] - energy_contact[0]
         var_external_work[n] = external_work[n] - external_work[0]
         varEtot[n] = var_external_work[n] - (
-            var_energy_potential[n] + var_energy_kinetic[n] + var_energy_dissipated[n] + varErev[n] + var_energy_contact[n]
+            var_energy_potential[n]
+            + var_energy_kinetic[n]
+            + var_energy_dissipated[n]
+            + varErev[n]
+            + var_energy_contact[n]
         )
 
-    return var_energy_potential, var_energy_kinetic,  var_energy_dissipated, varErev, var_energy_contact, var_external_work, varEtot
+    return (
+        var_energy_potential,
+        var_energy_kinetic,
+        var_energy_dissipated,
+        varErev,
+        var_energy_contact,
+        var_external_work,
+        varEtot,
+    )
 
 
-def computeVarEnergyLipfield(energy_potential, energy_kinetic, energy_dissipated, external_work):
+def computeVarEnergyLipfield(
+    energy_potential, energy_kinetic, energy_dissipated, external_work
+):
     """Returns the variation of energies between the current time step and the time step 0."""
 
     var_energy_potential = np.zeros(DFMesh.n_steps)
     var_energy_kinetic = np.zeros(DFMesh.n_steps)
     var_energy_dissipated = np.zeros(DFMesh.n_steps)
     var_external_work = np.zeros(DFMesh.n_steps)
-    var_energy_total= np.zeros(DFMesh.n_steps)
-    
+    var_energy_total = np.zeros(DFMesh.n_steps)
+
     for n in range(1, DFMesh.n_steps):
         var_energy_potential[n] = energy_potential[n] - energy_potential[0]
         var_energy_kinetic[n] = energy_kinetic[n] - energy_kinetic[0]
         var_energy_dissipated[n] = energy_dissipated[n] - energy_dissipated[0]
         var_external_work[n] = external_work[n] - external_work[0]
-        var_energy_total[n] = var_external_work[n] - (var_energy_potential[n] + var_energy_kinetic[n] + var_energy_dissipated[n])
+        var_energy_total[n] = var_external_work[n] - (
+            var_energy_potential[n] + var_energy_kinetic[n] + var_energy_dissipated[n]
+        )
 
-    return var_energy_potential, var_energy_kinetic, var_energy_dissipated, var_external_work, var_energy_total
+    return (
+        var_energy_potential,
+        var_energy_kinetic,
+        var_energy_dissipated,
+        var_external_work,
+        var_energy_total,
+    )
 
 
 def PowerCZM(Epot, Ekin, Edis, Erev, Econ, Wext):
