@@ -67,7 +67,7 @@ def logStress(time_step, stress_evolution, current_stress):
     return stress_evolution
 
 
-def stressBar(current_stress, nelements_at_current_step):
+def stressBar(current_stress):
     """Returns the average stress at the whole bar at each time step.\n
     Arguments:\n
     current_stress: the stress vector of the current time step.\n
@@ -77,7 +77,7 @@ def stressBar(current_stress, nelements_at_current_step):
     n_elements = len(DFMesh.materials)
     for el in range(n_elements):
         sum_stress += current_stress[el]
-    avg_stress_bar = sum_stress / nelements_at_current_step
+    avg_stress_bar = sum_stress / n_elements
 
     return avg_stress_bar
 
@@ -262,7 +262,7 @@ def computeEnergiesLipfield(
     return energy_potential, energy_kinetic, energy_dissipated, external_work
 
 
-def computeVarEnergyCZM(
+def computeVarEnergiesCZM(
     energy_potential,
     energy_kinetic,
     energy_dissipated,
@@ -306,7 +306,7 @@ def computeVarEnergyCZM(
     )
 
 
-def computeVarEnergyLipfield(
+def computeVarEnergiesLipfield(
     energy_potential, energy_kinetic, energy_dissipated, external_work
 ):
     """Returns the variation of energies between the current time step and the time step 0."""
