@@ -162,10 +162,11 @@ nstep_peak = int(time_peakstress / dt)  # Time-step to peak stress
 
 v0 = np.array([strain_rate * i for i in node_coord])  # Initial velocity 
 acel0 = np.zeros(n_dofs) # Initial acceleration 
-d0 = np.zeros(n_elements)  # Initial damage
 p = np.zeros(n_steps + 1, n_dofs)  # External forces 
 C = np.zeros(n_dofs, n_dofs)  # Damping 
 Eg = np.zeros(n_elements)
+if use_lipfield == True:
+    d0 = np.zeros(n_elements)  # Initial damage
 
 # Initial displacement
 # Apply initial displacement neq zero to save computational time during pre-crack phase for low strain-rates
