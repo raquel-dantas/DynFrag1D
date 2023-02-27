@@ -42,7 +42,7 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
         d_next = DFDiffuseDamage.computeDamageNextTimeStep(u_next, d, use_FM=True)
 
         # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
-        f_int = DFDiffuseDamage.InternalForce(u_next, d_next)
+        f_int = DFDiffuseDamage.internalForce(u_next, d_next)
     
     else:
         f_int = DFInterface.internalForce(u_next)

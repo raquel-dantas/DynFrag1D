@@ -104,7 +104,7 @@ def computeDamagePredictor(u_next, dn):
         fun=functional,
         x0=dn,
         method="SLSQP",
-        bounds=zip(dn, [1.0] * DFMesh.n_el),
+        bounds=zip(dn, [1.0] * DFMesh.n_elements),
         tol=1e-6,
     )
     if damage_predictor_opt.success == False:
@@ -189,20 +189,20 @@ def computeProjectionsUsingFM_lip_projector_1D(
 
                 delta_projection = (
                     (projection[index_neighbour] - projection_current_index)
-                    / DFMesh.hun
+                    / DFMesh.h_uniform
                     * regularization_lenght
                 )
 
                 if delta_projection < -1.0:
                     update_projection_value = True
                     new_projection = (
-                        projection_current_index - DFMesh.hun / regularization_lenght
+                        projection_current_index - DFMesh.h_uniform / regularization_lenght
                     )
 
                 elif delta_projection > 1.0:
                     update_projection_value = True
                     new_projection = (
-                        projection_current_index + DFMesh.hun / regularization_lenght
+                        projection_current_index + DFMesh.h_uniform / regularization_lenght
                     )
 
                 if update_projection_value == True:
@@ -225,7 +225,7 @@ def computeDamageLipConstraint(strain, region_optimization, dn):
     size = len(region_optimization)
     # Inputs for LinearConstraint
     A = scipy.sparse.eye(size - 1, size) - scipy.sparse.eye(size - 1, size, 1)
-    b = DFMesh.hun / reg_length
+    b = DFMesh.h_uniform / reg_length
     constraints = LinearConstraint(A, -b * np.ones(size - 1), b * np.ones(size - 1))
     # Bounds
     bound_inf = [dn[region_optimization[i]] for i in range(size)]
@@ -262,7 +262,7 @@ def computeDamageNextTimeStep(u_next, dn, use_FM=False):
     u_next -- displacement at the next time-step (n+1);\n
     dn -- damage at time-step (n)."""
 
-    d_next = np.zeros(DFMesh.n_el)
+    d_next = np.zeros(DFMesh.n_elements)
     region_lip = []
     small_number = 10e-5
 
@@ -270,7 +270,7 @@ def computeDamageNextTimeStep(u_next, dn, use_FM=False):
     strain = [
         (u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]])
         / DFMesh.getElemLength(el)
-        for el in range(DFMesh.n_el)
+        for el in range(DFMesh.n_elements)
     ]
 
     # Compute damage predictor (dp) -- Only imposition of D space
@@ -284,7 +284,7 @@ def computeDamageNextTimeStep(u_next, dn, use_FM=False):
         upper, lower = computeProjections(dp)
 
     # Verify if the projections are supperposed
-    for el in range(DFMesh.n_el):
+    for el in range(DFMesh.n_elements):
 
         # If projections are superposed
         if upper[el] - lower[el] < small_number:
@@ -320,7 +320,7 @@ def internalForce(u, d):
     n_dofs = u.shape[0]
     fint = np.zeros(n_dofs)
 
-    for el in range(DFMesh.n_el):
+    for el in range(DFMesh.n_elements):
         g = (1.0 - d[el]) ** 2
         # u_loc returns a vector contained u for a local dof
         u_loc = np.array([u[DFFem.getGlobalIndex(el, 0)], u[DFFem.getGlobalIndex(el, 1)]])

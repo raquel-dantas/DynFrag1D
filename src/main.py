@@ -204,19 +204,23 @@ def runSimulation(strain_rate):
 
     if DFMesh.use_lipfield == True:
 
-        var_energy_potential,
-        var_energy_kinetic,
-        var_energy_dissipated,
-        var_external_work,
-        var_energy_total = DFPostProcess.computeVarEnergiesLipfield(
+        (
+            var_energy_potential,
+            var_energy_kinetic,
+            var_energy_dissipated,
+            var_external_work,
+            var_energy_total,
+        ) = DFPostProcess.computeVarEnergiesLipfield(
             energy_potential, energy_kinetic, energy_dissipated, external_work
         )
 
-        power_potential,
-        power_kinetic,
-        power_dissipated,
-        power_external_work,
-        power_total = DFPostProcess.computePowerLipfield(
+        (
+            power_potential,
+            power_kinetic,
+            power_dissipated,
+            power_external_work,
+            power_total,
+        ) = DFPostProcess.computePowerLipfield(
             energy_potential, energy_kinetic, energy_dissipated, external_work
         )
 

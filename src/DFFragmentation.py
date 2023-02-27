@@ -20,7 +20,7 @@ def getFragmentSizes(damage):
     coord = DFMesh.listDofCoord()
     previous_crack_coord = DFMesh.x0
     j = 0
-    for i in range(len(DFMesh.materials)):
+    for i in range(DFMesh.n_elements - 1):
         if damage[i] > 0.999:
             fragments_lengths[j] = coord[DFFem.getGlobalIndex(i, 0), 0] - previous_crack_coord
             previous_crack_coord = coord[DFFem.getGlobalIndex(i, 1), 0]
