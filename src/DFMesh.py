@@ -71,21 +71,15 @@ if use_akantu:
 else:
     h_uniform = bar_length / n_elements
 
-# node_id : returns the global node id for all elements
-node_id = [[i, i + 1] for i in range(n_elements)]
+node_id = [[i, i + 1] for i in range(n_elements)] # node_id : returns the global node id for all elements
 
 # Append the nodes with apllied BCs to match material convention
 node_id.append([0])  # Applied velocity at id = 0
 node_id.append([n_elements])  # Applied velocity at id = nb_elements
 
-# connect: returns the connectivity of all elements
-connect = copy.deepcopy(node_id)
-
-# nb_dofs: number of degree of freedom
+connect = copy.deepcopy(node_id) # connect: returns the connectivity of all elements
 n_dofs = max(list(itertools.chain.from_iterable(connect))) + 1
-
-# n_points: number of geometric points in the mesh
-n_points = n_dofs
+n_points = n_dofs # n_points: number of geometric points in the mesh
 
 if create_mesh:
     # uniform_coord: returns the points coodinate for a uniform mesh
