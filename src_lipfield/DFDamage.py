@@ -98,7 +98,7 @@ def computeDamagePredictor(u_next, dn):
         x0=dn,
         method="SLSQP",
         bounds=zip(dn, [1.0] * DFMesh.n_el),
-        tol=1e-6,
+        tol=1e-5,
     )
     if damage_predictor_opt.success == False:
         raise Exception("optimization damage predictor failed")
