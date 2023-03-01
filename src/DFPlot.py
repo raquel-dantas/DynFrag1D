@@ -360,8 +360,8 @@ DATASET UNSTRUCTURED_GRID
         + "\n"
     )
 
-    cellist = np.zeros((DFMesh.n_el, 3), dtype=int)
-    for i in range(DFMesh.n_el):
+    cellist = np.zeros((DFMesh.n_elements, 3), dtype=int)
+    for i in range(DFMesh.n_elements):
         cellist[i, 0] = len(DFMesh.connect[i])
         cellist[i, 1] = DFMesh.connect[i][0]
         cellist[i, 2] = DFMesh.connect[i][1]
@@ -378,9 +378,9 @@ DATASET UNSTRUCTURED_GRID
 
     celltypes = (
         "\nCELL_TYPES "
-        + str(DFMesh.n_el)
+        + str(DFMesh.n_elements)
         + "\n"
-        + "\n".join(map(str, [3] * DFMesh.n_el))
+        + "\n".join(map(str, [3] * DFMesh.n_elements))
         + "\n"
     )
 
@@ -393,11 +393,11 @@ DATASET UNSTRUCTURED_GRID
 
     el_avgdisp = [
         (u[DFMesh.connect[el][0]] + u[DFMesh.connect[el][1]]) * 0.5
-        for el in range(DFMesh.n_el)
+        for el in range(DFMesh.n_elements)
     ]
 
     avgdisp = np.zeros((ndofs, 3))
-    for el in range(DFMesh.n_el):
+    for el in range(DFMesh.n_elements):
         avgdisp[DFMesh.connect[el][0], 0] = el_avgdisp[el]
         avgdisp[DFMesh.connect[el][1], 0] = el_avgdisp[el]
 
@@ -409,9 +409,9 @@ DATASET UNSTRUCTURED_GRID
 
     stressplot = (
         "StressX 1 "
-        + str(DFMesh.n_el)
+        + str(DFMesh.n_elements)
         + " float\n"
-        + "\n".join(map(str, stress[: DFMesh.n_el]))
+        + "\n".join(map(str, stress[: DFMesh.n_elements]))
         + "\n"
     )
 
@@ -420,7 +420,7 @@ DATASET UNSTRUCTURED_GRID
     output.write(points)
     output.write(cells)
     output.write(celltypes)
-    output.write("\nCELL_DATA " + str(DFMesh.n_el) + "\n")
+    output.write("\nCELL_DATA " + str(DFMesh.n_elements) + "\n")
     output.write("FIELD FieldData 1\n")
     output.write(stressplot)
     output.write("\nPOINT_DATA " + str(len(u)) + "\n")
