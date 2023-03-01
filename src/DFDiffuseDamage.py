@@ -356,7 +356,39 @@ def computeDamageNextStep_useProjection(u_next, dn, predictor_method, projection
 
     return d_next
 
+def computeDamageNext_noProjection(u_next, dprevious_step):
 
+    # Compute strain using u_next
+    strain = [
+        (u_next[DFMesh.connect[el][1]] - u_next[DFMesh.connect[el][0]])
+        / DFMesh.getElemLength(el)
+        for el in range(DFMesh.n_elements)
+    ]
+
+    functional = getFunctionalWholeDomain(strain)
+    # Size of the domain
+    size = len(dprevious_step)
+
+    # Inputs for LinearConstraint
+    A = scipy.sparse.eye(size - 1, size) - scipy.sparse.eye(size - 1, size, 1)
+    b = DFMesh.h_uniform / regularization_length
+    constraints = LinearConstraint(A, -b * np.ones(size - 1), b * np.ones(size - 1))
+    # Bounds
+
+    dlip_opt = minimize(
+        fun=functional,
+        x0=dprevious_step,
+        method="SLSQP",
+        bounds=zip(dprevious_step, [1.0]*size),
+        tol=tolerance_opt,
+        constraints=constraints,
+    )
+    if dlip_opt.success == False:
+        raise Exception("optimization failed")
+
+    d_next = dlip_opt.x
+
+    return d_next
 
 
 def internalForce(u, d):
