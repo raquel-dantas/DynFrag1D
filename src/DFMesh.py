@@ -27,7 +27,6 @@ applied_vel = strain_rate * bar_length / 2.0
 
 # Assign method
 use_1d_cohesive_elements = inputdata.use_1d_cohesive_elements
-use_akantu = inputdata.use_akantu
 use_lipfield = inputdata.use_lipfield
 
 # Assign mesh inputs
@@ -63,13 +62,7 @@ bc_dict = {
 # Mesh
 
 # Compute the size of elements (h) for uniform mesh
-if use_akantu:
-    if n_elements % 2 != 0:
-        raise Exception("For use Akantu the number of elements must be even.")
-    else:
-        h_uniform = bar_length / (n_elements * 0.5)
-else:
-    h_uniform = bar_length / n_elements
+h_uniform = bar_length / n_elements
 
 node_id = [[i, i + 1] for i in range(n_elements)] # node_id : returns the global node id for all elements
 
@@ -101,7 +94,7 @@ else:
         node_coord = pickle.load(handle)
 
 # intpoit_coord: returns the coordinates of integration points
-intpoint_coord = [(node_coord[i + 1] - node_coord[i] for i in range(n_elements - 1))]
+intpoint_coord = [node_coord[i + 1] - 0.5*node_coord[i] for i in range(n_elements)]
 
 
 # Interface parameters
