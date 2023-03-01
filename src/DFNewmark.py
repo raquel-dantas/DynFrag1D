@@ -39,7 +39,8 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
 
     if DFMesh.use_lipfield:
         # Compute damage at the next time-step (d_next)
-        d_next = DFDiffuseDamage.computeDamageNextTimeStep(u_next, d, use_FM=True)
+        # d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='SLSQP', projection_method='SLSQP')
+        d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='Newton', projection_method='FM')
 
         # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
         f_int = DFDiffuseDamage.internalForce(u_next, d_next)
