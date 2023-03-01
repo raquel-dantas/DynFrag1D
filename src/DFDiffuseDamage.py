@@ -18,15 +18,23 @@ tolerance_opt = 1e-5
 
 
 # Energy release rate (Yc)
-Yc = [DFMesh.stress_critical[el] ** 2 / (2.0 * DFMesh.young_modulus)
-    for el in range(DFMesh.n_elements)]
+Yc = [
+    DFMesh.stress_critical[el] ** 2 / (2.0 * DFMesh.young_modulus)
+    for el in range(DFMesh.n_elements)
+]
 
 
 # Constant lambda
-lamb_lip = [2.0 * Yc[el] * regularization_length / DFMesh.fracture_energy
-    for el in range(DFMesh.n_elements)]
-lamb_czm_mimic = [DFMesh.stress_critical[el] * DFMesh.h_uniform / (DFMesh.young_modulus * DFMesh.crack_critical[el])
-    for el in range(DFMesh.n_elements)]
+lamb_lip = [
+    2.0 * Yc[el] * regularization_length / DFMesh.fracture_energy
+    for el in range(DFMesh.n_elements)
+]
+lamb_czm_mimic = [
+    DFMesh.stress_critical[el]
+    * DFMesh.h_uniform
+    / (DFMesh.young_modulus * DFMesh.crack_critical[el])
+    for el in range(DFMesh.n_elements)
+]
 lamb_const = lamb_lip
 # if max(lamb_const) > 1.0 / 3.0:
 #     raise Exception("lambda > 1/3 -> h(d) not convex!")
@@ -36,8 +44,10 @@ lamb_const = lamb_lip
 def h_lip(lamb, d):
     return (2.0 * d - d**2) / (1.0 - d + lamb * d**2) ** 2
 
+
 def h_czm(lamb, d):
     return 1.0 / (1.0 - lamb) * ((1.0 / ((1.0 - lamb) * (1.0 - d) ** 2 + lamb)) - 1.0)
+
 
 h = h_lip
 
@@ -110,38 +120,66 @@ def computeDamagePredictorUsingSLSQP(strain, dn):
 
     return damage_predictor
 
+
 def getGradFunctional(strain, damage):
-    
-    first_derivative_g = [- 2. * (1. - damage[i]) for i in range(len(damage))]
-    first_derivative_h =  [(2. + 2. * (-3. + damage[i]) * damage[i]**2 * lamb_const[i]) / (1. + damage[i] * (-1. + damage[i] * lamb_const[i]))**3  for i in range(len(damage))]
-    grad = np.array([ 0.5 * first_derivative_g[i] * DFMesh.young_modulus * strain[i] ** 2 + Yc[i] * first_derivative_h[i] for i in range(len(damage))])
+
+    first_derivative_g = [-2.0 * (1.0 - damage[i]) for i in range(len(damage))]
+    first_derivative_h = [
+        (2.0 + 2.0 * (-3.0 + damage[i]) * damage[i] ** 2 * lamb_const[i])
+        / (1.0 + damage[i] * (-1.0 + damage[i] * lamb_const[i])) ** 3
+        for i in range(len(damage))
+    ]
+    grad = np.array(
+        [
+            0.5 * first_derivative_g[i] * DFMesh.young_modulus * strain[i] ** 2
+            + Yc[i] * first_derivative_h[i]
+            for i in range(len(damage))
+        ]
+    )
 
     return grad
 
 
 def getHessFunctional(strain, damage):
 
-    second_derivative_g = 2.
-    second_derivative_h = [(6. + 6.*damage[i]*lamb_const[i]*(-4. + damage[i])*damage[i]**2*lamb_const[i])/ (1. + damage[i] * (-1. + damage[i]*lamb_const[i]))**4 for i in range(len(damage))]
-    hess = np.array([0.5 * second_derivative_g * DFMesh.young_modulus * strain[i] ** 2 + Yc[i] * second_derivative_h[i] for i in range(len(damage))])
+    second_derivative_g = 2.0
+    second_derivative_h = [
+        (
+            6.0
+            + 6.0
+            * damage[i]
+            * lamb_const[i]
+            * (-4.0 + damage[i])
+            * damage[i] ** 2
+            * lamb_const[i]
+        )
+        / (1.0 + damage[i] * (-1.0 + damage[i] * lamb_const[i])) ** 4
+        for i in range(len(damage))
+    ]
+    hess = np.array(
+        [
+            0.5 * second_derivative_g * DFMesh.young_modulus * strain[i] ** 2
+            + Yc[i] * second_derivative_h[i]
+            for i in range(len(damage))
+        ]
+    )
 
     return hess
 
 
-def computeDamagePredictorUsingNewton(damage_previous_step):
+def computeDamagePredictorUsingNewton(strain, damage_previous_step):
 
-    dp = np.zeros(len(damage_previous_step))
     d_previous = damage_previous_step
 
-    grad = getGradFunctional(d_previous)
-    hess = getHessFunctional(d_previous)
+    grad = getGradFunctional(strain, d_previous)
+    hess = getHessFunctional(strain, d_previous)
 
     dp = d_previous - grad / hess
     dp = np.clip(dp, damage_previous_step, 1)
 
     n_interrupt = 0
-    n_max_interations = 10
-    error = 1e-5
+    n_max_interations = 500
+    error = tolerance_opt
     norm_residual = np.linalg.norm(dp - d_previous) / np.sqrt(DFMesh.n_elements)
 
     while n_interrupt < n_max_interations and norm_residual > error:
@@ -149,8 +187,8 @@ def computeDamagePredictorUsingNewton(damage_previous_step):
         n_interrupt += 1
         d_previous = dp.copy()
 
-        grad = getGradFunctional(d_previous)
-        hess = getHessFunctional(d_previous)
+        grad = getGradFunctional(strain, d_previous)
+        hess = getHessFunctional(strain, d_previous)
 
         dp = d_previous - grad / hess
         dp = np.clip(dp, damage_previous_step, 1)
@@ -158,23 +196,22 @@ def computeDamagePredictorUsingNewton(damage_previous_step):
         norm_residual = np.linalg.norm(dp - d_previous) / np.sqrt(DFMesh.n_elements)
 
     if norm_residual > error:
+        print(norm_residual)
         raise Exception("optimization damage predictor failed ")
-        
+
     return dp
-
-
 
 
 def computeProjectionsUsingSLSQP(damage_prediction):
     """Returns the damage_prediction upper and lower projections by solving an optimization problem with scipy.optimize.minimize method=SLSQP."""
 
-    lower = np.zeros(DFMesh.n_el)
-    upper = np.zeros(DFMesh.n_el)
+    lower = np.zeros(DFMesh.n_elements)
+    upper = np.zeros(DFMesh.n_elements)
 
-    for el in range(DFMesh.n_el):
+    for el in range(DFMesh.n_elements):
         upper_opt = minimize(
             lambda y: -damage_prediction[np.searchsorted(DFMesh.node_coord, y[0]) - 1]
-            + abs(DFMesh.x[el] - y[0]) / regularization_length,
+            + abs(DFMesh.intpoint_coord[el] - y[0]) / regularization_length,
             x0=0.0,
             method="SLSQP",
             bounds=[(DFMesh.x0, DFMesh.xf)],
@@ -186,7 +223,7 @@ def computeProjectionsUsingSLSQP(damage_prediction):
 
         lower_opt = minimize(
             lambda y: damage_prediction[np.searchsorted(DFMesh.node_coord, y[0]) - 1]
-            + abs(DFMesh.x[el] - y[0]) / regularization_length,
+            + abs(DFMesh.intpoint_coord[el] - y[0]) / regularization_length,
             x0=0.0,
             method="SLSQP",
             bounds=[(DFMesh.x0, DFMesh.xf)],
@@ -215,7 +252,7 @@ def computeProjectionsUsingFM(damage_predictor, flank):
 
     # Let's assume initially the projection equal to the damage predictor
     projection = damage_predictor.copy()
-    slope_limit = 1. / regularization_length
+    slope_limit = 1.0 / regularization_length
     # Configure key for trial set according to the projection if upper (flank=max) or lower (flank=min)
     if flank == "min":
         trial_set = SortedList(key=lambda x: (-x[0], x[1]))
@@ -226,7 +263,7 @@ def computeProjectionsUsingFM(damage_predictor, flank):
     for index, projection_value in enumerate(projection):
         trial_set.add((projection_value, index))
 
-    # Initialize the frozen set 
+    # Initialize the frozen set
     frozen_set = set()
 
     while len(trial_set) > 0:
@@ -236,18 +273,24 @@ def computeProjectionsUsingFM(damage_predictor, flank):
         neighbours = get_neighbour(index)
 
         for index_neighbour in neighbours:
-            if index_neighbour not in frozen_set:      
+            if index_neighbour not in frozen_set:
                 update_projection_value = False
 
-                delta_projection = (projection[index_neighbour] - projection_current_index) / DFMesh.hun 
+                delta_projection = (
+                    projection[index_neighbour] - projection_current_index
+                ) / DFMesh.h_uniform
 
                 if delta_projection < -slope_limit:
                     update_projection_value = True
-                    new_projection = projection_current_index - DFMesh.hun /  regularization_length
+                    new_projection = (
+                        projection_current_index - DFMesh.h_uniform / regularization_length
+                    )
 
                 elif delta_projection > slope_limit:
                     update_projection_value = True
-                    new_projection = projection_current_index + DFMesh.hun / regularization_length
+                    new_projection = (
+                        projection_current_index + DFMesh.h_uniform / regularization_length
+                    )
 
                 if update_projection_value == True:
                     trial_set.discard((projection[index_neighbour], index_neighbour))
@@ -300,7 +343,9 @@ def groupSubregion(region_lip):
     return regions
 
 
-def computeDamageNextStep_useProjection(u_next, dn, predictor_method, projection_method):
+def computeDamageNextStep_useProjection(
+    u_next, dn, predictor_method, projection_method
+):
     """Returns the damage at the next time-step (n+1) for all the domain.\n
     Arguments:\n
     u_next -- displacement at the next time-step (n+1);\n
@@ -320,15 +365,15 @@ def computeDamageNextStep_useProjection(u_next, dn, predictor_method, projection
     ]
 
     # Compute damage predictor (dp) -- Only imposition of D space
-    if predictor_method == 'SLSQP':
+    if predictor_method == "SLSQP":
         dp = computeDamagePredictorUsingSLSQP(strain, dn)
-    if predictor_method == 'Newton':
+    if predictor_method == "Newton":
         dp = computeDamagePredictorUsingNewton(strain, dn)
 
     # Compute upper and lower projections of the damage predictor
-    if projection_method == 'SLSQP':
+    if projection_method == "SLSQP":
         upper, lower = computeProjectionsUsingSLSQP(dp)
-    if projection_method == 'FM':
+    if projection_method == "FM":
         upper = computeProjectionsUsingFM(dp, flank="max")
         lower = computeProjectionsUsingFM(dp, flank="min")
 
@@ -356,6 +401,7 @@ def computeDamageNextStep_useProjection(u_next, dn, predictor_method, projection
 
     return d_next
 
+
 def computeDamageNext_noProjection(u_next, dprevious_step):
 
     # Compute strain using u_next
@@ -379,7 +425,7 @@ def computeDamageNext_noProjection(u_next, dprevious_step):
         fun=functional,
         x0=dprevious_step,
         method="SLSQP",
-        bounds=zip(dprevious_step, [1.0]*size),
+        bounds=zip(dprevious_step, [1.0] * size),
         tol=tolerance_opt,
         constraints=constraints,
     )
@@ -403,7 +449,9 @@ def internalForce(u, d):
     for el in range(DFMesh.n_elements):
         g = (1.0 - d[el]) ** 2
         # u_loc returns a vector contained u for a local dof
-        u_loc = np.array([u[DFFem.getGlobalIndex(el, 0)], u[DFFem.getGlobalIndex(el, 1)]])
+        u_loc = np.array(
+            [u[DFFem.getGlobalIndex(el, 0)], u[DFFem.getGlobalIndex(el, 1)]]
+        )
         fint_loc = g * np.matmul(DFFem.k_elem, u_loc) / DFMesh.getElemLength(el)
         # Contribution of each dof in the internal force vector
         for i_loc in range(2):
