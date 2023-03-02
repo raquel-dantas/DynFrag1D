@@ -36,8 +36,8 @@ lamb_czm_mimic = [
     for el in range(DFMesh.n_elements)
 ]
 lamb_const = lamb_lip
-# if max(lamb_const) > 1.0 / 3.0:
-#     raise Exception("lambda > 1/3 -> h(d) not convex!")
+if max(lamb_const) > 1.0 / 3.0:
+    raise Exception("lambda > 1/3 -> h(d) not convex!")
 
 
 # Softening function of damage h(d)
