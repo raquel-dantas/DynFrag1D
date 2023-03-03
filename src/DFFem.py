@@ -52,7 +52,7 @@ def contributeEl(M, F, elem_index):
     M[i_gl, i_gl] += m_elem[i_loc, i_loc] * DFMesh.getElemLength(elem_index)
 
 
-def Contribute(M, F, elem_index):
+def contribute(M, F, elem_index):
     material_id = DFMesh.materials[elem_index]
     if material_id == 0:
         contributeEl(M, F, elem_index)
@@ -70,6 +70,6 @@ def globalSystem():
 
     # Assembly of elements
     n_elements = len(DFMesh.connect)
-    [Contribute(M, F, i_el) for i_el in range(n_elements)]
+    [contribute(M, F, i_el) for i_el in range(n_elements)]
 
     return M, F
