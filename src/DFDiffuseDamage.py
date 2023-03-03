@@ -167,7 +167,7 @@ def getHessFunctional(strain, damage):
     return hess
 
 
-def computeDamagePredictorUsingNewton(strain, damage_previous_step):
+def computeDamagePredictor_useNewton(strain, damage_previous_step):
 
     d_previous = damage_previous_step
 
@@ -202,7 +202,7 @@ def computeDamagePredictorUsingNewton(strain, damage_previous_step):
     return dp
 
 
-def computeProjectionsUsingSLSQP(damage_prediction):
+def computeProjections_useSLSQP(damage_prediction):
     """Returns the damage_prediction upper and lower projections by solving an optimization problem with scipy.optimize.minimize method=SLSQP."""
 
     lower = np.zeros(DFMesh.n_elements)
@@ -245,7 +245,7 @@ def get_neighbour(index):
 
 
 # Use FM to compute projections based in function provide by GEM code
-def computeProjectionsUsingFM(damage_predictor, flank):
+def computeProjections_useFM(damage_predictor, flank):
     """Returns the damage_predictor projection by usign FastMarching.\n
     For the uuper prediction set flank='max'\n
     For the lower prediction set flank='min'."""
@@ -298,6 +298,7 @@ def computeProjectionsUsingFM(damage_predictor, flank):
                     projection[index_neighbour] = new_projection
 
     return projection
+
 
 
 def computeDamageLipConstraint(strain, region_optimization, dn):
@@ -368,14 +369,14 @@ def computeDamageNextStep_useProjection(
     if predictor_method == "SLSQP":
         dp = computeDamagePredictorUsingSLSQP(strain, dn)
     if predictor_method == "Newton":
-        dp = computeDamagePredictorUsingNewton(strain, dn)
+        dp = computeDamagePredictor_useNewton(strain, dn)
 
     # Compute upper and lower projections of the damage predictor
     if projection_method == "SLSQP":
-        upper, lower = computeProjectionsUsingSLSQP(dp)
+        upper, lower = computeProjections_useSLSQP(dp)
     if projection_method == "FM":
-        upper = computeProjectionsUsingFM(dp, flank="max")
-        lower = computeProjectionsUsingFM(dp, flank="min")
+        upper = computeProjections_useFM(dp, flank="max")
+        lower = computeProjections_useFM(dp, flank="min")
 
     # Verify if the projections are supperposed
     for el in range(DFMesh.n_elements):
