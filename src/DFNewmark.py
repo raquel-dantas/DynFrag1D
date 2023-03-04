@@ -37,10 +37,11 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
     # Compute velocity predictor (vp)
     vp = v + (1.0 - gamma) * dt * acel
 
-    if DFMesh.use_lipfield:
+    if DFMesh.use_lipfield == True:
         # Compute damage at the next time-step (d_next)
         # d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='SLSQP', projection_method='SLSQP')
         d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='Newton', projection_method='FM')
+        # d_next = DFDiffuseDamage.computeDamageNextStep_noProjection(u_next, d)
 
         # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
         f_int = DFDiffuseDamage.internalForce(u_next, d_next)
@@ -58,7 +59,7 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
         if DFMesh.materials[i_el] == 2:
             value, bc_type = DFMesh.bc_dict[DFMesh.materials[i_el]]
             if bc_type == "dirichlet":
-                i_dof = DFFem.Gl_index(i_el, 0)
+                i_dof = DFFem.getGlobalIndex(i_el, 0)
                 u_next[i_dof] = value
                 acel_next[i_dof] = 0.0
                 v_next[i_dof] = 0.0
