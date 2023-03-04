@@ -17,7 +17,7 @@ def plot(x, y, labelx, labely, title):
     # for col in range(len(y)):
     #     plt.plot(x, y[col])
     plt.plot(x, y)
-    plt.show()
+    # plt.show()
 
 
 def plotlog(x, y, labelx, labely, title):
@@ -108,6 +108,13 @@ def plotByInterface(func):
             y[j] = func[el]
 
     plotScatter(x, y, "x", labely, title)
+
+def plotByIntPoint(func):
+    """Plot a vector of values that corresponds to each integration point"""
+
+    labely = retrieveName(func)[0]
+    plot(DFMesh.intpoint_coord, func, "x", labely, labely)
+    plt.savefig("LOG/damage.svg")
 
 
 def plotAverageStressBar(average_stress_bar):
