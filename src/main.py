@@ -47,6 +47,10 @@ def runSimulation(strain_rate):
         d = None
         energy_reversible = np.zeros(DFMesh.n_steps)
         energy_contact = np.zeros(DFMesh.n_steps)
+    
+    # if DFMesh.continue_simulation_from_step == True:
+    #     with open("src/input_files/random_stress_critical.pickle", "rb") as handle:
+    #         stress_critical = pickle.load(handle)
 
     for n in range(DFMesh.n_steps):
 
@@ -116,11 +120,15 @@ def runSimulation(strain_rate):
                     uprevious_bc_left = np.array(
                         [u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]]
                     )
+                    if DFMesh.use_lipfield == True:
+                        dprevious_bc_left = d[el_bc]
                 else:
                     el_bc = DFMesh.n_elements - 1
                     uprevious_bc_right = np.array(
                         [u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]]
                     )
+                    if DFMesh.use_lipfield == True:
+                        dprevious_bc_right = d[el_bc]
 
         # Time integration
         u, v, acel, d = DFNewmark.explicitScheme(M, u, v, acel, d, F, DFMesh.dt)
@@ -243,9 +251,12 @@ def runSimulation(strain_rate):
             power_total,
         )
 
+        DFPlot.plotByIntPoint(d)
+
     # Save results
     if DFMesh.use_1d_cohesive_elements == True:
 
+        
         DFPlot.saveResultsCZM(n_fragments)
         DFPlot.saveResultsCZM(avg_frag_size)
         DFPlot.saveResultsCZM(data_histogram_frag_size)
@@ -275,6 +286,11 @@ def runSimulation(strain_rate):
 
     if DFMesh.use_lipfield == True:
 
+        DFPlot.saveResultsLipfield(d)
+        DFPlot.saveResultsLipfield(u)
+        DFPlot.saveResultsLipfield(v)
+        DFPlot.saveResultsLipfield(acel)
+        
         DFPlot.saveResultsLipfield(n_fragments)
         DFPlot.saveResultsLipfield(avg_frag_size)
         DFPlot.saveResultsLipfield(data_histogram_frag_size)
