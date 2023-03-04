@@ -5,6 +5,7 @@ from scipy.optimize import LinearConstraint
 from itertools import groupby
 from operator import itemgetter
 from sortedcontainers import SortedList
+import copy
 
 import DFMesh
 import DFFem
@@ -14,7 +15,7 @@ import DFFem
 n_elements_regularization = 10
 regularization_length = n_elements_regularization * DFMesh.h_uniform
 weight_quadrature = 2.0
-tolerance_opt = 1e-5
+tolerance_opt = 10e-5
 
 
 # Energy release rate (Yc)
@@ -256,7 +257,7 @@ def computeProjections_useFM(damage_predictor, flank):
     # Configure key for trial set according to the projection if upper (flank=max) or lower (flank=min)
     if flank == "min":
         trial_set = SortedList(key=lambda x: (-x[0], x[1]))
-    else:
+    if flank == "max":
         trial_set = SortedList()
 
     # Add all elements to the trial set
@@ -316,10 +317,10 @@ def computeDamageLipConstraint(strain, region_optimization, dn, upper, lower):
     b = DFMesh.h_uniform / regularization_length
     constraints = LinearConstraint(A, -b * np.ones(size - 1), b * np.ones(size - 1))
     # Bounds
-    # bound_inf = [dn[region_optimization[i]] for i in range(size)]
-    bound_inf = [lower[region_optimization[i]] for i in range(size)]
-    # bound_sup = [1.0 for i in range(size)]
-    bound_sup = [upper[region_optimization[i]] for i in range(size)]
+    bound_inf = [dn[region_optimization[i]] for i in range(size)]
+    # bound_inf = [lower[region_optimization[i]] for i in range(size)]
+    bound_sup = [1.0 for i in range(size)]
+    # bound_sup = [upper[region_optimization[i]] for i in range(size)]
 
     dlip_opt = minimize(
         fun=functional,
@@ -373,12 +374,14 @@ def computeDamageNextStep_useProjection(
     if predictor_method == "Newton":
         dp = computeDamagePredictor_useNewton(strain, dn)
 
+    dp_copy = copy.deepcopy(dp)
     # Compute upper and lower projections of the damage predictor
     if projection_method == "SLSQP":
         upper, lower = computeProjections_useSLSQP(dp)
     if projection_method == "FM":
         upper = computeProjections_useFM(dp, flank="max")
         lower = computeProjections_useFM(dp, flank="min")
+    assert np.linalg.norm(dp_copy - dp) < small_number
 
     # Verify if the projections are supperposed
     for el in range(DFMesh.n_elements):
@@ -391,16 +394,31 @@ def computeDamageNextStep_useProjection(
 
     if region_lip:
         # Separate the consecutive elements in subregions
+        region_lip_copy = copy.deepcopy(region_lip)
         regions = groupSubregion(region_lip)
+        assert np.linalg.norm(np.array(region_lip_copy) - np.array(region_lip)) < small_number
 
         # Solve the optimization problem for each subregion
         for subregion in regions:
             if len(subregion) > 1:
                 dlip = computeDamageLipConstraint(strain, subregion, dn, upper, lower)
-                i = 0
-                for intpoint in subregion:
-                    d_next[intpoint] = dlip[i]
-                    i = +1
+                d_next[subregion] = dlip
+                # i = 0
+                # for intpoint in subregion:
+                #     d_next[intpoint] = dlip[i]
+                #     i += 1
+
+                for el in subregion:
+                    tolerance = 10e-8
+                    assert d_next[el] - dn[el] > - tolerance
+                    assert dp[el] - dn[el] > - tolerance
+                    assert upper[el] - dp[el] > - tolerance
+                    assert lower[el] - dp[el] < tolerance
+
+    # test derivative
+    # if __debug__:
+    #     for el in range(1, DFMesh.n_elements):
+    #         assert abs( d_next[el] - d_next[el - 1]) < abs( dn[el] - dn[el - 1])
 
     return d_next
 
