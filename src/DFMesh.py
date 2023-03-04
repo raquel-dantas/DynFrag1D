@@ -23,7 +23,8 @@ xf = inputdata.xf
 
 # Assign load
 strain_rate = inputdata.strain_rate
-applied_vel = strain_rate * bar_length / 2.0
+applied_vel = strain_rate * bar_length * 0.5
+# applied_vel = strain_rate * bar_length 
 
 # Assign method
 use_1d_cohesive_elements = inputdata.use_1d_cohesive_elements
@@ -47,8 +48,8 @@ time_simulation = inputdata.time_simulation
 # 4 : Velocity applied left node
 # 5 : Velocity applied right node
 materials = [0] * n_elements
-# materials.append(4)
-materials.append(2)
+materials.append(4)
+# materials.append(2)
 materials.append(5)
 
 
@@ -164,8 +165,9 @@ if use_lipfield == True:
 
 # Initial displacement
 # Apply initial displacement neq zero to save computational time during pre-crack phase for low strain-rates
+# if strain_rate < 5.0 * 10.0**3:
 if strain_rate < 5.0 * 10.0**3:
-    u0 = np.array([0.98 * stress_critical * i / young_modulus for i in node_coord])
+    u0 = np.array([0.98 * stress_limit * i / young_modulus for i in node_coord])
 else:
     u0 = np.zeros(n_dofs)
 
