@@ -98,7 +98,7 @@ def getFunctionalSubdomain(strain, region_lip_optimization):
     return functional_subdomain
 
 
-def computeDamagePredictorUsingSLSQP(strain, dn):
+def computeDamagePredictor_useSLSQP(strain, dn):
     """Returns an array with the damage predictor for the whole domain.\n
     Arguments: \n
     strain -- strain computed with the displacement at the next time-step(n+1); \n
@@ -175,7 +175,7 @@ def computeDamagePredictor_useNewton(strain, damage_previous_step):
     hess = getHessFunctional(strain, d_previous)
 
     dp = d_previous - grad / hess
-    dp = np.clip(dp, damage_previous_step, 1)
+    dp = np.clip(dp, damage_previous_step, 1.)
 
     n_interrupt = 0
     n_max_interations = 500
@@ -185,13 +185,13 @@ def computeDamagePredictor_useNewton(strain, damage_previous_step):
     while n_interrupt < n_max_interations and norm_residual > error:
 
         n_interrupt += 1
-        d_previous = dp.copy()
+        d_previous = dp
 
         grad = getGradFunctional(strain, d_previous)
         hess = getHessFunctional(strain, d_previous)
 
         dp = d_previous - grad / hess
-        dp = np.clip(dp, damage_previous_step, 1)
+        dp = np.clip(dp, damage_previous_step, 1.)
 
         norm_residual = np.linalg.norm(dp - d_previous) / np.sqrt(DFMesh.n_elements)
 
@@ -301,7 +301,7 @@ def computeProjections_useFM(damage_predictor, flank):
 
 
 
-def computeDamageLipConstraint(strain, region_optimization, dn):
+def computeDamageLipConstraint(strain, region_optimization, dn, upper, lower):
     """Returns an array with the damage at the next time-step for one subdomain imposing the Lipischitz constraint.\n
     Arguments:
     strain -- array with the strain for next time-step for all the elements;\n
@@ -316,8 +316,10 @@ def computeDamageLipConstraint(strain, region_optimization, dn):
     b = DFMesh.h_uniform / regularization_length
     constraints = LinearConstraint(A, -b * np.ones(size - 1), b * np.ones(size - 1))
     # Bounds
-    bound_inf = [dn[region_optimization[i]] for i in range(size)]
-    bound_sup = [1.0 for i in range(size)]
+    # bound_inf = [dn[region_optimization[i]] for i in range(size)]
+    bound_inf = [lower[region_optimization[i]] for i in range(size)]
+    # bound_sup = [1.0 for i in range(size)]
+    bound_sup = [upper[region_optimization[i]] for i in range(size)]
 
     dlip_opt = minimize(
         fun=functional,
@@ -367,7 +369,7 @@ def computeDamageNextStep_useProjection(
 
     # Compute damage predictor (dp) -- Only imposition of D space
     if predictor_method == "SLSQP":
-        dp = computeDamagePredictorUsingSLSQP(strain, dn)
+        dp = computeDamagePredictor_useSLSQP(strain, dn)
     if predictor_method == "Newton":
         dp = computeDamagePredictor_useNewton(strain, dn)
 
@@ -384,7 +386,7 @@ def computeDamageNextStep_useProjection(
         d_next[el] = dp[el]
 
         # If projections are superposed
-        if upper[el] - lower[el] > small_number:
+        if abs(upper[el] - lower[el]) > small_number:
             region_lip.append(el)
 
     if region_lip:
@@ -394,7 +396,7 @@ def computeDamageNextStep_useProjection(
         # Solve the optimization problem for each subregion
         for subregion in regions:
             if len(subregion) > 1:
-                dlip = computeDamageLipConstraint(strain, subregion, dn)
+                dlip = computeDamageLipConstraint(strain, subregion, dn, upper, lower)
                 i = 0
                 for intpoint in subregion:
                     d_next[intpoint] = dlip[i]
@@ -403,7 +405,7 @@ def computeDamageNextStep_useProjection(
     return d_next
 
 
-def computeDamageNext_noProjection(u_next, dprevious_step):
+def computeDamageNextStep_noProjection(u_next, dprevious_step):
 
     # Compute strain using u_next
     strain = [
@@ -420,7 +422,6 @@ def computeDamageNext_noProjection(u_next, dprevious_step):
     A = scipy.sparse.eye(size - 1, size) - scipy.sparse.eye(size - 1, size, 1)
     b = DFMesh.h_uniform / regularization_length
     constraints = LinearConstraint(A, -b * np.ones(size - 1), b * np.ones(size - 1))
-    # Bounds
 
     dlip_opt = minimize(
         fun=functional,
