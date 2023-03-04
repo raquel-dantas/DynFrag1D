@@ -47,7 +47,8 @@ time_simulation = inputdata.time_simulation
 # 4 : Velocity applied left node
 # 5 : Velocity applied right node
 materials = [0] * n_elements
-materials.append(4)
+# materials.append(4)
+materials.append(2)
 materials.append(5)
 
 
@@ -144,7 +145,7 @@ else:
     smallest_element = (0.2 * h_uniform)  
 dt_crit = smallest_element / ((young_modulus / rho) ** 0.5)
 
-dt = dt_crit * 0.9  # Adopted time step (s)
+dt = dt_crit * 0.5  # Adopted time step (s)
 
 n_steps = int(time_simulation / dt)  # Number of time-steps
 time_peakstress = stress_limit / (young_modulus * strain_rate)  # Time peak stress
