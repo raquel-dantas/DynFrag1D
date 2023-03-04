@@ -70,16 +70,9 @@ def logStress(time_step, stress_evolution, current_stress):
 def stressBar(current_stress):
     """Returns the average stress at the whole bar at each time step.\n
     Arguments:\n
-    current_stress: the stress vector of the current time step.\n
-    els_step: number of elements (linear + cohesive) at the current time step."""
+    current_stress: the stress vector of the current time step."""
 
-    sum_stress = 0.0
-    n_elements = len(DFMesh.materials)
-    for el in range(n_elements):
-        sum_stress += current_stress[el]
-    avg_stress_bar = sum_stress / n_elements
-
-    return avg_stress_bar
+    return sum(current_stress)/len(DFMesh.materials)
 
 
 def computeEnergiesCZM(
