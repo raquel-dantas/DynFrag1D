@@ -1,5 +1,5 @@
 import numpy as np
-
+import copy
 import DFMesh
 import DFFem
 import DFInterface
@@ -7,7 +7,7 @@ import DFDiffuseDamage
 
 
 def explicitScheme(M, u, v, acel, d, p_next, dt):
-    """Apply Newmarks explicity integration scheme. Returns vectors with displacement, velocity and aceleration in all dofs for the next time step.\n
+    """Apply Newmarks explicit integration scheme. Returns vectors with displacement, velocity and aceleration in all dofs for the next time step.\n
     Arguments: \n
     M -- Global mass matrix; \n
     u -- displacement in the current time-step;\n
@@ -33,16 +33,25 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
 
     # Compute displacement at next time-step 
     u_next = u + dt * v + ((1.0 / 2.0) * dt**2) * acel
-
+    
     # Compute velocity predictor (vp)
     vp = v + (1.0 - gamma) * dt * acel
 
     if DFMesh.use_lipfield == True:
+
+        u_next_copy = copy.deepcopy(u_next)
+        d_copy = copy.deepcopy(d)
         # Compute damage at the next time-step (d_next)
         # d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='SLSQP', projection_method='SLSQP')
+        # d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='SLSQP', projection_method='FM')
+        
         d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='Newton', projection_method='FM')
         # d_next = DFDiffuseDamage.computeDamageNextStep_noProjection(u_next, d)
-
+        
+        tolerance = 10e-8
+        assert(np.linalg.norm(u_next_copy - u_next) < tolerance)
+        assert(np.linalg.norm(d_copy - d) < tolerance)
+        
         # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
         f_int = DFDiffuseDamage.internalForce(u_next, d_next)
     
