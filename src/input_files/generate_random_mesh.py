@@ -21,7 +21,7 @@ node_coord[0] = x0
 node_coord[n_elements] = xf
 
 
-with open('src/input_files/non_uniform_mesh.pickle', 'wb') as handle:
+with open('src/input_files/mesh.pickle', 'wb') as handle:
     pickle.dump(node_coord, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
