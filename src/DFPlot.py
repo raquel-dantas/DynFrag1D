@@ -523,9 +523,9 @@ def plotLogAnalyticals(grady, gc, zmr, values_strainrate):
 def saveResultsCZM(variable):
     variable_name = retrieveName(variable)[0]
     with open('LOG/czm_' + variable_name + '.pickle', 'wb') as handle:
-        pickle.dump(variable_name, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(variable, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def saveResultsLipfield(variable):
     variable_name = retrieveName(variable)[0]
     with open('LOG/lipfield_' + variable_name + '.pickle', 'wb') as handle:
-        pickle.dump(variable_name, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(variable, handle, protocol=pickle.HIGHEST_PROTOCOL)
