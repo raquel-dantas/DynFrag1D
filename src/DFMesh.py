@@ -67,7 +67,6 @@ bc_dict = {
 h_uniform = bar_length / n_elements
 
 node_id = [[i, i + 1] for i in range(n_elements)] # node_id : returns the global node id for all elements
-
 # Append the nodes with apllied BCs to match material convention
 node_id.append([0])  # Applied velocity at id = 0
 node_id.append([n_elements])  # Applied velocity at id = nb_elements
@@ -92,7 +91,7 @@ if create_mesh:
 
 else:
     # import the coordinates from a picke file
-    with open("src/input_files/non_uniform_mesh.pickle", "rb") as handle:
+    with open("src/input_files/mesh.pickle", "rb") as handle:
         node_coord = pickle.load(handle)
 
 # intpoit_coord: returns the coordinates of integration points
@@ -159,13 +158,11 @@ v0 = np.array([strain_rate * i for i in node_coord])  # Initial velocity
 acel0 = np.zeros(n_dofs) # Initial acceleration 
 p = np.zeros((n_steps + 1, n_dofs))  # External forces 
 C = np.zeros((n_dofs, n_dofs))  # Damping 
-Eg = np.zeros(n_elements)
 if use_lipfield == True:
     d0 = np.zeros(n_elements)  # Initial damage
 
 # Initial displacement
 # Apply initial displacement neq zero to save computational time during pre-crack phase for low strain-rates
-# if strain_rate < 5.0 * 10.0**3:
 if strain_rate < 5.0 * 10.0**3:
     u0 = np.array([0.98 * stress_limit * i / young_modulus for i in node_coord])
 else:
