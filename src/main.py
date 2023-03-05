@@ -1,5 +1,4 @@
 import numpy as np
-import pickle
 import progressbar
 import time
 
@@ -10,55 +9,58 @@ import DFNewmark
 import DFInterface
 import DFPlot
 import DFFragmentation
+import DFModel
+
+
+
 
 
 def runSimulation(strain_rate):
 
-    bar = progressbar.ProgressBar(
-        maxval=50,
-        widgets=[progressbar.Bar("=", "[", "]"), " ", progressbar.Percentage()],
-    )
-    bar.start()
-
     # Initiation of variables
-    u = DFMesh.u0
-    v = DFMesh.v0
-    acel = DFMesh.acel0
-    energy_potential = np.zeros(DFMesh.n_steps)
-    energy_kinetic = np.zeros(DFMesh.n_steps)
-    energy_dissipated = np.zeros(DFMesh.n_steps)
-    external_work = np.zeros(DFMesh.n_steps)
-    work_previous_step = 0.0
-    els_step = DFMesh.n_elements
-    stress_evolution = np.zeros((2 * len(DFMesh.materials), DFMesh.n_steps))
-    avg_stress_bar = np.zeros(DFMesh.n_steps)
-    uprevious_bc_left = np.array([0, 0])
-    uprevious_bc_right = np.array([0, 0])
-    n_fragments = np.zeros(DFMesh.n_steps)
-    avg_frag_size = np.zeros(DFMesh.n_steps)
+
+    
+    u = DFModel.u
+    v = DFModel.v
+    acel = DFModel.acel
+    uprevious_bc_left = DFModel.uprevious_bc_left
+    uprevious_bc_right = DFModel.uprevious_bc_right
+
+    energy_potential = DFModel.energy_potential
+    energy_kinetic = DFModel.energy_kinetic
+    energy_dissipated = DFModel.energy_dissipated
+    external_work = DFModel.external_work
+    work_previous_step = DFModel.work_previous_step
+
+    # stress_evolution = np.zeros((2 * len(DFMesh.materials), DFMesh.n_steps))
+    avg_stress_bar = DFModel.avg_stress_bar
+
+
+    n_fragments = DFModel.n_fragments
+    avg_frag_size = DFModel.avg_frag_size
     data_histogram_frag_size = []
 
+
     if DFMesh.use_lipfield == True:
-        d = DFMesh.d0
-        dprevious_bc_left = 0.0
-        dprevious_bc_right = 0.0
+        d = DFModel.d
+        dprevious_bc_left = DFModel.dprevious_bc_left
+        dprevious_bc_right = DFModel.dprevious_bc_right
 
     if DFMesh.use_1d_cohesive_elements == True:
         d = None
-        energy_reversible = np.zeros(DFMesh.n_steps)
-        energy_contact = np.zeros(DFMesh.n_steps)
-    
-    # if DFMesh.continue_simulation_from_step == True:
-    #     with open("src/input_files/random_stress_critical.pickle", "rb") as handle:
-    #         stress_critical = pickle.load(handle)
+        energy_reversible = DFModel.energy_reversible
+        energy_contact = DFModel.energy_contact
 
-    for n in range(DFMesh.n_steps):
 
-        progress = int(bar.maxval * float(n / DFMesh.n_steps))
-        bar.update(progress)
+
+    bar = DFModel.initProgressBar()
+
+    for n in range(DFModel.n_init, DFModel.n_final):
+
+        DFModel.updateProgressBar(n, bar)
 
         strain, stress, average_stress_neighbors = DFPostProcess.postProcess(u, d)
-        stress_evolution = DFPostProcess.logStress(n, stress_evolution, stress)
+        # stress_evolution = DFPostProcess.logStress(n, stress_evolution, stress)
         avg_stress_bar[n] = DFPostProcess.stressBar(stress)
         M, F = DFFem.globalSystem()
 
@@ -140,8 +142,7 @@ def runSimulation(strain_rate):
                     u, v, acel = DFInterface.insertInterface(el, el + 1, u, v, acel)
                     els_step = els_step + 1
 
-    bar.finish()
-    print("\n")
+    DFModel.endProgressBar(bar)
 
     DFPlot.plotAverageStressBar(avg_stress_bar)
     DFPlot.plotNumberFragments(n_fragments)
@@ -290,7 +291,7 @@ def runSimulation(strain_rate):
         DFPlot.saveResultsLipfield(u)
         DFPlot.saveResultsLipfield(v)
         DFPlot.saveResultsLipfield(acel)
-        
+
         DFPlot.saveResultsLipfield(n_fragments)
         DFPlot.saveResultsLipfield(avg_frag_size)
         DFPlot.saveResultsLipfield(data_histogram_frag_size)

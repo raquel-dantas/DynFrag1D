@@ -32,4 +32,10 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 3.0 * 10**-7  # Total time of simulation (s)
+time_simulation = 6.0 * 10**-7  # Total time of simulation (s)
+
+
+initial_step = 598
+continue_simulation_from_step = True
+# if there is previous data to continue the simulation from a previous simulation set 
+# continue_simulation_from_step = True and give the time to start the simulation
