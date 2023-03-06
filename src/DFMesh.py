@@ -27,7 +27,7 @@ applied_vel = strain_rate * bar_length * 0.5
 # applied_vel = strain_rate * bar_length 
 
 # Assign method
-use_1d_cohesive_elements = inputdata.use_1d_cohesive_elements
+use_cohesive_elements = inputdata.use_cohesive_elements
 use_lipfield = inputdata.use_lipfield
 
 # Assign mesh inputs

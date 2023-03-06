@@ -2,7 +2,7 @@
 
 
 # Method
-use_1d_cohesive_elements = False
+use_cohesive_elements = False
 use_lipfield = True
 
 

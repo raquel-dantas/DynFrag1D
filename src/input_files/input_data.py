@@ -2,7 +2,7 @@
 
 
 # Method
-use_1d_cohesive_elements = False
+use_cohesive_elements = False
 use_lipfield = True
 
 
@@ -23,7 +23,7 @@ generate_limit_stress_variation = True # if there is already a file with the ran
 bar_length = 5 * 10** -3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 500  
+number_elements = 2500  
 area = 1. * 10 **-3  # Cross sectional area (m2) (Equal to element size )
 
 
@@ -32,10 +32,10 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 6.0 * 10**-7  # Total time of simulation (s)
+time_simulation = 3.0 * 10**-7  # Total time of simulation (s)
 
 
-initial_step = 598
-continue_simulation_from_step = True
+initial_step = 0
+continue_simulation_from_step = False
 # if there is previous data to continue the simulation from a previous simulation set 
 # continue_simulation_from_step = True and give the time to start the simulation

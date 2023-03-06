@@ -44,7 +44,7 @@ def runSimulation(strain_rate):
         dprevious_bc_left = DFModel.dprevious_bc_left
         dprevious_bc_right = DFModel.dprevious_bc_right
 
-    if DFMesh.use_1d_cohesive_elements == True:
+    if DFMesh.use_cohesive_elements == True:
         d = None
         energy_reversible = DFModel.energy_reversible
         energy_contact = DFModel.energy_contact
@@ -61,7 +61,7 @@ def runSimulation(strain_rate):
 
         # DFPlot.PlotVTK('animation/test',n,u,stress)
 
-        if DFMesh.use_1d_cohesive_elements == True:
+        if DFMesh.use_cohesive_elements == True:
             d = DFInterface.getDamageParameter()
 
             (
@@ -124,7 +124,7 @@ def runSimulation(strain_rate):
         # Time integration
         u, v, acel, d = DFNewmark.explicitScheme(M, u, v, acel, d, F, DFMesh.dt)
 
-        if DFMesh.use_1d_cohesive_elements == True:
+        if DFMesh.use_cohesive_elements == True:
             for el in range(DFMesh.n_elements - 1):
                 if average_stress_neighbors[el] > DFMesh.stress_critical[el]:
                     # Fracture happens: creat new interface element
@@ -138,7 +138,7 @@ def runSimulation(strain_rate):
     DFPlot.plotFragmentSizeHistogram(frag_lengths, 10)
 
     # Energy balance
-    if DFMesh.use_1d_cohesive_elements == True:
+    if DFMesh.use_cohesive_elements == True:
         (
             var_energy_potential,
             var_energy_kinetic,
@@ -244,7 +244,7 @@ def runSimulation(strain_rate):
         DFPlot.plotByIntPoint(d)
 
     # Save results
-    if DFMesh.use_1d_cohesive_elements == True:
+    if DFMesh.use_cohesive_elements == True:
 
         
         DFPlot.saveResultsCZM(n_fragments)
@@ -308,7 +308,7 @@ if __name__ == "__main__":
     runSimulation(DFMesh.strain_rate)
     total_time = time.time() - start_time
     print("--- %s seconds ---" % (time.time() - start_time))
-    if DFMesh.use_1d_cohesive_elements == True:
+    if DFMesh.use_cohesive_elements == True:
         DFPlot.saveResultsCZM(total_time)
     if DFMesh.use_lipfield == True:
         DFPlot.saveResultsLipfield(total_time)
