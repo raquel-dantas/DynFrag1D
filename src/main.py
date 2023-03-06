@@ -17,8 +17,9 @@ import DFModel
 
 def runSimulation(strain_rate):
 
-    # Initiation of variables
+    bar = DFModel.initProgressBar()
 
+    # Initiation of variables
     
     u = DFModel.u
     v = DFModel.v
@@ -32,14 +33,11 @@ def runSimulation(strain_rate):
     external_work = DFModel.external_work
     work_previous_step = DFModel.work_previous_step
 
-    # stress_evolution = np.zeros((2 * len(DFMesh.materials), DFMesh.n_steps))
     avg_stress_bar = DFModel.avg_stress_bar
-
 
     n_fragments = DFModel.n_fragments
     avg_frag_size = DFModel.avg_frag_size
     data_histogram_frag_size = []
-
 
     if DFMesh.use_lipfield == True:
         d = DFModel.d
@@ -53,28 +51,19 @@ def runSimulation(strain_rate):
 
 
 
-    bar = DFModel.initProgressBar()
-
     for n in range(DFModel.n_init, DFModel.n_final):
 
         DFModel.updateProgressBar(n, bar)
 
-        strain, stress, average_stress_neighbors = DFPostProcess.postProcess(u, d)
-        # stress_evolution = DFPostProcess.logStress(n, stress_evolution, stress)
+        stress, average_stress_neighbors = DFPostProcess.postProcess(u, d)
         avg_stress_bar[n] = DFPostProcess.stressBar(stress)
         M, F = DFFem.globalSystem()
 
-        # Plots at each time step
-        # DFPlot.PlotByDOF(v)
-        # DFPlot.PlotByElement(stress)
         # DFPlot.PlotVTK('animation/test',n,u,stress)
 
         if DFMesh.use_1d_cohesive_elements == True:
-            d = [
-                DFInterface.getDamageParameter(el)
-                for el in range(len(DFMesh.materials))
-            ]
-            # DFPlot.PlotByInterface(D)
+            d = DFInterface.getDamageParameter()
+
             (
                 energy_potential[n],
                 energy_kinetic[n],

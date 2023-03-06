@@ -64,14 +64,15 @@ def stressCohesiveLaw(jump_u, el_index):
     return stress_interface
 
 
-def getDamageParameter(el_index):
+def getDamageParameter():
     """Returns the damage parameter for an interface element.\n"""
 
-    if DFMesh.materials[el_index] == 1:
-        i = DFMesh.connect[el_index][0] - 1
-        return min(1.0, DFMesh.jump_max[el_index] / DFMesh.crack_critical[i])
-    else:
-        return 0.0
+    for el_index in range(len(DFMesh.materials)):
+        if DFMesh.materials[el_index] == 1:
+            i = DFMesh.connect[el_index][0] - 1
+            return min(1.0, DFMesh.jump_max[el_index] / DFMesh.crack_critical[i])
+        else:
+            return 0.0
 
 
 def forceInterface(u):
