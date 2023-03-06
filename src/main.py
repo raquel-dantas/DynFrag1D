@@ -1,5 +1,4 @@
 import numpy as np
-import progressbar
 import time
 
 import DFMesh
@@ -12,50 +11,31 @@ import DFFragmentation
 import DFModel
 
 
-
-
-
 def runSimulation(strain_rate):
 
     bar = DFModel.initProgressBar()
 
     # Initiation of variables
-    
+
     u = DFModel.u
     v = DFModel.v
     acel = DFModel.acel
-    uprevious_bc_left = DFModel.uprevious_bc_left
-    uprevious_bc_right = DFModel.uprevious_bc_right
-
-    energy_potential = DFModel.energy_potential
-    energy_kinetic = DFModel.energy_kinetic
-    energy_dissipated = DFModel.energy_dissipated
-    external_work = DFModel.external_work
-    work_previous_step = DFModel.work_previous_step
-
+    d = DFModel.d
     avg_stress_bar = DFModel.avg_stress_bar
+
+    data_bc = DFModel.data_bc
+    work_previous_step = DFModel.work_previous_step
+    energies = DFModel.energies
 
     n_fragments = DFModel.n_fragments
     avg_frag_size = DFModel.avg_frag_size
     data_histogram_frag_size = []
 
-    if DFMesh.use_lipfield == True:
-        d = DFModel.d
-        dprevious_bc_left = DFModel.dprevious_bc_left
-        dprevious_bc_right = DFModel.dprevious_bc_right
-
-    if DFMesh.use_cohesive_elements == True:
-        d = None
-        energy_reversible = DFModel.energy_reversible
-        energy_contact = DFModel.energy_contact
-
-
-
     for n in range(DFModel.n_init, DFModel.n_final):
 
         DFModel.updateProgressBar(n, bar)
 
-        stress, average_stress_neighbors = DFPostProcess.postProcess(u, d)
+        stress, average_stress_neighbors = DFPostProcess.computeStress(u, d)
         avg_stress_bar[n] = DFPostProcess.stressBar(stress)
         M, F = DFFem.globalSystem()
 
@@ -64,72 +44,26 @@ def runSimulation(strain_rate):
         if DFMesh.use_cohesive_elements == True:
             d = DFInterface.getDamageParameter()
 
-            (
-                energy_potential[n],
-                energy_kinetic[n],
-                energy_dissipated[n],
-                energy_reversible[n],
-                energy_contact[n],
-                external_work[n],
-            ) = DFPostProcess.computeEnergiesCZM(
-                uprevious_bc_left, uprevious_bc_right, u, v, stress, work_previous_step
-            )
-
-        if DFMesh.use_lipfield == True:
-            (
-                energy_potential[n],
-                energy_kinetic[n],
-                energy_dissipated[n],
-                external_work[n],
-            ) = DFPostProcess.computeEnergiesLipfield(
-                uprevious_bc_left,
-                uprevious_bc_right,
-                u,
-                v,
-                d,
-                dprevious_bc_left,
-                dprevious_bc_right,
-                work_previous_step,
-            )
-
-        work_previous_step = external_work[n]
+        energies = DFPostProcess.updateEnergies(
+            energies, n, u, v, d, stress, data_bc, work_previous_step
+        )
+        work_previous_step = DFPostProcess.getEnergy(energies, "external work")[n]
 
         # Fragmentation data
         n_fragments[n] = DFFragmentation.getNumberFragments(d)
         frag_lengths, avg_frag_size[n] = DFFragmentation.getFragmentSizes(d)
-        data_histogram_frag_size = DFFragmentation.getFragmentSizeHistogramData(
-            frag_lengths, 10
+        data_histogram_frag_size = DFFragmentation.getFragSizeHistogramData(
+            frag_lengths
         )
 
-        # up_bc is the previous displacement vector for the local dofs in the boundary elements (left and right)
-        uprevious_bc_left = np.array([0, 0])
-        uprevious_bc_right = np.array([0, 0])
-        for bc in range(len(DFMesh.materials)):
-            if DFMesh.materials[bc] == 4 or DFMesh.materials[bc] == 5:
-                if DFMesh.materials[bc] == 4:
-                    el_bc = 0
-                    uprevious_bc_left = np.array(
-                        [u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]]
-                    )
-                    if DFMesh.use_lipfield == True:
-                        dprevious_bc_left = d[el_bc]
-                else:
-                    el_bc = DFMesh.n_elements - 1
-                    uprevious_bc_right = np.array(
-                        [u[DFMesh.connect[el_bc][0]], u[DFMesh.connect[el_bc][1]]]
-                    )
-                    if DFMesh.use_lipfield == True:
-                        dprevious_bc_right = d[el_bc]
+        # Save results previous step at BC to compute external work
+        data_bc = DFPostProcess.saveResultsAtBC(u, d)
 
         # Time integration
         u, v, acel, d = DFNewmark.explicitScheme(M, u, v, acel, d, F, DFMesh.dt)
 
         if DFMesh.use_cohesive_elements == True:
-            for el in range(DFMesh.n_elements - 1):
-                if average_stress_neighbors[el] > DFMesh.stress_critical[el]:
-                    # Fracture happens: creat new interface element
-                    u, v, acel = DFInterface.insertInterface(el, el + 1, u, v, acel)
-                    els_step = els_step + 1
+            u, v, acel = DFInterface.verifyStress(average_stress_neighbors, u, v, acel)
 
     DFModel.endProgressBar(bar)
 
@@ -138,169 +72,30 @@ def runSimulation(strain_rate):
     DFPlot.plotFragmentSizeHistogram(frag_lengths, 10)
 
     # Energy balance
-    if DFMesh.use_cohesive_elements == True:
-        (
-            var_energy_potential,
-            var_energy_kinetic,
-            var_energy_dissipated,
-            var_energy_reversible,
-            var_energy_contact,
-            var_external_work,
-            var_energy_total,
-        ) = DFPostProcess.computeVarEnergiesCZM(
-            energy_potential,
-            energy_kinetic,
-            energy_dissipated,
-            energy_reversible,
-            energy_contact,
-            external_work,
-        )
+    var_energies = DFPostProcess.computeVariationEnergy(energies)
+    power = DFPostProcess.computePower(energies)
 
-        (
-            power_potential,
-            power_kinetic,
-            power_dissipated,
-            power_reversible,
-            power_contact,
-            power_external_work,
-            power_total,
-        ) = DFPostProcess.computePowerCZM(
-            energy_potential,
-            energy_kinetic,
-            energy_dissipated,
-            energy_reversible,
-            energy_contact,
-            external_work,
-        )
-
-        DFPlot.plotEnergiesCZM(
-            energy_potential,
-            energy_kinetic,
-            energy_dissipated,
-            energy_reversible,
-            energy_contact,
-            external_work,
-        )
-        DFPlot.plotVarEnergiesCZM(
-            var_energy_potential,
-            var_energy_kinetic,
-            var_energy_dissipated,
-            var_energy_reversible,
-            var_energy_contact,
-            var_external_work,
-            var_energy_total,
-        )
-        DFPlot.plotPowerCZM(
-            power_potential,
-            power_kinetic,
-            power_dissipated,
-            power_reversible,
-            power_contact,
-            power_external_work,
-            power_total,
-        )
+    DFPlot.plotEnergies(energies)
+    DFPlot.plotVarEnergies(var_energies)
+    DFPlot.plotPower(power)
 
     if DFMesh.use_lipfield == True:
-
-        (
-            var_energy_potential,
-            var_energy_kinetic,
-            var_energy_dissipated,
-            var_external_work,
-            var_energy_total,
-        ) = DFPostProcess.computeVarEnergiesLipfield(
-            energy_potential, energy_kinetic, energy_dissipated, external_work
-        )
-
-        (
-            power_potential,
-            power_kinetic,
-            power_dissipated,
-            power_external_work,
-            power_total,
-        ) = DFPostProcess.computePowerLipfield(
-            energy_potential, energy_kinetic, energy_dissipated, external_work
-        )
-
-        DFPlot.plotEnergiesLipfield(
-            energy_potential, energy_kinetic, energy_dissipated, external_work
-        )
-
-        DFPlot.plotVarEnergiesLipfield(
-            var_energy_potential,
-            var_energy_kinetic,
-            var_energy_dissipated,
-            var_external_work,
-            var_energy_total,
-        )
-        DFPlot.plotPowerLipfield(
-            power_potential,
-            power_kinetic,
-            power_dissipated,
-            power_external_work,
-            power_total,
-        )
-
         DFPlot.plotByIntPoint(d)
 
     # Save results
-    if DFMesh.use_cohesive_elements == True:
+    DFPlot.saveResults(u)
+    DFPlot.saveResults(v)
+    DFPlot.saveResults(acel)
+    DFPlot.saveResults(d)
 
-        
-        DFPlot.saveResultsCZM(n_fragments)
-        DFPlot.saveResultsCZM(avg_frag_size)
-        DFPlot.saveResultsCZM(data_histogram_frag_size)
+    DFPlot.saveResults(n_fragments)
+    DFPlot.saveResults(avg_frag_size)
+    DFPlot.saveResults(data_histogram_frag_size)
 
-        DFPlot.saveResultsCZM(avg_stress_bar)
-
-        DFPlot.saveResultsCZM(energy_potential)
-        DFPlot.saveResultsCZM(energy_kinetic)
-        DFPlot.saveResultsCZM(energy_dissipated)
-        DFPlot.saveResultsCZM(energy_reversible)
-        DFPlot.saveResultsCZM(energy_contact)
-        DFPlot.saveResultsCZM(external_work)
-
-        DFPlot.saveResultsCZM(var_energy_potential)
-        DFPlot.saveResultsCZM(var_energy_kinetic)
-        DFPlot.saveResultsCZM(var_energy_dissipated)
-        DFPlot.saveResultsCZM(var_energy_reversible)
-        DFPlot.saveResultsCZM(var_energy_contact)
-        DFPlot.saveResultsCZM(var_external_work)
-
-        DFPlot.saveResultsCZM(power_potential)
-        DFPlot.saveResultsCZM(power_kinetic)
-        DFPlot.saveResultsCZM(power_dissipated)
-        DFPlot.saveResultsCZM(power_reversible)
-        DFPlot.saveResultsCZM(power_contact)
-        DFPlot.saveResultsCZM(power_external_work)
-
-    if DFMesh.use_lipfield == True:
-
-        DFPlot.saveResultsLipfield(d)
-        DFPlot.saveResultsLipfield(u)
-        DFPlot.saveResultsLipfield(v)
-        DFPlot.saveResultsLipfield(acel)
-
-        DFPlot.saveResultsLipfield(n_fragments)
-        DFPlot.saveResultsLipfield(avg_frag_size)
-        DFPlot.saveResultsLipfield(data_histogram_frag_size)
-
-        DFPlot.saveResultsLipfield(avg_stress_bar)
-
-        DFPlot.saveResultsLipfield(energy_potential)
-        DFPlot.saveResultsLipfield(energy_kinetic)
-        DFPlot.saveResultsLipfield(energy_dissipated)
-        DFPlot.saveResultsLipfield(external_work)
-
-        DFPlot.saveResultsLipfield(var_energy_potential)
-        DFPlot.saveResultsLipfield(var_energy_kinetic)
-        DFPlot.saveResultsLipfield(var_energy_dissipated)
-        DFPlot.saveResultsLipfield(var_external_work)
-
-        DFPlot.saveResultsLipfield(power_potential)
-        DFPlot.saveResultsLipfield(power_kinetic)
-        DFPlot.saveResultsLipfield(power_dissipated)
-        DFPlot.saveResultsLipfield(power_external_work)
+    DFPlot.saveResults(avg_stress_bar)
+    DFPlot.saveResults(energies)
+    DFPlot.saveResults(var_energies)
+    DFPlot.saveResults(power)
 
 
 if __name__ == "__main__":
