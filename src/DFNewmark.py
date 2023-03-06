@@ -56,6 +56,7 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
         f_int = DFDiffuseDamage.internalForce(u_next, d_next)
     
     else:
+        d_next = d
         f_int = DFInterface.internalForce(u_next)
     
     inertia = p_next - f_int
