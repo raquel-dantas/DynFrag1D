@@ -5,6 +5,7 @@ import pickle
 
 import DFMesh
 import DFFem
+import DFPostProcess
 
 
 def plot(x, y, labelx, labely, title):
@@ -109,6 +110,7 @@ def plotByInterface(func):
 
     plotScatter(x, y, "x", labely, title)
 
+
 def plotByIntPoint(func):
     """Plot a vector of values that corresponds to each integration point"""
 
@@ -153,8 +155,15 @@ def plotStressByTime(stress_evolution):
     plt.show()
 
 
-def plotEnergiesCZM(energy_potential, energy_kinetic, energy_dissipated, energy_reversible, energy_contact, external_work):
+def plotEnergiesCZM(energies):
     """Plot energies values per time"""
+
+    energy_potential = DFPostProcess.getEnergy(energies, "energy potential")
+    energy_kinetic = DFPostProcess.getEnergy(energies, "energy kinetic")
+    energy_dissipated = DFPostProcess.getEnergy(energies, "energy dissipated")
+    energy_reversible = DFPostProcess.getEnergy(energies, "energy reversible")
+    energy_contact = DFPostProcess.getEnergy(energies, "energy contact")
+    external_work = DFPostProcess.getEnergy(energies, "external work")
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -175,13 +184,13 @@ def plotEnergiesCZM(energy_potential, energy_kinetic, energy_dissipated, energy_
     # plt.show()
 
 
-
-
-
-def plotEnergiesLipfield(
-    energy_potential, energy_kinetic, energy_dissipated, external_work
-):
+def plotEnergiesLipfield(energies):
     """Plot energies values x time"""
+
+    energy_potential = DFPostProcess.getEnergy(energies, "energy potential")
+    energy_kinetic = DFPostProcess.getEnergy(energies, "energy kinetic")
+    energy_dissipated = DFPostProcess.getEnergy(energies, "energy dissipated")
+    external_work = DFPostProcess.getEnergy(energies, "external work")
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -201,8 +210,29 @@ def plotEnergiesLipfield(
     # plt.show()
 
 
-def plotVarEnergiesCZM(var_energy_potential, var_energy_kinetic, var_energy_dissipated, var_energy_reversible, var_energy_contact, var_external_work, var_energy_total):
+def plotEnergies(energies):
+
+    if DFMesh.use_cohesive_elements == True:
+        plotEnergiesCZM(energies)
+
+    if DFMesh.use_lipfield == True:
+        plotEnergiesLipfield(energies)
+
+
+def plotVarEnergiesCZM(var_energies):
     """Plot variation of energy from time t to t0."""
+
+    var_energy_potential = DFPostProcess.getEnergy(var_energies, "var energy potential")
+    var_energy_kinetic = DFPostProcess.getEnergy(var_energies, "var energy kinetic")
+    var_energy_dissipated = DFPostProcess.getEnergy(
+        var_energies, "var energy dissipated"
+    )
+    var_energy_reversible = DFPostProcess.getEnergy(
+        var_energies, "var energy reversible"
+    )
+    var_energy_contact = DFPostProcess.getEnergy(var_energies, "var energy contact")
+    var_external_work = DFPostProcess.getEnergy(var_energies, "var external work")
+    var_energy_total = DFPostProcess.getEnergy(var_energies, "var energy total")
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -224,14 +254,16 @@ def plotVarEnergiesCZM(var_energy_potential, var_energy_kinetic, var_energy_diss
     # plt.show()
 
 
-def plotVarEnergiesLipfield(
-    var_energy_potential,
-    var_energy_kinetic,
-    var_energy_dissipated,
-    var_external_work,
-    var_energy_total,
-):
+def plotVarEnergiesLipfield(var_energies):
     """Plot variation of energy from time t to t0."""
+
+    var_energy_potential = DFPostProcess.getEnergy(var_energies, "var energy potential")
+    var_energy_kinetic = DFPostProcess.getEnergy(var_energies, "var energy kinetic")
+    var_energy_dissipated = DFPostProcess.getEnergy(
+        var_energies, "var energy dissipated"
+    )
+    var_external_work = DFPostProcess.getEnergy(var_energies, "var external work")
+    var_energy_total = DFPostProcess.getEnergy(var_energies, "var energy total")
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -252,11 +284,25 @@ def plotVarEnergiesLipfield(
     # plt.show()
 
 
+def plotVarEnergies(var_energies):
+
+    if DFMesh.use_cohesive_elements == True:
+        plotVarEnergiesCZM(var_energies)
+
+    if DFMesh.use_lipfield == True:
+        plotVarEnergiesLipfield(var_energies)
 
 
-
-def plotPowerCZM(power_potential, power_kinetic, power_dissipated, power_reversible, power_contact, power_external_work, power_total):
+def plotPowerCZM(power):
     """Plot variation of energy between time steps"""
+
+    power_potential = DFPostProcess.getEnergy(power, "power potential")
+    power_kinetic = DFPostProcess.getEnergy(power, "power kinetic")
+    power_dissipated = DFPostProcess.getEnergy(power, "power dissipated")
+    power_reversible = DFPostProcess.getEnergy(power, "power reversible")
+    power_contact = DFPostProcess.getEnergy(power, "power contact")
+    power_external_work = DFPostProcess.getEnergy(power, "power external work")
+    power_total = DFPostProcess.getEnergy(power, "power total")
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -278,8 +324,14 @@ def plotPowerCZM(power_potential, power_kinetic, power_dissipated, power_reversi
     # plt.show()
 
 
-def plotPowerLipfield(power_potential, power_kinetic, power_dissipated, power_external_work, power_total):
+def plotPowerLipfield(power):
     """Plot variation of energy between time steps"""
+
+    power_potential = DFPostProcess.getEnergy(power, "power potential")
+    power_kinetic = DFPostProcess.getEnergy(power, "power kinetic")
+    power_dissipated = DFPostProcess.getEnergy(power, "power dissipated")
+    power_external_work = DFPostProcess.getEnergy(power, "power external work")
+    power_total = DFPostProcess.getEnergy(power, "power total")
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -297,6 +349,15 @@ def plotPowerLipfield(power_potential, power_kinetic, power_dissipated, power_ex
     plt.legend()
     plt.savefig("LOG/power_Lipfield.svg")
     # plt.show()
+
+
+def plotPower(power):
+
+    if DFMesh.use_cohesive_elements == True:
+        plotPowerCZM(power)
+
+    if DFMesh.use_lipfield == True:
+        plotPowerLipfield(power)
 
 
 def plotNumberFragments(nfrag):
@@ -344,7 +405,7 @@ def plotFragmentSizeHistogram(frag_sizes, n_columns):
     plt.xlabel("Fragment size (m)")
     plt.ylabel("Number of fragments")
 
-    plt.hist(frag_sizes,  n_columns)
+    plt.hist(frag_sizes, n_columns)
     plt.savefig("LOG/fragment_size_distribution.svg")
     # plt.show()
 
@@ -519,13 +580,21 @@ def plotLogAnalyticals(grady, gc, zmr, values_strainrate):
     plt.show()
 
 
-
-def saveResultsCZM(variable):
-    variable_name = retrieveName(variable)[0]
-    with open('LOG/czm_' + variable_name + '.pickle', 'wb') as handle:
+def saveResultsCZM(variable_name, variable):
+    with open("LOG/czm_" + variable_name + ".pickle", "wb") as handle:
         pickle.dump(variable, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def saveResultsLipfield(variable):
-    variable_name = retrieveName(variable)[0]
-    with open('LOG/lipfield_' + variable_name + '.pickle', 'wb') as handle:
+
+def saveResultsLipfield(variable_name, variable):
+    with open("LOG/lipfield_" + variable_name + ".pickle", "wb") as handle:
         pickle.dump(variable, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def saveResults(variable):
+
+    variable_name = retrieveName(variable)[0]
+    if DFMesh.use_cohesive_elements == True:
+        saveResultsCZM(variable_name, variable)
+
+    if DFMesh.use_lipfield == True:
+        saveResultsLipfield(variable_name, variable)
