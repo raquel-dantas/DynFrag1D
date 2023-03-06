@@ -38,6 +38,14 @@ def insertInterface(el_left, el_right, u, v, acel):
     return u, v, acel
 
 
+def verifyStress(average_stress_neighbors, u, v, acel):
+    for el in range(DFMesh.n_elements - 1):
+        if average_stress_neighbors[el] > DFMesh.stress_critical[el]:
+            # Fracture happens: creat new interface element
+            u, v, acel = insertInterface(el, el + 1, u, v, acel)
+    return u, v, acel
+
+
 def stressCohesiveLaw(jump_u, el_index):
     """Returns the stress for interface element through a linear cohesive law. \n
     Arguments:\n
@@ -66,13 +74,14 @@ def stressCohesiveLaw(jump_u, el_index):
 
 def getDamageParameter():
     """Returns the damage parameter for an interface element.\n"""
-
+    d = np.zeros(len(DFMesh.materials))
     for el_index in range(len(DFMesh.materials)):
         if DFMesh.materials[el_index] == 1:
             i = DFMesh.connect[el_index][0] - 1
-            return min(1.0, DFMesh.jump_max[el_index] / DFMesh.crack_critical[i])
+            d[el_index] = min(1.0, DFMesh.jump_max[el_index] / DFMesh.crack_critical[i])
         else:
-            return 0.0
+            d[el_index] = 0.0
+    return d
 
 
 def forceInterface(u):
