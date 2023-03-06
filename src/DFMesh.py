@@ -158,6 +158,8 @@ v0 = np.array([strain_rate * i for i in node_coord])  # Initial velocity
 acel0 = np.zeros(n_dofs) # Initial acceleration 
 p = np.zeros((n_steps + 1, n_dofs))  # External forces 
 C = np.zeros((n_dofs, n_dofs))  # Damping 
+if use_cohesive_elements == True:
+    d0 = None
 if use_lipfield == True:
     d0 = np.zeros(n_elements)  # Initial damage
 
