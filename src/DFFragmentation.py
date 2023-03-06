@@ -29,7 +29,8 @@ def getFragmentSizes(damage):
     return fragments_lengths, np.average(fragments_lengths)
 
 
-def getFragmentSizeHistogramData(fragments_legths, hist_number_columns):
+def getFragSizeHistogramData(fragments_legths):
+    hist_number_columns = 10
     data_histogram = plt.hist(fragments_legths,hist_number_columns)
 
 
