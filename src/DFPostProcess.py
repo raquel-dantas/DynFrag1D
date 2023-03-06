@@ -50,7 +50,7 @@ def postProcess(u, d):
     )
     average_stress_neighbors = [average_stress(el) for el in range(DFMesh.n_elements - 1)]
 
-    return strain, stress, average_stress_neighbors
+    return stress, average_stress_neighbors
 
 
 def logStress(time_step, stress_evolution, current_stress):
