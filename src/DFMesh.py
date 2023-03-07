@@ -91,7 +91,7 @@ if create_mesh:
 
 else:
     # import the coordinates from a picke file
-    with open("src/input_files/mesh.pickle", "rb") as handle:
+    with open(inputdata.mesh_file_name, "rb") as handle:
         node_coord = pickle.load(handle)
 
 # intpoit_coord: returns the coordinates of integration points
@@ -119,7 +119,7 @@ if generate_limit_stress_variation == True:
         size=(n_elements),
     )
 else:
-    with open("src/input_files/random_stress_critical.pickle", "rb") as handle:
+    with open(inputdata.stress_limite_file_name, "rb") as handle:
         stress_critical = pickle.load(handle)
 
 # crack_critical: returns the critical crack opening for the values in stress_critical
