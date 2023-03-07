@@ -106,8 +106,10 @@ def runSimulation(strain_rate):
     DFPlot.saveResults(var_energies)
     DFPlot.saveResults(power)
     if DFMesh.use_cohesive_elements == True:
-        DFPlot.saveResults(DFMesh.materials)
-        DFPlot.saveResults(DFMesh.connect)
+        materials = DFMesh.materials
+        connect = DFMesh.connect
+        DFPlot.saveResults(materials)
+        DFPlot.saveResults(connect)
 
 
 if __name__ == "__main__":
