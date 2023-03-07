@@ -26,6 +26,11 @@ work_previous_step = 0.0
 # stress_evolution = np.zeros((2 * len(DFMesh.materials), DFMesh.n_steps))
 avg_stress_bar = np.zeros(DFMesh.n_steps)
 
+u_all_steps = [DFMesh.u0]
+damage_all_steps = [DFMesh.d0]
+fraglen_all_steps = []
+stress_all_steps = []
+
 
 n_fragments = np.zeros(DFMesh.n_steps)
 avg_frag_size = np.zeros(DFMesh.n_steps)
@@ -89,6 +94,10 @@ if inputdata.continue_simulation_from_step == True:
     avg_stress_bar = readPreviousResults('avg_stress_bar')
     energies = readPreviousResults('energies')
     work_previous_step = DFPostProcess.getEnergy(energies, "external work")[n_init]
+    u_all_steps = readPreviousResults('u_all_steps')
+    damage_all_steps = readPreviousResults('damage_all_steps')
+    stress_all_steps = readPreviousResults('stress_all_steps')
+    fraglen_all_steps = readPreviousResults('fraglen_all_steps')
     data_bc = DFPostProcess.saveResultsAtBC(u, d)
 
 
