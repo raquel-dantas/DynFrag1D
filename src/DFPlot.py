@@ -31,7 +31,7 @@ def plotlog(x, y, labelx, labely, title):
     plt.xscale("log")
     plt.yscale("log")
     plt.plot(x, y)
-    plt.show()
+    # plt.show()
 
 
 def plotScatter(x, y, labelx, labely, title):
@@ -42,7 +42,7 @@ def plotScatter(x, y, labelx, labely, title):
     plt.xlabel(str(labelx))
     plt.ylabel(str(labely))
     plt.scatter(x, y)
-    plt.show()
+    # plt.show()
 
 
 def retrieveName(var):
@@ -116,7 +116,18 @@ def plotByIntPoint(func):
 
     labely = retrieveName(func)[0]
     plot(DFMesh.intpoint_coord, func, "x", labely, labely)
-    plt.savefig("LOG/damage.svg")
+
+
+def plotDamage(damage):
+
+
+    if DFMesh.use_cohesive_elements == True:
+        plotByInterface(damage)
+        plt.savefig("LOG/czm_damage.svg")
+
+    if DFMesh.use_lipfield == True:
+        plotByElement(damage)
+        plt.savefig("LOG/lipfield_damage.svg")
 
 
 def plotAverageStressBar(average_stress_bar):
@@ -133,8 +144,10 @@ def plotAverageStressBar(average_stress_bar):
     y = average_stress_bar
 
     plt.plot(x, y)
-    plt.savefig("LOG/average_stress_bar.svg")
-    # plt.show()
+    if DFMesh.use_cohesive_elements == True:
+        plt.savefig("LOG/czm_average_stress_bar.svg")
+    if DFMesh.use_lipfield == True:
+        plt.savefig("LOG/lipfield_average_stress_bar.svg")
 
 
 def plotStressByTime(stress_evolution):
@@ -180,8 +193,9 @@ def plotEnergiesCZM(energies):
     plt.plot(x, energy_contact, label="Econ")
     plt.plot(x, external_work, label="Wext")
     plt.legend()
-    plt.savefig("LOG/energies_CZM.svg")
-    # plt.show()
+
+    plt.savefig("LOG/czm_energies.svg")
+        
 
 
 def plotEnergiesLipfield(energies):
@@ -206,8 +220,7 @@ def plotEnergiesLipfield(energies):
     plt.plot(x, energy_dissipated, label="Edis")
     plt.plot(x, external_work, label="Wext")
     plt.legend()
-    plt.savefig("LOG/energies_Lipfield.svg")
-    # plt.show()
+    plt.savefig("LOG/lipfield_energies.svg")
 
 
 def plotEnergies(energies):
@@ -250,7 +263,7 @@ def plotVarEnergiesCZM(var_energies):
     plt.plot(x, -var_external_work, label="-varWext")
     plt.plot(x, var_energy_total, label="varEtot")
     plt.legend()
-    plt.savefig("LOG/var_energies_CZM.svg")
+    plt.savefig("LOG/czm_var_energies.svg")
     # plt.show()
 
 
@@ -280,7 +293,7 @@ def plotVarEnergiesLipfield(var_energies):
     plt.plot(x, -var_external_work, label="-varWext")
     plt.plot(x, var_energy_total, label="varEtot")
     plt.legend()
-    plt.savefig("LOG/var_energies_Lipfield.svg")
+    plt.savefig("LOG/lipfield_var_energies.svg")
     # plt.show()
 
 
@@ -320,8 +333,7 @@ def plotPowerCZM(power):
     plt.plot(x, -power_external_work, label="-pWext")
     plt.plot(x, power_total, label="pEtot")
     plt.legend()
-    plt.savefig("LOG/power_CZM.svg")
-    # plt.show()
+    plt.savefig("LOG/czm_power.svg")
 
 
 def plotPowerLipfield(power):
@@ -347,8 +359,7 @@ def plotPowerLipfield(power):
     plt.plot(x, -power_external_work, label="-pWext")
     plt.plot(x, power_total, label="pEtot")
     plt.legend()
-    plt.savefig("LOG/power_Lipfield.svg")
-    # plt.show()
+    plt.savefig("LOG/lipfield_power.svg")
 
 
 def plotPower(power):
@@ -374,8 +385,10 @@ def plotNumberFragments(nfrag):
     y = nfrag
 
     plt.plot(x, y)
-    plt.savefig("LOG/number_fragments.svg")
-    # plt.show()
+    if DFMesh.use_cohesive_elements == True:
+        plt.savefig("LOG/czm_number_fragments.svg")
+    if DFMesh.use_lipfield == True:
+        plt.savefig("LOG/lipfield_number_fragments.svg")
 
 
 def plotAvgFragmentSize(avg_frag_sizes):
@@ -392,9 +405,11 @@ def plotAvgFragmentSize(avg_frag_sizes):
     y = avg_frag_sizes
 
     plt.plot(x, y)
-    plt.savefig("LOG/size_fragments.svg")
-    # plt.show()
 
+    if DFMesh.use_cohesive_elements == True:
+        plt.savefig("LOG/czm_avg_size_fragments.svg")
+    if DFMesh.use_lipfield == True:
+        plt.savefig("LOG/lipfield_avg_size_fragments.svg")
 
 def plotFragmentSizeHistogram(frag_sizes, n_columns):
 
@@ -406,8 +421,12 @@ def plotFragmentSizeHistogram(frag_sizes, n_columns):
     plt.ylabel("Number of fragments")
 
     plt.hist(frag_sizes, n_columns)
-    plt.savefig("LOG/fragment_size_distribution.svg")
-    # plt.show()
+
+    if DFMesh.use_cohesive_elements == True:
+        plt.savefig("LOG/czm_fragment_size_histogram.svg")
+
+    if DFMesh.use_lipfield == True:
+        plt.savefig("LOG/lipfield_fragment_size_histogram.svg")
 
 
 def plotVTK(prefix, timestep, u, stress):
