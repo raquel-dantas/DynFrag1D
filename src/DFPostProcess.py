@@ -95,7 +95,9 @@ def saveResultsAtBC(u, d):
                 )
                 if DFMesh.use_lipfield == True:
                     dprevious_bc_right = d[el_bc]
-
+        if DFMesh.materials[bc] == 2:
+            uprevious_bc_left = None
+            dprevious_bc_left = None
     uprevious_bc = [uprevious_bc_left, uprevious_bc_right]
     if DFMesh.use_cohesive_elements == True:
         dprevious_bc = None
