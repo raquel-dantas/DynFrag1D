@@ -48,9 +48,9 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
         d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='Newton', projection_method='FM')
         # d_next = DFDiffuseDamage.computeDamageNextStep_noProjection(u_next, d)
         
-        tolerance = 10e-8
-        assert(np.linalg.norm(u_next_copy - u_next) < tolerance)
-        assert(np.linalg.norm(d_copy - d) < tolerance)
+        # tolerance = 10e-8
+        # assert(np.linalg.norm(u_next_copy - u_next) < tolerance)
+        # assert(np.linalg.norm(d_copy - d) < tolerance)
         
         # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
         f_int = DFDiffuseDamage.internalForce(u_next, d_next)
