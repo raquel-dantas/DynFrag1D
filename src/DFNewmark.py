@@ -32,18 +32,21 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
     acel_next = np.zeros(dofs)
 
     # Compute displacement at next time-step 
-    u_next = u + dt * v + ((1.0 / 2.0) * dt**2) * acel
+    u_next = u + dt * v + (0.5 * dt**2) * acel
     
     # Compute velocity predictor (vp)
     vp = v + (1.0 - gamma) * dt * acel
 
+    if DFMesh.use_cohesive_elements == True:
+        d_next = d
+        f_int = DFInterface.internalForce(u_next)
+    
+
     if DFMesh.use_lipfield == True:
 
-        u_next_copy = copy.deepcopy(u_next)
-        d_copy = copy.deepcopy(d)
+        # u_next_copy = copy.deepcopy(u_next)
+        # d_copy = copy.deepcopy(d)
         # Compute damage at the next time-step (d_next)
-        # d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='SLSQP', projection_method='SLSQP')
-        # d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='SLSQP', projection_method='FM')
         
         d_next = DFDiffuseDamage.computeDamageNextStep_useProjection(u_next, d, predictor_method='Newton', projection_method='FM')
         # d_next = DFDiffuseDamage.computeDamageNextStep_noProjection(u_next, d)
@@ -55,9 +58,6 @@ def explicitScheme(M, u, v, acel, d, p_next, dt):
         # Solution of the linear problem: acel_next returns a vector with the acceleration in all dofs for the next time step
         f_int = DFDiffuseDamage.internalForce(u_next, d_next)
     
-    else:
-        d_next = d
-        f_int = DFInterface.internalForce(u_next)
     
     inertia = p_next - f_int
     # Compute aceleration and velocity at next time-step 
