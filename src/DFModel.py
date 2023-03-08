@@ -58,13 +58,13 @@ if DFMesh.use_lipfield == True:
 
 def readPreviousResultsLipfield(variable_name):
 
-    with open("src/input_files/lipfield" + variable_name + ".pickle", "rb") as handle:
+    with open("src/input_files/lipfield_" + variable_name + ".pickle", "rb") as handle:
         variable = pickle.load(handle)
     return variable
 
 def readPreviousResultsCZM(variable_name):
 
-    with open("src/input_files/CZM" + variable_name + ".pickle", "rb") as handle:
+    with open("src/input_files/czm_" + variable_name + ".pickle", "rb") as handle:
         variable = pickle.load(handle)
     return variable
 
