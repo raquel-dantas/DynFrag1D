@@ -8,4 +8,4 @@ paraview*
 *.txt
 *.svg
 *.pdf
-*.pickle
+# *.pickle
