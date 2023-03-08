@@ -2,8 +2,8 @@
 
 
 # Method
-use_cohesive_elements = False
-use_lipfield = True
+use_cohesive_elements = True
+use_lipfield = False
 
 
 # Type of mesh
@@ -29,7 +29,7 @@ bar_length = 5. * 10** -3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
 number_elements = 600
-area = 1*10**-5  # Cross sectional area (m2) (Equal to element size )
+area = 1  # Cross sectional area (m2) (Equal to element size )
 
 
 # Load

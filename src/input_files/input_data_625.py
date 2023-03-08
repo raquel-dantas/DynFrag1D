@@ -21,14 +21,14 @@ stress_limit = 300.0 * 10**6  # (Pa)
 
 generate_limit_stress_variation = False # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = 'src/input_files/random_stress_critical_300.pickle'
+    stress_limite_file_name = 'src/input_files/random_stress_critical_625.pickle'
 
 
 # Geometry
 bar_length = 0.5* 5. * 10** -3  # (m)
 x0 = 0. # Left extremitiy x coordinate / 0-initial
 xf = bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 300
+number_elements = 625
 area = 1  # Cross sectional area (m2) (Equal to element size )
 
 
