@@ -8,7 +8,7 @@ import DFPlot
 
 
 def getNumberFragments(damage):
-    return 1 + sum(1 for D in damage if D > 0.999)
+    return 1 + sum(1 for D in damage if D > 0.99)
 
 
 def getFragmentSizes(damage):
