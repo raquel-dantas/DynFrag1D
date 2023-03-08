@@ -98,6 +98,7 @@ def runSimulation(strain_rate):
     DFPlot.saveResults(u_all_steps)
     DFPlot.saveResults(damage_all_steps)
     DFPlot.saveResults(stress_all_steps)
+    DFPlot.saveResults(fraglen_all_steps)
     DFPlot.saveResults(n_fragments)
     DFPlot.saveResults(avg_frag_size)
     DFPlot.saveResults(data_histogram_frag_size)
@@ -105,6 +106,8 @@ def runSimulation(strain_rate):
     DFPlot.saveResults(energies)
     DFPlot.saveResults(var_energies)
     DFPlot.saveResults(power)
+    time_data = [DFMesh.time_simulation, DFMesh.dt, DFModel.n_final]
+    DFPlot.saveResults(time_data)
     if DFMesh.use_cohesive_elements == True:
         materials = DFMesh.materials
         connect = DFMesh.connect
