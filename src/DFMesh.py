@@ -4,7 +4,7 @@ import copy
 import pickle
 
 # import input_files.input_data as inputdata
-import input_files.input_data_2500 as inputdata
+import input_files.input_paper.input_data_lipdyn_paper_un_mesh_1250 as inputdata
 
 
 # Import or set inputs
