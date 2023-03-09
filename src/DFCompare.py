@@ -13,7 +13,7 @@ def readResults(file_address, variable_name):
     return variable
 
 
-def plotCompareSimulations(results, x_values, title, label_x, label_y, save_filename):
+def plotCompareSimulations(results, title, label_x, label_y, save_filename):
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -26,63 +26,34 @@ def plotCompareSimulations(results, x_values, title, label_x, label_y, save_file
 
     for i in range(nb_simulations):
         name_simulation = results[i][0]
-        y_values = results[i][1]
+        x_values = results[i][1]
+        y_values = results[i][2]
         plt.plot(x_values, y_values, label=name_simulation)
     plt.legend()
     plt.savefig(save_filename)
     plt.show()
 
 
-#  Compare symmetry
-
-# file_address = 'LOG/test_symmetry/uniform_mesh/lipfield/half_bar_300el/lipfield_'
-
-# u_lip_half = readResults(file_address, "u")
-# v_lip_half = readResults(file_address, "v")
-# acel_lip_half = readResults(file_address, "acel")
-# d_lip_half = readResults(file_address, "d")
-# n_fragments_lip_half = readResults(file_address, "n_fragments")
-# avg_frag_size_lip_half = readResults(file_address, "avg_frag_size")
-# avg_stress_bar_lip_half = readResults(file_address, "avg_stress_bar")
-# energies_lip_half = readResults(file_address, "energies")
-# u_all_steps_lip_half = readResults(file_address, "u_all_steps")
-# damage_all_steps_lip_half = readResults(file_address, "damage_all_steps")
-# stress_all_steps_lip_half = readResults(file_address, "stress_all_steps")
-# fraglen_all_steps_lipfield = readResults(file_address, "fraglen_all_steps")
-# time_data = readResults(file_address, "time_data")
-# time_simulation = time_data[0]
-# n_steps = time_data[2]
 
 
-# file_address = 'LOG/test_symmetry/uniform_mesh/lipfield/whole_bar_600el/lipfield_'
-# u_lip_whole = readResults(file_address, "u")
-# v_lip_whole = readResults(file_address, "v")
-# acel_lip_whole =readResults(file_address, "acel")
-# d_lip_whole = readResults(file_address, "d")
-# n_fragments_lip_whole = readResults(file_address, "n_fragments")
-# avg_frag_size_lip_whole = readResults(file_address, "avg_frag_size")
-# avg_stress_bar_lip_whole = readResults(file_address, "avg_stress_bar")
-# energies_lip_whole = readResults(file_address, "energies")
-# u_all_steps_lip_whole = readResults(file_address, "u_all_steps")
-# damage_all_steps_lip_whole = readResults(file_address, "damage_all_steps")
-# # stress_all_steps_lip_whole = readResults(file_address, "stress_all_steps")
+def plotConvergence(results,meshes, title, label_x, label_y, save_filename):
 
-# time = np.linspace(0, time_simulation, n_steps)
+    fig, axes = plt.subplots()
+    axes.grid(True, which="both")
+    axes.axhline(y=0, color="k")
+    plt.title(title)
+    plt.xlabel(label_x)
+    plt.ylabel(label_y)
 
-# stress_bar = [['whole bar', avg_stress_bar_lip_whole],
-#               ['half bar', avg_stress_bar_lip_half]]
+    nb_simulations = len(meshes)
+    x_values = np.zeros(nb_simulations)
+    final_values = np.zeros(nb_simulations)
 
+    for i in range(nb_simulations):
+        x_values[i] = meshes[i]
+        final_values[i] = max(results[i][2])
+    plt.plot(x_values, final_values, marker='.')
 
-
-
-
-# plotCompareSimulations(
-#     stress_bar,
-#     time,
-#     title="Test use symmetry",
-#     label_x="time (s)",
-#     label_y="Average stress at the bar",
-#     save_filename="LOG/test_symmetry_avg_stress.svg",
-# )
-
-# Compare symmetry
+    plt.legend()
+    plt.savefig(save_filename)
+    plt.show()
