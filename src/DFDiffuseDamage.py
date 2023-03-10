@@ -14,8 +14,9 @@ import DFFem
 if DFMesh.use_lipfield == True:
 
     # Regularization inputs
-    n_elements_regularization = 10
-    regularization_length = n_elements_regularization * DFMesh.h_uniform
+    # n_elements_regularization = 10
+    # regularization_length = n_elements_regularization * DFMesh.h_uniform
+    regularization_length = 2.21 * 10**-6
     weight_quadrature = 2.0
     tolerance_opt = 10e-5
 
