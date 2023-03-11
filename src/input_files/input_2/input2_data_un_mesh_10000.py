@@ -10,7 +10,7 @@ use_lipfield = True
 uniform_mesh = True
 create_mesh = True # if there is an mesh file for input set create_mesh = False
 if create_mesh == False:
-    mesh_file_name = 'src/input_files/mesh_uniform_600.pickle'
+    mesh_file_name = 'src/input_files/filename.pickle'
 
 
 # Material
@@ -25,9 +25,9 @@ if generate_limit_stress_variation == False:
 
 
 # Geometry
-bar_length = 0.5* 50 * 10** -3  # (m)
-x0 = 0. # Left extremitiy x coordinate / 0-initial
-xf = bar_length  # Rigth extremitiy x coordinate / f-final
+bar_length = 50. * 10** -3  # (m)
+x0 = - 0.5 * bar_length # Left extremitiy x coordinate / 0-initial
+xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
 number_elements = 10000
 area = 1  # Cross sectional area (m2) (Equal to element size )
 
@@ -37,7 +37,7 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 3.0 * 10**-7  # Total time of simulation (s)
+time_simulation = 4.0 * 10**-7  # Total time of simulation (s)
 
 
 initial_step = 0
@@ -45,5 +45,5 @@ continue_simulation_from_step = False
 # if there is previous data to continue the simulation from a previous simulation set 
 # continue_simulation_from_step = True and give the time to start the simulation
 
-half_bar = True
+half_bar = False
 # if use symmetry we have to add the bc properly
