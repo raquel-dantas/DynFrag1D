@@ -16,7 +16,8 @@ if DFMesh.use_lipfield == True:
     # Regularization inputs
     # n_elements_regularization = 10
     # regularization_length = n_elements_regularization * DFMesh.h_uniform
-    regularization_length = 2.21 * 10**-6
+    # regularization_length = 2.21 * 10**-6
+    regularization_length = 5 * DFMesh.bar_length/2500 # Considering at least 5 elements in a 2500 elements mesh
     weight_quadrature = 2.0
     tolerance_opt = 10e-5
 
