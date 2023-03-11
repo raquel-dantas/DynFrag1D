@@ -29,7 +29,7 @@ bar_length = 50. * 10** -3  # (m)
 x0 = - 0.5 * bar_length # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
 number_elements = 7500
-area = 1  # Cross sectional area (m2) (Equal to element size )
+area = 1.  # Cross sectional area (m2) (Equal to element size )
 
 
 # Load
@@ -37,7 +37,7 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 4.0 * 10**-7  # Total time of simulation (s)
+time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
 
 
 initial_step = 0
