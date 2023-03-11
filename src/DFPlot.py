@@ -438,7 +438,7 @@ ASCII
 
 DATASET UNSTRUCTURED_GRID
 """
-    coord = DFMesh.ListDofCoord()
+    coord = DFMesh.listDofCoord()
     points = (
         "POINTS "
         + str(len(coord))
