@@ -45,7 +45,7 @@ def runSimulation(strain_rate):
         avg_stress_bar[n] = DFPostProcess.stressBar(stress)
         M, F = DFFem.globalSystem()
 
-        # DFPlot.PlotVTK('animation/test',n,u,stress)
+        # DFPlot.plotVTK('LOG/vtk/czm_bug',n,u,stress)
 
         if DFMesh.use_cohesive_elements == True:
             d = DFInterface.getDamageParameter()
