@@ -21,7 +21,7 @@ stress_limit = 300.0 * 10**6  # (Pa)
 
 generate_limit_stress_variation = False # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = 'src/input_files/random_stress_critical_5000.pickle'
+    stress_limite_file_name = 'src/input_files/random_stress_critical_7500.pickle'
 
 
 # Geometry
