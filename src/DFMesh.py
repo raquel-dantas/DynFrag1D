@@ -4,7 +4,7 @@ import copy
 import pickle
 
 # import input_files.input_data as inputdata
-import input_files.input_2.input2_data_un_mesh_2500 as inputdata
+import input_files.input_data as inputdata
 
 
 # Import or set inputs
@@ -150,7 +150,7 @@ else:
     smallest_element = (0.2 * h_uniform)  
 dt_crit = smallest_element / ((young_modulus / rho) ** 0.5)
 
-dt = dt_crit * 0.5  # Adopted time step (s)
+dt = dt_crit * 0.1  # Adopted time step (s)
 
 n_steps = int(time_simulation / dt)  # Number of time-steps
 time_peakstress = stress_limit / (young_modulus * strain_rate)  # Time peak stress
@@ -164,7 +164,7 @@ acel0 = np.zeros(n_dofs) # Initial acceleration
 p = np.zeros((n_steps + 1, n_dofs))  # External forces 
 C = np.zeros((n_dofs, n_dofs))  # Damping 
 if use_cohesive_elements == True:
-    d0 = None
+    d0 = np.zeros(len(materials))
 if use_lipfield == True:
     d0 = np.zeros(n_elements)  # Initial damage
 
