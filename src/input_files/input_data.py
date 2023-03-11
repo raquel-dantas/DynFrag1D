@@ -25,11 +25,11 @@ if generate_limit_stress_variation == False:
 
 
 # Geometry
-bar_length = 5. * 10** -3  # (m)
+bar_length = 50 * 10** -3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
 number_elements = 100
-area = 1*10**-5  # Cross sectional area (m2) (Equal to element size )
+area = 1.  # Cross sectional area (m2) (Equal to element size )
 
 
 # Load
@@ -37,7 +37,7 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 6.0 * 10**-7  # Total time of simulation (s)
+time_simulation = 4.0 * 10**-6  # Total time of simulation (s)
 
 
 initial_step = 0
