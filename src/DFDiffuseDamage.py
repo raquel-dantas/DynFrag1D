@@ -283,18 +283,18 @@ if DFMesh.use_lipfield == True:
 
                     delta_projection = (
                         projection[index_neighbour] - projection_current_index
-                    ) / DFMesh.h_uniform
+                    ) / DFMesh.dx(index, index_neighbour)
 
                     if delta_projection < -slope_limit:
                         update_projection_value = True
                         new_projection = (
-                            projection_current_index - DFMesh.h_uniform / regularization_length
+                            projection_current_index - DFMesh.dx(index, index_neighbour) / regularization_length
                         )
 
                     elif delta_projection > slope_limit:
                         update_projection_value = True
                         new_projection = (
-                            projection_current_index + DFMesh.h_uniform / regularization_length
+                            projection_current_index + DFMesh.dx(index, index_neighbour) / regularization_length
                         )
 
                     if update_projection_value == True:
@@ -318,8 +318,9 @@ if DFMesh.use_lipfield == True:
         size = len(region_optimization)
         # Inputs for LinearConstraint
         A = scipy.sparse.eye(size - 1, size) - scipy.sparse.eye(size - 1, size, 1)
-        b = DFMesh.h_uniform / regularization_length
-        constraints = LinearConstraint(A, -b * np.ones(size - 1), b * np.ones(size - 1))
+        b = [DFMesh.dx(i, i+1) / regularization_length for i in region_optimization[:-1]]
+        # b = DFMesh.h_uniform / regularization_length
+        constraints = LinearConstraint(A, - b,  b)
         # Bounds
         bound_inf = [dn[region_optimization[i]] for i in range(size)]
         # bound_inf = [lower[region_optimization[i]] for i in range(size)]

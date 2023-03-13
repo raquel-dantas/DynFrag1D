@@ -3,8 +3,8 @@ import itertools
 import copy
 import pickle
 
-import input_files.input_data as inputdata
-# import input_files.input_2.input2_data_non_un_mesh_5000 as inputdata
+# import input_files.input_data as inputdata
+import input_files.input_2.input2_data_non_un_mesh_2500 as inputdata
 filepath = inputdata.filepath
 
 # Import or set inputs
@@ -210,3 +210,8 @@ def listDofCoord():
         dof = connect[el][1]
         dof_coord[dof, 0] = node_coord[node_id[el][1]]
     return dof_coord
+
+
+def dx(id_el1, id_el2):
+    """Returns the distance between integration points of two given elements."""
+    return abs(intpoint_coord[id_el2] - intpoint_coord[id_el1])
