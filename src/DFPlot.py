@@ -123,11 +123,11 @@ def plotDamage(damage):
 
     if DFMesh.use_cohesive_elements == True:
         plotByInterface(damage)
-        plt.savefig("LOG/czm_damage.svg")
+        plt.savefig(DFMesh.filepath + "czm_damage.svg")
 
     if DFMesh.use_lipfield == True:
         plotByElement(damage)
-        plt.savefig("LOG/lipfield_damage.svg")
+        plt.savefig(DFMesh.filepath + "lipfield_damage.svg")
 
 
 def plotAverageStressBar(average_stress_bar):
@@ -145,9 +145,9 @@ def plotAverageStressBar(average_stress_bar):
 
     plt.plot(x, y)
     if DFMesh.use_cohesive_elements == True:
-        plt.savefig("LOG/czm_average_stress_bar.svg")
+        plt.savefig(DFMesh.filepath + "czm_average_stress_bar.svg")
     if DFMesh.use_lipfield == True:
-        plt.savefig("LOG/lipfield_average_stress_bar.svg")
+        plt.savefig(DFMesh.filepath + "lipfield_average_stress_bar.svg")
 
 
 def plotStressByTime(stress_evolution):
@@ -194,7 +194,7 @@ def plotEnergiesCZM(energies):
     plt.plot(x, external_work, label="Wext")
     plt.legend()
 
-    plt.savefig("LOG/czm_energies.svg")
+    plt.savefig(DFMesh.filepath + "czm_energies.svg")
         
 
 
@@ -220,7 +220,7 @@ def plotEnergiesLipfield(energies):
     plt.plot(x, energy_dissipated, label="Edis")
     plt.plot(x, external_work, label="Wext")
     plt.legend()
-    plt.savefig("LOG/lipfield_energies.svg")
+    plt.savefig(DFMesh.filepath + "lipfield_energies.svg")
 
 
 def plotEnergies(energies):
@@ -263,7 +263,7 @@ def plotVarEnergiesCZM(var_energies):
     plt.plot(x, -var_external_work, label="-varWext")
     plt.plot(x, var_energy_total, label="varEtot")
     plt.legend()
-    plt.savefig("LOG/czm_var_energies.svg")
+    plt.savefig(DFMesh.filepath + "czm_var_energies.svg")
     # plt.show()
 
 
@@ -293,7 +293,7 @@ def plotVarEnergiesLipfield(var_energies):
     plt.plot(x, -var_external_work, label="-varWext")
     plt.plot(x, var_energy_total, label="varEtot")
     plt.legend()
-    plt.savefig("LOG/lipfield_var_energies.svg")
+    plt.savefig(DFMesh.filepath + "lipfield_var_energies.svg")
     # plt.show()
 
 
@@ -333,7 +333,7 @@ def plotPowerCZM(power):
     plt.plot(x, -power_external_work, label="-pWext")
     plt.plot(x, power_total, label="pEtot")
     plt.legend()
-    plt.savefig("LOG/czm_power.svg")
+    plt.savefig(DFMesh.filepath + "czm_power.svg")
 
 
 def plotPowerLipfield(power):
@@ -359,7 +359,7 @@ def plotPowerLipfield(power):
     plt.plot(x, -power_external_work, label="-pWext")
     plt.plot(x, power_total, label="pEtot")
     plt.legend()
-    plt.savefig("LOG/lipfield_power.svg")
+    plt.savefig(DFMesh.filepath + "lipfield_power.svg")
 
 
 def plotPower(power):
@@ -386,9 +386,9 @@ def plotNumberFragments(nfrag):
 
     plt.plot(x, y)
     if DFMesh.use_cohesive_elements == True:
-        plt.savefig("LOG/czm_number_fragments.svg")
+        plt.savefig(DFMesh.filepath + "czm_number_fragments.svg")
     if DFMesh.use_lipfield == True:
-        plt.savefig("LOG/lipfield_number_fragments.svg")
+        plt.savefig(DFMesh.filepath + "lipfield_number_fragments.svg")
 
 
 def plotAvgFragmentSize(avg_frag_sizes):
@@ -407,9 +407,9 @@ def plotAvgFragmentSize(avg_frag_sizes):
     plt.plot(x, y)
 
     if DFMesh.use_cohesive_elements == True:
-        plt.savefig("LOG/czm_avg_size_fragments.svg")
+        plt.savefig(DFMesh.filepath + "czm_avg_size_fragments.svg")
     if DFMesh.use_lipfield == True:
-        plt.savefig("LOG/lipfield_avg_size_fragments.svg")
+        plt.savefig(DFMesh.filepath + "lipfield_avg_size_fragments.svg")
 
 def plotFragmentSizeHistogram(frag_sizes, n_columns):
 
@@ -423,10 +423,10 @@ def plotFragmentSizeHistogram(frag_sizes, n_columns):
     plt.hist(frag_sizes, n_columns)
 
     if DFMesh.use_cohesive_elements == True:
-        plt.savefig("LOG/czm_fragment_size_histogram.svg")
+        plt.savefig(DFMesh.filepath + "czm_fragment_size_histogram.svg")
 
     if DFMesh.use_lipfield == True:
-        plt.savefig("LOG/lipfield_fragment_size_histogram.svg")
+        plt.savefig(DFMesh.filepath + "lipfield_fragment_size_histogram.svg")
 
 
 def plotVTK(prefix, timestep, u, stress):
@@ -600,12 +600,12 @@ def plotLogAnalyticals(grady, gc, zmr, values_strainrate):
 
 
 def saveResultsCZM(variable_name, variable):
-    with open("LOG/czm_" + variable_name + ".pickle", "wb") as handle:
+    with open(DFMesh.filepath + "czm_" + variable_name + ".pickle", "wb") as handle:
         pickle.dump(variable, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def saveResultsLipfield(variable_name, variable):
-    with open("LOG/lipfield_" + variable_name + ".pickle", "wb") as handle:
+    with open(DFMesh.filepath + "lipfield_" + variable_name + ".pickle", "wb") as handle:
         pickle.dump(variable, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
