@@ -47,3 +47,6 @@ continue_simulation_from_step = False
 
 half_bar = False
 # if use symmetry we have to add the bc properly
+
+filepath = "LOG/mesh_study/lipfield_uniform_mesh/10000el/"
+# filepath = "LOG/mesh_study/czm_uniform_mesh/10000el/"
