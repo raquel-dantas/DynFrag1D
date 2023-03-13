@@ -318,7 +318,7 @@ if DFMesh.use_lipfield == True:
         size = len(region_optimization)
         # Inputs for LinearConstraint
         A = scipy.sparse.eye(size - 1, size) - scipy.sparse.eye(size - 1, size, 1)
-        b = [DFMesh.dx(i, i+1) / regularization_length for i in region_optimization[:-1]]
+        b = np.array([DFMesh.dx(i, i+1) / regularization_length for i in region_optimization[:-1]])
         # b = DFMesh.h_uniform / regularization_length
         constraints = LinearConstraint(A, - b,  b)
         # Bounds
