@@ -10,7 +10,7 @@ use_lipfield = True
 uniform_mesh = False
 create_mesh = False # if there is an mesh file for input set create_mesh = False
 if create_mesh == False:
-    mesh_file_name = 'src/input_files/mesh_non_unuiform_2500.pickle'
+    mesh_file_name = 'src/input_files/mesh_non_uniform_2500.pickle'
 
 
 # Material
