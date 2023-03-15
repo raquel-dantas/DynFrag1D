@@ -2,6 +2,7 @@ ipykernel
 numpy
 matplotlib
 progressbar
+sortedcontainers
 # Dependencies of Vscode extensions
 autopep8
 # Dependencies of akantu
