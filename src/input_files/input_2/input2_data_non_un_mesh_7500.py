@@ -43,10 +43,11 @@ strain_rate = 10.0**4  # (s-1)
 # Time
 time_simulation = 1.0 * 10**-7  # Total time of simulation (s)
 
-# if there is previous data to continue the simulation from a previous simulation set
-# continue_simulation_from_step = True and give the time to start the simulation
+# if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
 initial_step = 0
 continue_simulation_from_step = False
+if continue_simulation_from_step == True:
+    previous_simulation = "filenae.pickle"
 
 half_bar = False
 # if use symmetry we have to add the bc properly

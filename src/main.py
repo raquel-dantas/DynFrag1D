@@ -51,19 +51,19 @@ def runSimulation(strain_rate):
         if DFMesh.use_cohesive_elements == True:
             u, v, acel = DFInterface.verifyStress(average_stress_neighbors, u, v, acel)
 
-        
-        results = [
-            ["displacement", u],
-            ["velocity", v],
-            ["acceleration", acel],
-            ["damage", d],
-            ["stress", stress],
-            ["avg_stress_bar", avg_stress_bar],
-            ["energies", energies],
-            ["n_fragments", n_fragments],
-            ["frag_lengths", frag_lengths],
-        ]
-        DFPlot.saveResultsCurrentStep(results, n)
+        if n%10 == 0:
+            results = [
+                ["displacement", u],
+                ["velocity", v],
+                ["acceleration", acel],
+                ["damage", d],
+                ["stress", stress],
+                ["avg_stress_bar", avg_stress_bar],
+                ["energies", energies],
+                ["n_fragments", n_fragments],
+                ["frag_lengths", frag_lengths],
+            ]
+            DFPlot.saveResultsCurrentStep(results, n)
 
     DFModel.endProgressBar(bar)
 
