@@ -3,12 +3,16 @@ import itertools
 import copy
 import pickle
 
-import input_files.input_data_tests as inputdata
+# import input_files.input_data_tests as inputdata
 # import input_files.input_2.input2_data_non_un_mesh_7500 as inputdata
-
+import input_files.input_2.input2_data_un_mesh_1250 as inputdata
 
 # Import or set inputs
+n_init = inputdata.initial_step
 filepath = inputdata.filepath_save_results
+continue_simulation_from_step = inputdata.continue_simulation_from_step
+if continue_simulation_from_step == True:
+    previous_simulation = inputdata.previous_simulation
 
 # Assign material properties
 young_modulus = inputdata.young_modulus

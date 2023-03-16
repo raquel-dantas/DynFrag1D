@@ -27,10 +27,10 @@ if generate_limit_stress_variation == False:
 
 
 # Geometry
-bar_length = 5 * 10** -3  # (m)
+bar_length = 50 * 10** -3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 600
+number_elements = 1250
 area = 1.  # Cross sectional area 
 
 
@@ -39,17 +39,17 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 1.0 * 10**-6  # Total time of simulation (s)
+time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
 
 
 # if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
-initial_step = 0
-continue_simulation_from_step = False
+initial_step = 498
+continue_simulation_from_step = True
 if continue_simulation_from_step == True:
-    previous_simulation = "src/input_files/lipfield_test/"
+    previous_simulation = "LOG/lipfield_test/lipfield_step_498_.pickle"
 
 
 half_bar = False
 # if use symmetry we have to add the bc proper
 
-filepath_save_results = "output/lipfield_test/"
+filepath_save_results = "LOG/lipfield_test/"

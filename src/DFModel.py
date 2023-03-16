@@ -4,7 +4,6 @@ import progressbar
 
 import DFMesh
 import DFPostProcess
-import input_files.input_data_tests as inputdata
 
 
 # Initiation of variables
@@ -36,7 +35,7 @@ def getResults(results, variable_name):
 
     for i in range(len(results)):
         if results[i][0] == variable_name:
-            variable = energies[i][1]
+            variable = results[i][1]
             return variable
 
 
@@ -45,20 +44,19 @@ def getResults(results, variable_name):
 
 
 
-if inputdata.continue_simulation_from_step == True:
-
-    n_init = inputdata.initial_step
+if DFMesh.continue_simulation_from_step == True:
+    n_init = DFMesh.n_init
     n_final = DFMesh.n_steps
 
-    previous_results = readPreviousResults(inputdata.previous_simulation)
+    previous_results = readPreviousResults(DFMesh.previous_simulation)
 
     # Load previous results
     u = getResults(previous_results, "displacement")
     v = getResults(previous_results, "velocity")
     acel = getResults(previous_results, "acceleration")
-    acel = getResults(previous_results, "damage")
+    d = getResults(previous_results, "damage")
     energies = getResults(previous_results, "energies")
-    work_previous_step = DFPostProcess.getEnergy(energies, "external work")[n_init]
+    work_previous_step = DFPostProcess.getEnergy(energies, "external work")
     data_bc = DFPostProcess.saveResultsAtBC(u, d)
 
 

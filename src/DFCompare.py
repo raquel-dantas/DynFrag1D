@@ -7,7 +7,6 @@ import pickle
 
 
 def readResults(file_address, variable_name):
-    file = file_address + variable_name + ".pickle"
     with open(file_address + variable_name + ".pickle", "rb") as handle:
         variable = pickle.load(handle)
     return variable
