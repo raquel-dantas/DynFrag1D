@@ -299,9 +299,10 @@ def updateEnergies(energies, n, u, v, d, stress, data_bc, work_previous_step):
     if DFMesh.use_lipfield == True:
         energies_step = computeEnergiesLipfield(u, v, d, data_bc, work_previous_step)
 
-    for i in range(len(energies)):
-        energies[i][1][n] = energies_step[i][1]
-    return energies
+    # for i in range(len(energies)):
+    #     energies[i][1][n] = energies_step[i][1]
+    # return energies
+    return energies_step
 
 
 def getEnergy(energies, energy_name):

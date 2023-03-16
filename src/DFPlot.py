@@ -617,3 +617,11 @@ def saveResults(variable):
 
     if DFMesh.use_lipfield == True:
         saveResultsLipfield(variable_name, variable)
+
+
+
+def saveResultsCurrentStep(results, current_step):
+
+    step_id = "step_" + str(current_step) + "_"
+    with open(DFMesh.filepath + "lipfield_" + step_id + ".pickle", "wb") as handle:
+        pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)

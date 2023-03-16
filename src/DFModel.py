@@ -17,24 +17,28 @@ acel = DFMesh.acel0
 d = DFMesh.d0
 data_bc = DFPostProcess.saveResultsAtBC(u, d)
 
-energy_potential = np.zeros(DFMesh.n_steps)
-energy_kinetic = np.zeros(DFMesh.n_steps)
-energy_dissipated = np.zeros(DFMesh.n_steps)
-external_work = np.zeros(DFMesh.n_steps)
+# energy_potential = np.zeros(DFMesh.n_steps)
+# energy_kinetic = np.zeros(DFMesh.n_steps)
+# energy_dissipated = np.zeros(DFMesh.n_steps)
+# external_work = np.zeros(DFMesh.n_steps)
+energy_potential = 0.0
+energy_kinetic = 0.0
+energy_dissipated = 0.0
+external_work = 0.0
 work_previous_step = 0.0
 
 # stress_evolution = np.zeros((2 * len(DFMesh.materials), DFMesh.n_steps))
-avg_stress_bar = np.zeros(DFMesh.n_steps)
+# avg_stress_bar = np.zeros(DFMesh.n_steps)
 
 u_all_steps = [DFMesh.u0]
 damage_all_steps = [DFMesh.d0]
-fraglen_all_steps = []
-stress_all_steps = []
+# fraglen_all_steps = []
+# stress_all_steps = []
 
 
-n_fragments = np.zeros(DFMesh.n_steps)
-avg_frag_size = np.zeros(DFMesh.n_steps)
-data_histogram_frag_size = []
+# n_fragments = np.zeros(DFMesh.n_steps)
+# avg_frag_size = np.zeros(DFMesh.n_steps)
+# data_histogram_frag_size = []
 
 if DFMesh.use_cohesive_elements == True:
     energy_reversible = np.zeros(DFMesh.n_steps)
@@ -99,56 +103,6 @@ if inputdata.continue_simulation_from_step == True:
     stress_all_steps = readPreviousResults('stress_all_steps')
     fraglen_all_steps = readPreviousResults('fraglen_all_steps')
     data_bc = DFPostProcess.saveResultsAtBC(u, d)
-
-
-
-    # if DFMesh.use_lipfield == True:
-
-    #     with open("src/input_files/lipfield_u.pickle", "rb") as handle:
-    #         u = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_v.pickle", "rb") as handle:
-    #         v = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_acel.pickle", "rb") as handle:
-    #         acel = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_d.pickle", "rb") as handle:
-    #         d = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_energy_potential.pickle", "rb") as handle:
-    #         energy_potential_previous = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_energy_kinetic.pickle", "rb") as handle:
-    #         energy_kinetic_previous = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_energy_dissipated.pickle", "rb") as handle:
-    #         energy_dissipated_previous = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_external_work.pickle", "rb") as handle:
-    #         external_work_previous = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_avg_stress_bar.pickle", "rb") as handle:
-    #         avg_stress_bar_previous = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_n_fragments.pickle", "rb") as handle:
-    #         n_fragments_previous = pickle.load(handle)
-
-    #     with open("src/input_files/lipfield_avg_frag_size.pickle", "rb") as handle:
-    #         avg_frag_size_previous = pickle.load(handle)
-
-    #     for n in range(n_init):
-    #         energy_potential[n] = energy_potential_previous[n]
-    #         energy_kinetic[n] = energy_kinetic_previous[n]
-    #         energy_dissipated[n] = energy_dissipated_previous[n]
-    #         external_work[n] = external_work_previous[n]
-    #         avg_stress_bar[n] = avg_stress_bar_previous[n]
-    #         n_fragments[n] = n_fragments_previous[n]
-    #         avg_frag_size[n] = avg_frag_size_previous[n]
-
-    #     work_previous_step = external_work[n_init]
-
-    #     data_bc = DFPostProcess.saveResultsAtBC(u, d)
 
 
 def initProgressBar():
