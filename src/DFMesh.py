@@ -3,9 +3,9 @@ import itertools
 import copy
 import pickle
 
-# import input_files.input_data_tests as inputdata
-# import input_files.input_2.input2_data_non_un_mesh_7500 as inputdata
-import input_files.input_2.input2_data_non_un_mesh_10000 as inputdata
+
+import input_files.input_2.input2_data_un_mesh_10000 as inputdata
+
 
 # Import or set inputs
 n_init = inputdata.initial_step
