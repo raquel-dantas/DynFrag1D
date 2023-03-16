@@ -292,16 +292,13 @@ def computeEnergiesLipfield(u, v, d, data_bc, work_previous_step):
     return energies_step
 
 
-def updateEnergies(energies, n, u, v, d, stress, data_bc, work_previous_step):
+def updateEnergies(u, v, d, stress, data_bc, work_previous_step):
 
     if DFMesh.use_cohesive_elements == True:
         energies_step = computeEnergiesCZM(u, v, stress, data_bc, work_previous_step)
     if DFMesh.use_lipfield == True:
         energies_step = computeEnergiesLipfield(u, v, d, data_bc, work_previous_step)
 
-    # for i in range(len(energies)):
-    #     energies[i][1][n] = energies_step[i][1]
-    # return energies
     return energies_step
 
 
@@ -311,8 +308,6 @@ def getEnergy(energies, energy_name):
         if energies[i][0] == energy_name:
             energy = energies[i][1]
             return energy
-    # else:
-    #     raise Exception("energy name don't match!")
 
 
 def computeVarEnergiesCZM(energies):

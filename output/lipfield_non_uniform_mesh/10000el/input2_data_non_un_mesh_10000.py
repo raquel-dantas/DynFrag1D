@@ -7,10 +7,10 @@ use_lipfield = True
 
 
 # Type of mesh
-uniform_mesh = True
-create_mesh = True # if there is an mesh file for input set create_mesh = False
+uniform_mesh = False
+create_mesh = False # if there is an mesh file for input set create_mesh = False
 if create_mesh == False:
-    mesh_file_name = 'src/input_files/mesh_uniform_600.pickle'
+    mesh_file_name = 'src/input_files/mesh_non_uniform_10000.pickle'
 
 
 # Material
@@ -21,14 +21,14 @@ stress_limit = 300.0 * 10**6  # (Pa)
 
 generate_limit_stress_variation = False # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = 'src/input_files/random_stress_critical_300.pickle'
+    stress_limite_file_name = 'src/input_files/random_stress_critical_10000.pickle'
 
 
 # Geometry
-bar_length = 0.5* 5. * 10** -3  # (m)
-x0 = 0. # Left extremitiy x coordinate / 0-initial
-xf = bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 300
+bar_length = 50. * 10** -3  # (m)
+x0 = - 0.5 * bar_length # Left extremitiy x coordinate / 0-initial
+xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
+number_elements = 10000
 area = 1  # Cross sectional area (m2) (Equal to element size )
 
 
@@ -37,7 +37,7 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 3.0 * 10**-7  # Total time of simulation (s)
+time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
 
 
 initial_step = 0
@@ -45,5 +45,7 @@ continue_simulation_from_step = False
 # if there is previous data to continue the simulation from a previous simulation set 
 # continue_simulation_from_step = True and give the time to start the simulation
 
-half_bar = True
+half_bar = False
 # if use symmetry we have to add the bc properly
+
+filepath = "output/lipfield_non_uniform_mesh/10000el/"

@@ -3,11 +3,12 @@ import itertools
 import copy
 import pickle
 
-# import input_files.input_data as inputdata
-import input_files.input_2.input2_data_non_un_mesh_7500 as inputdata
-filepath = inputdata.filepath
+import input_files.input_data_tests as inputdata
+# import input_files.input_2.input2_data_non_un_mesh_7500 as inputdata
+
 
 # Import or set inputs
+filepath = inputdata.filepath_save_results
 
 # Assign material properties
 young_modulus = inputdata.young_modulus
