@@ -9,5 +9,7 @@ source .venv/bin/activate
 # Install dependencies
 pip3 install -r requirements.txt
 
+# Source akantu built from source 
+source ~/projects/lib/akantu/build/akantu_environement.sh
 
 set +e # return to default shell behaviour 
