@@ -1,7 +1,39 @@
 import numpy as np
+import akantu as aka
 
 import DFModel_aka as DFModel
 import DFMesh_aka as DFMesh
+
+
+def getDamageParameter():
+
+    d = DFModel.dynfrag.getMaterial(1).getInternalReal('damage')
+    d = d(aka._cohesive_2d_4)
+    mat = DFModel.dynfrag.getMaterial(1)
+    coh_id = DFModel.dynfrag.getMaterial('insertion').getElementFilter()(aka._cohesive_2d_4)
+    
+    return d
+
+# d
+# (facet, localNode) -> damage
+
+# def getDamagePerFacet(cohID, localNodeID):
+#     return d[cohID + localNodeID]
+
+# cohID -> facetID
+
+# coord -> ... -> damage
+
+# nodeindex -> damage
+
+# facetIndex -> globalNode (feito)
+# globalNode -> coord (feito)
+
+# facetIndex -> localNode
+
+
+# localNode -> coord     (feito)
+
 
 
 def computeEnergies(work_previous_step, fint_current_step):

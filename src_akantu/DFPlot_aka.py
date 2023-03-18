@@ -39,11 +39,11 @@ def retrieveName(var):
     return [var_name for var_name, var_val in callers_local_vars if var_val is var]
 
 
-def plotByCoord(func, mesh, labely):
+def plotByCoord(func, labely):
     """Plot a vector of values that corresponds to each DOF of the mesh"""
 
     title = labely
-    x = np.array([x for x, y in mesh.getNodes()])
+    x = np.array([x for x, y in DFMesh.getNodes()])
     y = func
     x = x.flatten()
     y = y.flatten()
@@ -159,6 +159,20 @@ def plotPower(power):
     plt.savefig(DFMesh.filepath + "aka_power.svg")
 
 
+def plotDamage(d):
+    fig, axes = plt.subplots()
+    axes.grid(True, which="both")
+    axes.axhline(y=0, color="k")
+    plt.title("Damage")
+    plt.xlabel("x")
+    plt.ylabel("d")
+
+    x = np.array([x for x, y in DFModel.facets_coords])
+    plt.plot(x,d)
+    plt.savefig(DFMesh.filepath + "aka_damage.svg")
+
+
+
 def plotNumberFragments(nfrag):
     """Plot a vector of values that corresponds to the number of fragments at eacth time step in the analysis"""
 
@@ -265,22 +279,21 @@ def plotConvergenceNumfrag(nfrags_un, nfrags_nun, meshes):
     plt.show()
 
 
-def addPlotVtk(model_aka):
-    model_aka.setBaseName("bar")
-    model_aka.addDumpFieldVector("displacement")
-    model_aka.addDumpFieldVector("velocity")
-    model_aka.addDumpField("strain")
-    model_aka.addDumpField("stress")
-    model_aka.addDumpField("blocked_dofs")
-    model_aka.addDumpField("material_index")
+def addPlotVtk():
+    DFModel.dynfrag.setBaseName('bar')
+    DFModel.dynfrag.addDumpFieldVector('displacement')
+    DFModel.dynfrag.addDumpFieldVector('velocity')
+    DFModel.dynfrag.addDumpField('strain')
+    DFModel.dynfrag.addDumpField('stress')
+    DFModel.dynfrag.addDumpField('blocked_dofs')
+    DFModel.dynfrag.addDumpField('material_index')
 
     # VTK plot for Cohesive model
-    model_aka.setBaseNameToDumper("cohesive elements", "cohesive")
-    model_aka.addDumpFieldVectorToDumper("cohesive elements", "displacement")
-    model_aka.addDumpFieldToDumper("cohesive elements", "damage")
-    model_aka.addDumpFieldVectorToDumper("cohesive elements", "tractions")
-    model_aka.addDumpFieldVectorToDumper("cohesive elements", "opening")
-
+    DFModel.dynfrag.setBaseNameToDumper('cohesive elements', 'cohesive')
+    DFModel.dynfrag.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
+    DFModel.dynfrag.addDumpFieldToDumper('cohesive elements', 'damage')
+    DFModel.dynfrag.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
+    DFModel.dynfrag.addDumpFieldVectorToDumper('cohesive elements', 'opening')
 
 def addVtkFiles(n_steps_to_save):
     if n_steps_to_save % 100 == 0:
@@ -292,3 +305,10 @@ def saveResults(variable):
     variable_name = retrieveName(variable)[0]
     with open(DFMesh.filepath + "aka_" + variable_name + ".pickle", "wb") as handle:
         pickle.dump(variable, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def saveResultsCurrentStep(results, current_step):
+
+    step_id = "step_" + str(current_step) + "_"
+    with open(DFMesh.filepath + "lipfield_" + step_id + ".pickle", "wb") as handle:
+        pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
