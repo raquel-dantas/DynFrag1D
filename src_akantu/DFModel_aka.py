@@ -89,14 +89,15 @@ u0 = dynfrag.getDisplacement()
 v0 = dynfrag.getVelocity()
 v0[:, 0] = np.array([DFMesh.strain_rate * x for x, y in DFMesh.mesh.getNodes()])
 dynfrag.getVelocity()[:] = v0
+data_bc = [0, 0]
 
 # Initiation of variables
-energy_potential = np.zeros(n_steps)
-energy_kinetic = np.zeros(n_steps)
-energy_dissipated = np.zeros(n_steps)
-energy_reversible = np.zeros(n_steps)
-energy_contact = np.zeros(n_steps)
-external_work = np.zeros(n_steps)
+energy_potential = 0.0
+energy_kinetic = 0.0
+energy_dissipated = 0.0
+energy_reversible = 0.0
+energy_contact = 0.0
+external_work = 0.0
 work_previous_step = 0.0
 energies = [
     ["energy potential", energy_potential],
@@ -107,17 +108,6 @@ energies = [
     ["external work", external_work],
 ]
 
-avg_stress_bar = np.zeros(n_steps)
-
-damage_all_steps = []
-fraglen_all_steps = []
-
-
-n_fragments = np.zeros(n_steps)
-elements_per_frag = []
-avg_frag_size = np.zeros(n_steps)
-data_histogram_frag_size = []
-data_bc = [0, 0]
 
 
 def initProgressBar():
