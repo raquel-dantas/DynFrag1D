@@ -14,10 +14,7 @@ def runSimulation(strain_rate):
 
     # Initiation of variables
 
-    # damage_all_steps = DFModel.damage_all_steps
     avg_stress_bar = DFModel.avg_stress_bar
-    stress_all_steps = DFModel.stress_all_steps
-    # data_bc = DFModel.data_bc
     work_previous_step = DFModel.work_previous_step
     energies = DFModel.energies
 
@@ -25,10 +22,12 @@ def runSimulation(strain_rate):
     elements_per_fragment = DFModel.elements_per_frag
     avg_frag_size = DFModel.avg_frag_size
     fraglen_all_steps = DFModel.fraglen_all_steps
-    data_histogram_frag_size = []
+    damage_all_steps = DFModel.damage_all_steps
+
 
     # VTK plot
-    # DFPlot.addPlotVtk(DFModel.dynfrag)
+    DFPlot.addPlotVtk()
+
 
     for n in range(DFModel.n_steps):
 
@@ -58,12 +57,8 @@ def runSimulation(strain_rate):
         )
         work_previous_step = DFPostProcess.getEnergy(energies, "external work")[n]
 
-        coh = DFModel.dynfrag.getMaterial(1)
-        d = DFModel.dynfrag.getMaterial(1).getInternalReal('damage')
-        d = d(aka._cohesive_2d_4)
-        print(d)
-        coh_id = DFModel.dynfrag.getMaterial('insertion').getElementFilter()(aka._cohesive_2d_4)
-        print(coh_id)
+        d = DFPostProcess.getDamageParameter()
+        damage_all_steps.append(d)
 
         # Fragmentation data
         fragment_data = aka.FragmentManager(DFModel.dynfrag)
@@ -72,20 +67,14 @@ def runSimulation(strain_rate):
         # Number of fragments
         n_fragments[n] = fragment_data.getNbFragment()  
         elements_per_fragment.append([fragment_data.getNbElementsPerFragment()])
-        # avg_elements_per_fragment = np.mean(elements_per_fragment)
+        mean_els_per_fragment = np.mean(fragment_data.getNbElementsPerFragment())
 
         # Fragments size (assuming uniform mesh)
         frag_lengths = np.zeros(fragment_data.getNbFragment())
         frag_lengths = fragment_data.getNbElementsPerFragment() * DFMesh.h_uniform
-        # avg_sfrag[n] = (mean_nelfrag[n]%2 + (mean_nelfrag[n] - mean_nelfrag[n]%2)/2 ) * DFMesh_aka.hun                      # Mean size of fragments
+        fraglen_all_steps.append(frag_lengths)
+        # avg_sfrag = (mean_els_per_fragment%2 + (mean_els_per_fragment - mean_els_per_fragment%2)*0.5 ) * DFMesh.h_uniform                      
 
-        # Fragments velocities
-        # vel_frag = np.zeros(fragment_data.getNbFragment())
-        # vel_frag = fragment_data.getVelocity()
-        # mean_vel_frag[n] = np.mean(vel_frag)
-        # Fragments mass
-        # m_frag = np.zeros(fragment_data.getNbFragment())
-        # m_frag = fragment_data.getMass()
 
     DFModel.endProgressBar(bar)
 
@@ -105,14 +94,11 @@ def runSimulation(strain_rate):
     DFPlot.saveResults(u)
     DFPlot.saveResults(v)
     DFPlot.saveResults(acel)
-    # DFPlot.saveResults(d)
-    # DFPlot.saveResults(u_all_steps)
-    # DFPlot.saveResults(damage_all_steps)
-    DFPlot.saveResults(stress_all_steps)
+    DFPlot.saveResults(d)
+    DFPlot.saveResults(damage_all_steps)
     DFPlot.saveResults(fraglen_all_steps)
     DFPlot.saveResults(n_fragments)
     DFPlot.saveResults(avg_frag_size)
-    DFPlot.saveResults(data_histogram_frag_size)
     DFPlot.saveResults(avg_stress_bar)
     DFPlot.saveResults(energies)
     DFPlot.saveResults(var_energies)
