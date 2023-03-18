@@ -1,6 +1,7 @@
 import akantu as aka
 import numpy as np
 import progressbar
+import pickle
 
 import DFMesh_aka as DFMesh
 import DFApplyVel_aka as DFApplyVel
@@ -25,6 +26,7 @@ if use_automatic_insertion == True:
 else:
     mesh_facets = DFMesh.mesh.getMeshFacets()
     connect_facets = mesh_facets.getConnectivities()
+    facets_coords = mesh_facets.getNodes()
 
     # Get the cohesive inserter and check facets
     cohesive_inserter = dynfrag.getElementInserter()
@@ -42,13 +44,31 @@ else:
             if abs(direction) < 0.9:
                 check_facettype[el] = False
 
+if DFMesh.generate_limit_stress_variation == False:
+    stress_critical = dynfrag.getMaterial(1).getInternalReal("sigma_c")
+    stress_critical = stress_critical(aka._segment_2)
+    with open(DFMesh.stress_limit_file_name, "rb") as handle:
+        random_stress = pickle.load(handle)
+    
+    update_stress = []
+    stress_value = []
+    for i in check_facettype:
+        update_stress.extend([i,i])
+    for i in random_stress:
+        stress_value.extend([i,i])
+
+    i = 0
+    for facet in range(len(stress_critical)):
+        if update_stress[facet] == True:
+            stress_critical[facet] = stress_value[i]
+            i += 1
 
 
 # Set time increment
-dt_crit = dynfrag.getStableTimeStep()     # Critical time step (s)
-dt = dt_crit*0.1                        # Adopted time step
+dt_crit = dynfrag.getStableTimeStep()    
+dt = dt_crit*0.1                       
 dynfrag.setTimeStep(dt)
-n_steps = int(DFMesh.time_simulation/dt)       # Number of time steps
+n_steps = int(DFMesh.time_simulation/dt)      
 
 
 # Apply Dirichlet BC to block dispacements at y direction on top and botton of the elements
@@ -86,10 +106,8 @@ energies = [
 
 avg_stress_bar = np.zeros(n_steps)
 
-u_all_steps = [u0]
 damage_all_steps = []
 fraglen_all_steps = []
-stress_all_steps = []
 
 
 n_fragments = np.zeros(n_steps)
