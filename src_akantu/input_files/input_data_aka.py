@@ -1,10 +1,10 @@
 # Input model for src_akantu
 
 # Type of mesh
-uniform_mesh = True
-create_mesh = True # if there is an mesh file for input set create_mesh = False
+uniform_mesh = False
+create_mesh = False # if there is an mesh file for input set create_mesh = False
 if create_mesh == False:
-    mesh_file_name = 'file_mesh.pickle'
+    mesh_file_name = 'src_akantu/input_files/mesh_non_uniform_test.pickle'
 
 # Material
 young_modulus = 275.0*10**9   # (Pa)
@@ -12,9 +12,9 @@ density = 2750.0 # (kg/m3)
 fracture_energy = 100.  # (N/m)
 stress_limit = 300.0 * 10**6  # (Pa)
 
-generate_limit_stress_variation = True # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
+generate_limit_stress_variation = False # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = 'file_random_stress.pickle'
+    stress_limit_file_name = 'src_akantu/input_files/random_stress_test.pickle'
 
 
 # Geometry
@@ -30,7 +30,7 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 3.5 * 10**-7   # Total time of simulation (s)
+time_simulation = 6.0 * 10**-6   # Total time of simulation (s)
 
 
 initial_step = 0
