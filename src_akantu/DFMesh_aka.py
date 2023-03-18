@@ -1,6 +1,7 @@
 import subprocess
 import pickle
 import akantu as aka
+import numpy as np
 
 import input_files.input_data_aka as inputdata
 filepath = inputdata.filepath
@@ -11,6 +12,8 @@ rho = inputdata.density
 fracture_energy = inputdata.fracture_energy
 stress_limit = inputdata.stress_limit
 generate_limit_stress_variation = inputdata.generate_limit_stress_variation
+if generate_limit_stress_variation == False:
+    stress_limit_file_name = inputdata.stress_limit_file_name
 
 # Assign geometry
 area = inputdata.area
@@ -106,7 +109,6 @@ with open('src_akantu/LOG/material.dat', 'w') as f:
     f.write(material_file)
 
 
-
 # Read material file to akantu
 aka.parseInput('src_akantu/LOG/material.dat')
 
@@ -121,4 +123,14 @@ n_nodes = mesh.getNbNodes()
 connect = mesh.getConnectivity(aka._triangle_3)
 # Get coordinates 
 node_coord = mesh.getNodes()
+
+
+
+if create_mesh == False:
+    # import the coordinates from a picke file
+    with open(inputdata.mesh_file_name, "rb") as handle:
+        node_coord_x = pickle.load(handle)
+    for i in range(len(node_coord_x)-2):
+        node_coord[i + 4, 0] = node_coord_x[i + 1]
+        node_coord[n_elements + 1 - i , 0] = node_coord_x[i + 1]
 
