@@ -168,9 +168,8 @@ def plotDamage(d):
     plt.ylabel("d")
 
     x = np.array([x for x, y in DFModel.facets_coords])
-    plt.plot(x,d)
+    plt.plot(x, d)
     plt.savefig(DFMesh.filepath + "aka_damage.svg")
-
 
 
 def plotNumberFragments(nfrag):
@@ -280,20 +279,21 @@ def plotConvergenceNumfrag(nfrags_un, nfrags_nun, meshes):
 
 
 def addPlotVtk():
-    DFModel.dynfrag.setBaseName('bar')
-    DFModel.dynfrag.addDumpFieldVector('displacement')
-    DFModel.dynfrag.addDumpFieldVector('velocity')
-    DFModel.dynfrag.addDumpField('strain')
-    DFModel.dynfrag.addDumpField('stress')
-    DFModel.dynfrag.addDumpField('blocked_dofs')
-    DFModel.dynfrag.addDumpField('material_index')
+    DFModel.dynfrag.setBaseName("bar")
+    DFModel.dynfrag.addDumpFieldVector("displacement")
+    DFModel.dynfrag.addDumpFieldVector("velocity")
+    DFModel.dynfrag.addDumpField("strain")
+    DFModel.dynfrag.addDumpField("stress")
+    DFModel.dynfrag.addDumpField("blocked_dofs")
+    DFModel.dynfrag.addDumpField("material_index")
 
     # VTK plot for Cohesive model
-    DFModel.dynfrag.setBaseNameToDumper('cohesive elements', 'cohesive')
-    DFModel.dynfrag.addDumpFieldVectorToDumper('cohesive elements', 'displacement')
-    DFModel.dynfrag.addDumpFieldToDumper('cohesive elements', 'damage')
-    DFModel.dynfrag.addDumpFieldVectorToDumper('cohesive elements', 'tractions')
-    DFModel.dynfrag.addDumpFieldVectorToDumper('cohesive elements', 'opening')
+    DFModel.dynfrag.setBaseNameToDumper("cohesive elements", "cohesive")
+    DFModel.dynfrag.addDumpFieldVectorToDumper("cohesive elements", "displacement")
+    DFModel.dynfrag.addDumpFieldToDumper("cohesive elements", "damage")
+    DFModel.dynfrag.addDumpFieldVectorToDumper("cohesive elements", "tractions")
+    DFModel.dynfrag.addDumpFieldVectorToDumper("cohesive elements", "opening")
+
 
 def addVtkFiles(n_steps_to_save):
     if n_steps_to_save % 100 == 0:

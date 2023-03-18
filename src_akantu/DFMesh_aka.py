@@ -4,6 +4,7 @@ import akantu as aka
 import numpy as np
 
 import input_files.input_data_aka as inputdata
+
 filepath = inputdata.filepath
 
 # Assign material properties
@@ -24,7 +25,7 @@ xf = inputdata.xf
 # Assign load
 strain_rate = inputdata.strain_rate
 if inputdata.half_bar == True:
-    applied_vel = strain_rate * bar_length 
+    applied_vel = strain_rate * bar_length
 else:
     applied_vel = strain_rate * bar_length * 0.5
 
@@ -38,11 +39,10 @@ n_elements = inputdata.number_elements
 time_simulation = inputdata.time_simulation
 
 
-
 # Mesh
 
 # Compute the size of elements (h) for uniform mesh
-h_uniform = bar_length / (n_elements * 0.5) 
+h_uniform = bar_length / (n_elements * 0.5)
 
 geometry_file = f"""
 Point(1) = {{ {x0}, 0, 0, {h_uniform} }};
@@ -69,17 +69,26 @@ subprocess.run("mkdir src_akantu/LOG", shell=True)
 subprocess.run("rm -r paraview_backup", shell=True)
 subprocess.run("mv paraview paraview_backup", shell=True)
 
-with open('src_akantu/LOG/bar.geo', 'w') as f:
+with open("src_akantu/LOG/bar.geo", "w") as f:
     f.write(geometry_file)
 
-ret = subprocess.run("gmsh -2 -order 1 -o src_akantu/LOG/bar.msh src_akantu/LOG/bar.geo", shell=True)
+ret = subprocess.run(
+    "gmsh -2 -order 1 -o src_akantu/LOG/bar.msh src_akantu/LOG/bar.geo", shell=True
+)
 if ret.returncode:
     print("FATAL    : Gmsh error")
 else:
     print("Info    : Mesh generated")
 
 # Contact penalty
-alpha = (stress_limit**2 + 4.5 * strain_rate**(2/3) * young_modulus * fracture_energy**(2/3) * rho**(1/3)) / (4.5 * fracture_energy)
+alpha = (
+    stress_limit**2
+    + 4.5
+    * strain_rate ** (2 / 3)
+    * young_modulus
+    * fracture_energy ** (2 / 3)
+    * rho ** (1 / 3)
+) / (4.5 * fracture_energy)
 
 material_file = f"""
 seed = 1.0
@@ -105,32 +114,30 @@ model solid_mechanics_model_cohesive [
 
 subprocess.run("mkdir src_akantu/LOG", shell=True)
 
-with open('src_akantu/LOG/material.dat', 'w') as f:
+with open("src_akantu/LOG/material.dat", "w") as f:
     f.write(material_file)
 
 
 # Read material file to akantu
-aka.parseInput('src_akantu/LOG/material.dat')
+aka.parseInput("src_akantu/LOG/material.dat")
 
 # Read mesh
 spatial_dimension = 2
 mesh = aka.Mesh(spatial_dimension)
-mesh.read('src_akantu/LOG/bar.msh')
+mesh.read("src_akantu/LOG/bar.msh")
 
 # Get number of nodes
 n_nodes = mesh.getNbNodes()
 # Get connectivity list
 connect = mesh.getConnectivity(aka._triangle_3)
-# Get coordinates 
+# Get coordinates
 node_coord = mesh.getNodes()
-
 
 
 if create_mesh == False:
     # import the coordinates from a picke file
     with open(inputdata.mesh_file_name, "rb") as handle:
         node_coord_x = pickle.load(handle)
-    for i in range(len(node_coord_x)-2):
+    for i in range(len(node_coord_x) - 2):
         node_coord[i + 4, 0] = node_coord_x[i + 1]
-        node_coord[n_elements + 1 - i , 0] = node_coord_x[i + 1]
-
+        node_coord[n_elements + 1 - i, 0] = node_coord_x[i + 1]

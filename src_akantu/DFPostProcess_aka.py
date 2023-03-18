@@ -7,12 +7,15 @@ import DFMesh_aka as DFMesh
 
 def getDamageParameter():
 
-    d = DFModel.dynfrag.getMaterial(1).getInternalReal('damage')
+    d = DFModel.dynfrag.getMaterial(1).getInternalReal("damage")
     d = d(aka._cohesive_2d_4)
     mat = DFModel.dynfrag.getMaterial(1)
-    coh_id = DFModel.dynfrag.getMaterial('insertion').getElementFilter()(aka._cohesive_2d_4)
-    
+    coh_id = DFModel.dynfrag.getMaterial("insertion").getElementFilter()(
+        aka._cohesive_2d_4
+    )
+
     return d
+
 
 # d
 # (facet, localNode) -> damage
@@ -35,7 +38,6 @@ def getDamageParameter():
 # localNode -> coord     (feito)
 
 
-
 def computeEnergies(work_previous_step, fint_current_step):
 
     energy_potential = DFModel.dynfrag.getEnergy("potential")
@@ -54,7 +56,7 @@ def computeEnergies(work_previous_step, fint_current_step):
     freact_previous_step_bcleft = DFModel.data_bc[0]
     freact_previous_step_bcright = DFModel.data_bc[1]
 
-    freact_bcleft = (fint_current_step_bcleft + freact_previous_step_bcleft ) * 0.5
+    freact_bcleft = (fint_current_step_bcleft + freact_previous_step_bcleft) * 0.5
     freact_bcright = (fint_current_step_bcright + freact_previous_step_bcright) * 0.5
     external_work = (
         work_previous_step
@@ -63,7 +65,7 @@ def computeEnergies(work_previous_step, fint_current_step):
     )
 
     DFModel.data_bc = [freact_bcleft, freact_bcright]
-    
+
     energies_step = [
         ["energy potential", energy_potential],
         ["energy kinetic", energy_kinetic],
@@ -74,6 +76,7 @@ def computeEnergies(work_previous_step, fint_current_step):
     ]
 
     return energies_step
+
 
 def updateEnergies(energies, n, work_previous_step, fint_current_step):
     energies_step = computeEnergies(work_previous_step, fint_current_step)
@@ -87,6 +90,7 @@ def getEnergy(energies, energy_name):
         if energies[i][0] == energy_name:
             energy = energies[i][1]
             return energy
+
 
 def computeVariationEnergy(energies):
     """Returns the variation of energies between the current time step and the time step 0."""

@@ -24,10 +24,8 @@ def runSimulation(strain_rate):
     fraglen_all_steps = DFModel.fraglen_all_steps
     damage_all_steps = DFModel.damage_all_steps
 
-
     # VTK plot
     DFPlot.addPlotVtk()
-
 
     for n in range(DFModel.n_steps):
 
@@ -44,7 +42,7 @@ def runSimulation(strain_rate):
 
         u = DFModel.dynfrag.getDisplacement()[:, 0]
         v = DFModel.dynfrag.getVelocity()[:, 0]
-        acel = DFModel.dynfrag.getAcceleration()[:,0]
+        acel = DFModel.dynfrag.getAcceleration()[:, 0]
 
         fint = DFModel.dynfrag.getInternalForce()[:, 0]
         stress = DFModel.dynfrag.getMaterial(0).getStress(aka._triangle_3)
@@ -52,9 +50,7 @@ def runSimulation(strain_rate):
         avg_stress_bar[n] = np.mean(stress_xx)
 
         # Energy balance
-        energies = DFPostProcess.updateEnergies(
-            energies, n, work_previous_step, fint
-        )
+        energies = DFPostProcess.updateEnergies(energies, n, work_previous_step, fint)
         work_previous_step = DFPostProcess.getEnergy(energies, "external work")[n]
 
         d = DFPostProcess.getDamageParameter()
@@ -65,7 +61,7 @@ def runSimulation(strain_rate):
         fragment_data.computeAllData()
 
         # Number of fragments
-        n_fragments[n] = fragment_data.getNbFragment()  
+        n_fragments[n] = fragment_data.getNbFragment()
         elements_per_fragment.append([fragment_data.getNbElementsPerFragment()])
         mean_els_per_fragment = np.mean(fragment_data.getNbElementsPerFragment())
 
@@ -73,8 +69,7 @@ def runSimulation(strain_rate):
         frag_lengths = np.zeros(fragment_data.getNbFragment())
         frag_lengths = fragment_data.getNbElementsPerFragment() * DFMesh.h_uniform
         fraglen_all_steps.append(frag_lengths)
-        # avg_sfrag = (mean_els_per_fragment%2 + (mean_els_per_fragment - mean_els_per_fragment%2)*0.5 ) * DFMesh.h_uniform                      
-
+        # avg_sfrag = (mean_els_per_fragment%2 + (mean_els_per_fragment - mean_els_per_fragment%2)*0.5 ) * DFMesh.h_uniform
 
     DFModel.endProgressBar(bar)
 

@@ -32,13 +32,16 @@ else:
     cohesive_inserter = dynfrag.getElementInserter()
     check_facets = cohesive_inserter.getCheckFacets()
     up = np.array([0.0, 1.0])
-    # Loop by all facet types used in the simulation 
+    # Loop by all facet types used in the simulation
     for facet_type in connect_facets.elementTypes(dim=(DFMesh.spatial_dimension - 1)):
         conn_facettype = connect_facets(facet_type)
         check_facettype = check_facets(facet_type)
         for el, conn_facettype in enumerate(conn_facettype):
-            # Check the direction of the vector 
-            dir_vec = DFMesh.node_coord[conn_facettype[1], :] - DFMesh.node_coord[conn_facettype[0], :]
+            # Check the direction of the vector
+            dir_vec = (
+                DFMesh.node_coord[conn_facettype[1], :]
+                - DFMesh.node_coord[conn_facettype[0], :]
+            )
             direction = (dir_vec / np.linalg.norm(dir_vec)).dot(up)
             # If the direction is not 1 it means that is a diagonal facet, then assign False
             if abs(direction) < 0.9:
@@ -49,13 +52,13 @@ if DFMesh.generate_limit_stress_variation == False:
     stress_critical = stress_critical(aka._segment_2)
     with open(DFMesh.stress_limit_file_name, "rb") as handle:
         random_stress = pickle.load(handle)
-    
+
     update_stress = []
     stress_value = []
     for i in check_facettype:
-        update_stress.extend([i,i])
+        update_stress.extend([i, i])
     for i in random_stress:
-        stress_value.extend([i,i])
+        stress_value.extend([i, i])
 
     i = 0
     for facet in range(len(stress_critical)):
@@ -65,26 +68,26 @@ if DFMesh.generate_limit_stress_variation == False:
 
 
 # Set time increment
-dt_crit = dynfrag.getStableTimeStep()    
-dt = dt_crit*0.1                       
+dt_crit = dynfrag.getStableTimeStep()
+dt = dt_crit * 0.1
 dynfrag.setTimeStep(dt)
-n_steps = int(DFMesh.time_simulation/dt)      
+n_steps = int(DFMesh.time_simulation / dt)
 
 
 # Apply Dirichlet BC to block dispacements at y direction on top and botton of the elements
-dynfrag.applyBC(aka.FixedValue(0., aka._y), 'Yblocked')
+dynfrag.applyBC(aka.FixedValue(0.0, aka._y), "Yblocked")
 
 # Apply constant velocity at the boundaries
-left_extremity = DFApplyVel.FixedVelocity(aka._x, - DFMesh.applied_vel)
+left_extremity = DFApplyVel.FixedVelocity(aka._x, -DFMesh.applied_vel)
 right_extremity = DFApplyVel.FixedVelocity(aka._x, DFMesh.applied_vel)
-dynfrag.applyBC(left_extremity, 'left')
-dynfrag.applyBC(right_extremity, 'right')
+dynfrag.applyBC(left_extremity, "left")
+dynfrag.applyBC(right_extremity, "right")
 
 
 # Initial values
 u0 = dynfrag.getDisplacement()
-v0 = dynfrag.getVelocity() 
-v0[:,0] = np.array([DFMesh.strain_rate * x for x,y in DFMesh.mesh.getNodes()])
+v0 = dynfrag.getVelocity()
+v0[:, 0] = np.array([DFMesh.strain_rate * x for x, y in DFMesh.mesh.getNodes()])
 dynfrag.getVelocity()[:] = v0
 
 # Initiation of variables
@@ -96,13 +99,13 @@ energy_contact = np.zeros(n_steps)
 external_work = np.zeros(n_steps)
 work_previous_step = 0.0
 energies = [
-        ["energy potential", energy_potential],
-        ["energy kinetic", energy_kinetic],
-        ["energy dissipated", energy_dissipated],
-        ["energy reversible", energy_reversible],
-        ["energy contact", energy_contact],
-        ["external work", external_work],
-    ]
+    ["energy potential", energy_potential],
+    ["energy kinetic", energy_kinetic],
+    ["energy dissipated", energy_dissipated],
+    ["energy reversible", energy_reversible],
+    ["energy contact", energy_contact],
+    ["external work", external_work],
+]
 
 avg_stress_bar = np.zeros(n_steps)
 
@@ -114,7 +117,7 @@ n_fragments = np.zeros(n_steps)
 elements_per_frag = []
 avg_frag_size = np.zeros(n_steps)
 data_histogram_frag_size = []
-data_bc = [0,0]
+data_bc = [0, 0]
 
 
 def initProgressBar():
@@ -137,7 +140,7 @@ def updateProgressBar(n, bar):
 
 
 def applyVel(current_time_step):
-    left_extremity.set_time(dt*current_time_step)
-    right_extremity.set_time(dt*current_time_step)
-    dynfrag.applyBC(left_extremity, 'left')
-    dynfrag.applyBC(right_extremity, 'right')
+    left_extremity.set_time(dt * current_time_step)
+    right_extremity.set_time(dt * current_time_step)
+    dynfrag.applyBC(left_extremity, "left")
+    dynfrag.applyBC(right_extremity, "right")
