@@ -16,14 +16,14 @@ stress_limit = 300.0 * 10**6  # (Pa)
 # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 generate_limit_stress_variation = False 
 if generate_limit_stress_variation == False:
-    stress_limit_file_name = 'src_akantu/input_files/random_stress_files/random_stress_critical_1250.pickle'
+    stress_limit_file_name = 'src_akantu/input_files/random_stress_files/random_stress_critical_2500.pickle'
 
 
 # Geometry
 bar_length = 50 * 10** -3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 1250 * 2 # Total number of triangular elements
+number_elements = 2500 * 2 # Total number of triangular elements
 area = 1.  # Cross sectional area (m2) (Equal to element size )
 
 
@@ -43,5 +43,5 @@ continue_simulation_from_step = False
 half_bar = False
 # if use symmetry we have to add the bc proper
 
-filepath = "src_akantu/LOG/mesh_study/czm_uniform_mesh/1250el/"
+filepath = "src_akantu/LOG/mesh_study/czm_uniform_mesh/2500el/"
 

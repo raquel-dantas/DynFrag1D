@@ -1,11 +1,11 @@
 # Input model for src_akantu
 
 # Type of mesh
-uniform_mesh = True
+uniform_mesh = False
 # if there is an mesh file for input set create_mesh = False
-create_mesh = True 
+create_mesh = False 
 if create_mesh == False:
-    mesh_file_name = 'filename.pickle'
+    mesh_file_name = 'src_akantu/input_files/mesh_files/mesh_non_uniform_1250.pickle'
 
 # Material
 young_modulus = 275.0*10**9   # (Pa)

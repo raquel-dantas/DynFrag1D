@@ -18,7 +18,7 @@ def runSimulation(strain_rate):
     energies = DFModel.energies
 
     # VTK plot
-    DFPlot.addPlotVtk()
+    # DFPlot.addPlotVtk()
 
     for n in range(DFModel.n_steps):
 
@@ -27,7 +27,7 @@ def runSimulation(strain_rate):
         DFPlot.addVtkFiles(n)
 
         # Apply velocity at the boundaries
-        DFModel.applyVel(n)
+        # DFModel.applyVel(n)
 
         # Run simulation
         DFModel.dynfrag.checkCohesiveStress()
