@@ -24,10 +24,10 @@ def runSimulation(strain_rate):
 
         DFModel.updateProgressBar(n, bar)
 
-        DFPlot.addVtkFiles(n)
+        # DFPlot.addVtkFiles(n)
 
         # Apply velocity at the boundaries
-        # DFModel.applyVel(n)
+        DFModel.applyVel(n)
 
         # Run simulation
         DFModel.dynfrag.checkCohesiveStress()
@@ -59,6 +59,7 @@ def runSimulation(strain_rate):
         frag_lengths = np.zeros(fragment_data.getNbFragment())
         frag_lengths = fragment_data.getNbElementsPerFragment() 
 
+        # if n%10 == 0:
         results = [
                 ["displacement", u],
                 ["velocity", v],
