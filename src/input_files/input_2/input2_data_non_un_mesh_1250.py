@@ -37,7 +37,7 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
+time_simulation = 4.5 * 10**-7  # Total time of simulation (s)
 
 
 initial_step = 0

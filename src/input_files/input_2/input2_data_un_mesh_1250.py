@@ -37,17 +37,17 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
+time_simulation = 4.5 * 10**-7  # Total time of simulation (s)
 
 
 # if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
-initial_step = 373
+initial_step = 874
 continue_simulation_from_step = True
 if continue_simulation_from_step == True:
-    previous_simulation = "LOG/test/lipfield_step_373_.pickle"
+    previous_simulation = "LOG/mesh_study/lifield_uniform_mesh/1250el/backup/"
 
 half_bar = False
 # if use symmetry we have to add the bc properly
 
-filepath_save_results = "LOG/test/"
+filepath_save_results = "LOG/mesh_study/lifield_uniform_mesh/1250el/"
 # filepath = "LOG/mesh_study/czm_uniform_mesh/2500el/"
