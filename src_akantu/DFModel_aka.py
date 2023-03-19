@@ -44,7 +44,7 @@ else:
             )
             direction = (dir_vec / np.linalg.norm(dir_vec)).dot(up)
             # If the direction is not 1 it means that is a diagonal facet, then assign False
-            if abs(direction) < 0.9:
+            if abs(direction) < 0.99:
                 check_facettype[el] = False
 
 if DFMesh.generate_limit_stress_variation == False:
@@ -61,8 +61,10 @@ if DFMesh.generate_limit_stress_variation == False:
         stress_value.extend([i, i])
 
     i = 0
+    deb = 0
     for facet in range(len(stress_critical)):
         if update_stress[facet] == True:
+            deb += 1
             stress_critical[facet] = stress_value[i]
             i += 1
 
