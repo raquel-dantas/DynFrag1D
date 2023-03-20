@@ -1,3 +1,4 @@
+import subprocess
 # Input model 1D dynamic fragmentation of an expanding ring
 
 
@@ -41,15 +42,18 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 4.5 * 10**-7  # Total time of simulation (s)
+time_simulation = 2.0 * 10**-7  # Total time of simulation (s)
 
 # if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
-initial_step = 26240
-continue_simulation_from_step = True
+initial_step = 0
+continue_simulation_from_step = False
 if continue_simulation_from_step == True:
-    previous_simulation = "LOG/mesh_study/lipfield_non_uniform_mesh/7500el/lipfield_step_26240_.pickle"
+    previous_simulation = "filename"
 
 half_bar = False
 # if use symmetry we have to add the bc properly
 
-filepath_save_results = "LOG/mesh_study/lipfield_non_uniform_mesh/7500el/"
+# filepath_save_results = "LOG/mesh_study/lipfield_non_uniform_mesh/7500el/"
+
+subprocess.Popen("mkdir output", shell=True)
+filepath_save_results = "output/"
