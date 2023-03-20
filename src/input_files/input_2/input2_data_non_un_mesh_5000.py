@@ -46,6 +46,8 @@ time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
 # continue_simulation_from_step = True and give the time to start the simulation
 initial_step = 0
 continue_simulation_from_step = False
+if continue_simulation_from_step == True:
+    previous_simulation = "filename"
 
 
 half_bar = False

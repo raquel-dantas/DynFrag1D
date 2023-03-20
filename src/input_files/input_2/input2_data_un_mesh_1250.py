@@ -41,13 +41,12 @@ time_simulation = 4.5 * 10**-7  # Total time of simulation (s)
 
 
 # if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
-initial_step = 874
-continue_simulation_from_step = True
+initial_step = 0
+continue_simulation_from_step = False
 if continue_simulation_from_step == True:
-    previous_simulation = "LOG/mesh_study/lifield_uniform_mesh/1250el/backup/"
+    previous_simulation = "filename"
 
 half_bar = False
 # if use symmetry we have to add the bc properly
 
-filepath_save_results = "LOG/mesh_study/lifield_uniform_mesh/1250el/"
-# filepath = "LOG/mesh_study/czm_uniform_mesh/2500el/"
+filepath_save_results = "LOG/mesh_study/lipfield_uniform_mesh/1250el/"

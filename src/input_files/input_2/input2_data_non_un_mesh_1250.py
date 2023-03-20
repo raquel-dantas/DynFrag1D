@@ -10,7 +10,7 @@ use_lipfield = True
 uniform_mesh = False
 create_mesh = False # if there is an mesh file for input set create_mesh = False
 if create_mesh == False:
-    mesh_file_name = 'src/input_files/mesh_non_uniform_1250.pickle'
+    mesh_file_name = 'src/input_files/mesh_files/mesh_non_uniform_1250.pickle'
 
 
 # Material
@@ -21,7 +21,7 @@ stress_limit = 300.0 * 10**6  # (Pa)
 
 generate_limit_stress_variation = False # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = 'src/input_files/random_stress_critical_1250.pickle'
+    stress_limite_file_name = 'src/input_files/random_stress_files/random_stress_critical_1250.pickle'
 
 
 # Geometry
@@ -39,14 +39,14 @@ strain_rate = 10.0**4  # (s-1)
 # Time
 time_simulation = 4.5 * 10**-7  # Total time of simulation (s)
 
-
-initial_step = 0
-continue_simulation_from_step = False
 # if there is previous data to continue the simulation from a previous simulation set 
 # continue_simulation_from_step = True and give the time to start the simulation
+initial_step = 0
+continue_simulation_from_step = False
+if continue_simulation_from_step == True:
+    previous_simulation = "filename"
 
 half_bar = False
 # if use symmetry we have to add the bc properly
 
-filepath = "LOG/mesh_study/lipfield_non_uniform_mesh/1250el/"
-# filepath = "LOG/mesh_study/czm_uniform_mesh/2500el/"
+filepath_save_results = "LOG/mesh_study/lipfield_non_uniform_mesh/1250el/"
