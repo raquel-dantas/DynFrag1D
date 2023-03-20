@@ -4,7 +4,8 @@ import copy
 import pickle
 
 
-import input_files.input_2.input2_data_non_un_mesh_5000 as inputdata
+import input_files.input_2.input2_data_un_mesh_2500 as inputdata
+# import input_files.input_2.input2_data_un_mesh_7500 as inputdata
 
 
 # Import or set inputs
@@ -105,8 +106,8 @@ else:
         node_coord = pickle.load(handle)
 
 # intpoit_coord: returns the coordinates of integration points
-intpoint_coord = [node_coord[i + 1] - 0.5*node_coord[i] for i in range(n_elements)]
-
+# intpoint_coord = [node_coord[i + 1] - 0.5*node_coord[i] for i in range(n_elements)]
+intpoint_coord = [node_coord[i] + (node_coord[i + 1]  - node_coord[i])*0.5 for i in range(n_elements)]
 
 # Interface parameters
 # crack_limit: limit crack oppening
