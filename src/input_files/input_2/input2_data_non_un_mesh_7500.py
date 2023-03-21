@@ -42,13 +42,13 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 2.0 * 10**-7  # Total time of simulation (s)
+time_simulation = 2.5 * 10**-7  # Total time of simulation (s)
 
 # if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
-initial_step = 0
-continue_simulation_from_step = False
+initial_step = 11740
+continue_simulation_from_step = True
 if continue_simulation_from_step == True:
-    previous_simulation = "filename"
+    previous_simulation = "output/lipfield_step_11740_.pickle"
 
 half_bar = False
 # if use symmetry we have to add the bc properly

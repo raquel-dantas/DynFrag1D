@@ -11,7 +11,7 @@ uniform_mesh = True
  # if there is an mesh file for input set create_mesh = False
 create_mesh = True
 if create_mesh == False:
-    mesh_file_name = 'src/input_files/filename.pickle'
+    mesh_file_name = 'filename'
 
 
 # Material
@@ -23,7 +23,7 @@ stress_limit = 300.0 * 10**6  # (Pa)
 # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 generate_limit_stress_variation = False 
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = 'src/input_files/random_stress_critical_5000.pickle'
+    stress_limite_file_name = 'src/input_files/random_stress_files/random_stress_critical_5000.pickle'
 
 
 # Geometry
@@ -39,17 +39,17 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
+time_simulation = 4.5 * 10**-7  # Total time of simulation (s)
 
 
 # if there is previous data to continue the simulation from a previous simulation set 
 # continue_simulation_from_step = True and give the time to start the simulation
-initial_step = 0
-continue_simulation_from_step = False
+initial_step = 2990
+continue_simulation_from_step = True
 if continue_simulation_from_step == True:
-    previous_simulation = "filename"
+    previous_simulation = "LOG/mesh_study/lipfield_uniform_mesh/5000el/lipfield_step_2990_.pickle"
 
 half_bar = False
 # if use symmetry we have to add the bc properly
 
-filepath = "LOG/mesh_study/lipfield_uniform_mesh/5000el/"
+filepath_save_results = "LOG/mesh_study/lipfield_uniform_mesh/5000el/"
