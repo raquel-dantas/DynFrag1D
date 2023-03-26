@@ -93,6 +93,12 @@ v0[:, 0] = np.array([DFMesh.strain_rate * x for x, y in DFMesh.mesh.getNodes()])
 dynfrag.getVelocity()[:] = v0
 data_bc = [0, 0]
 
+# if DFMesh.strain_rate < 5.0 * 10.0**3:
+#     u0[:,0] = np.array([0.98 * DFMesh.stress_limit * x / DFMesh.young_modulus for x, y in DFMesh.mesh.getNodes()])
+#     dynfrag.getDisplacement()[:] = u0
+
+
+
 # Initiation of variables
 energy_potential = 0.0
 energy_kinetic = 0.0

@@ -3,9 +3,8 @@ import pickle
 import akantu as aka
 import numpy as np
 
-import input_files.input_data_aka as inputdata
-# import input_files.input_2.input2_data_un_mesh_7500 as inputdata
-import input_files.input_2.input2_data_non_un_mesh_7500 as inputdata
+# import input_files.input_data_aka as inputdata
+import input_files.input_2.input2_data_un_mesh_5000 as inputdata
 
 filepath = inputdata.filepath
 

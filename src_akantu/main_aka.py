@@ -59,19 +59,19 @@ def runSimulation(strain_rate):
         frag_lengths = np.zeros(fragment_data.getNbFragment())
         frag_lengths = fragment_data.getNbElementsPerFragment() 
 
-        # if n%10 == 0:
-        results = [
-                ["displacement", u],
-                ["velocity", v],
-                ["acceleration", acel],
-                ["damage", d],
-                ["stress", stress],
-                ["avg_stress_bar", avg_stress_bar],
-                ["energies", energies],
-                ["n_fragments", n_fragments],
-                ["frag_lengths", frag_lengths],
-            ]
-        DFPlot.saveResultsCurrentStep(results, n)
+        if n%10 == 0:
+            results = [
+                    ["displacement", u],
+                    ["velocity", v],
+                    ["acceleration", acel],
+                    ["damage", d],
+                    ["stress", stress],
+                    ["avg_stress_bar", avg_stress_bar],
+                    ["energies", energies],
+                    ["n_fragments", n_fragments],
+                    ["frag_lengths", frag_lengths],
+                ]
+            DFPlot.saveResultsCurrentStep(results, n)
 
     DFModel.endProgressBar(bar)
 

@@ -13,7 +13,7 @@ def getDamageParameter():
     coh_id = DFModel.dynfrag.getMaterial("insertion").getElementFilter()(
         aka._cohesive_2d_4
     )
-
+    # model.getFEEngine().computeIntegrationPointsCoordinate(quad_coords, model.getMaterial("cohesive material").getElementFilter())
     return d
 
 
