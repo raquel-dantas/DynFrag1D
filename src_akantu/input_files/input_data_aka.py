@@ -1,8 +1,8 @@
 # Input model for src_akantu
 
 # Type of mesh
-uniform_mesh = False
-create_mesh = False # if there is an mesh file for input set create_mesh = False
+uniform_mesh = True
+create_mesh = True # if there is an mesh file for input set create_mesh = False
 if create_mesh == False:
     mesh_file_name = 'src_akantu/input_files/mesh_non_uniform_test.pickle'
 
@@ -12,7 +12,7 @@ density = 2750.0 # (kg/m3)
 fracture_energy = 100.  # (N/m)
 stress_limit = 300.0 * 10**6  # (Pa)
 
-generate_limit_stress_variation = False # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
+generate_limit_stress_variation = True # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
     stress_limit_file_name = 'src_akantu/input_files/random_stress_test.pickle'
 
@@ -21,7 +21,7 @@ if generate_limit_stress_variation == False:
 bar_length = 50 * 10** -3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 50 * 2 # Total number of triangular elements
+number_elements = 10  # Total number of triangular elements
 area = 1.  # Cross sectional area (m2) (Equal to element size )
 
 

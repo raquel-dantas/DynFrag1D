@@ -42,18 +42,17 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 2.5 * 10**-7  # Total time of simulation (s)
+time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
 
 # if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
-initial_step = 11740
+initial_step = 26240
 continue_simulation_from_step = True
 if continue_simulation_from_step == True:
-    previous_simulation = "output/lipfield_step_11740_.pickle"
+    previous_simulation = "LOG/mesh_study/lipfield_non_uniform_mesh/7500el/lipfield_step_26240_.pickle"
 
 half_bar = False
 # if use symmetry we have to add the bc properly
 
 # filepath_save_results = "LOG/mesh_study/lipfield_non_uniform_mesh/7500el/"
 
-subprocess.Popen("mkdir output", shell=True)
-filepath_save_results = "output/"
+filepath_save_results = "LOG/mesh_study/lipfield_non_uniform_mesh/7500el/"

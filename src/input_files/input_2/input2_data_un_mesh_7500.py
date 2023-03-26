@@ -39,14 +39,14 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 4.5 * 10**-7  # Total time of simulation (s)
+time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
 
 # if there is previous data to continue the simulation from a previous simulation set 
 # continue_simulation_from_step = True and give the time to start the simulation
-initial_step = 4870
+initial_step = 5240
 continue_simulation_from_step = True
 if continue_simulation_from_step == True:
-    previous_simulation = "LOG/mesh_study/lipfield_uniform_mesh/7500el/lipfield_step_4870_.pickle"
+    previous_simulation = "LOG/mesh_study/lipfield_uniform_mesh/7500el/lipfield_step_5240_.pickle"
 
 
 half_bar = False

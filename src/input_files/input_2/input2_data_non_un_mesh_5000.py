@@ -44,10 +44,10 @@ time_simulation = 3.5 * 10**-7  # Total time of simulation (s)
 
 # if there is previous data to continue the simulation from a previous simulation set 
 # continue_simulation_from_step = True and give the time to start the simulation
-initial_step = 0
-continue_simulation_from_step = False
+initial_step = 17490
+continue_simulation_from_step = True
 if continue_simulation_from_step == True:
-    previous_simulation = "filename"
+    previous_simulation = "LOG/mesh_study/lipfield_non_uniform_mesh/5000el/lipfield_step_17490_.pickle"
 
 
 half_bar = False
