@@ -4,8 +4,8 @@ animation
 .vscode
 videos
 LOG
+output
 paraview*
 *.txt
 *.svg
 *.pdf
-*.pickle
