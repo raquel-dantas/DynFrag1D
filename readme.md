@@ -1,1 +1,1 @@
-first test file
+This branch is related to the mesh study with different strain-rates and regularizations lengths 
