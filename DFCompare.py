@@ -46,7 +46,7 @@ def plotCompareSimulations(results, title, label_x, label_y, save_filename):
         y_values = results[i][2]
         plt.plot(x_values, y_values, label=name_simulation)
     plt.legend()
-    plt.savefig(save_filename)
+    # plt.savefig(save_filename)
     plt.show()
 
 
@@ -71,7 +71,7 @@ def plotConvergence(results, meshes, title, label_x, label_y, save_filename):
     plt.plot(x_values, final_values, marker='.')
 
     plt.legend()
-    plt.savefig(save_filename)
+    # plt.savefig(save_filename)
     plt.show()
 
 
@@ -98,5 +98,5 @@ def plotConvergenceComparison(results1, results2, meshes, title, label_x, label_
     plt.plot(x_values, final_values2, marker='.')
 
     plt.legend()
-    plt.savefig(save_filename)
+    # plt.savefig(save_filename)
     plt.show()
