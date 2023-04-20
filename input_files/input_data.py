@@ -7,23 +7,23 @@ use_lipfield = True
 
 
 # Type of mesh
-uniform_mesh = True
+uniform_mesh = False
 # if there is an mesh file for input set create_mesh = False
-create_mesh = True
+create_mesh = False
 if create_mesh == False:
-    mesh_file_name = "filename.pickle"
+    mesh_file_name = "input_files/mesh_non_uniform.pickle"
 
 
 # Material
 young_modulus = 275.0 * 10**9  # (Pa)
 density = 2750.0  # (kg/m3)
-fracture_energy = 300.0  # (N/m)
+fracture_energy = 100.0  # (N/m)
 stress_limit = 300.0 * 10**6  # (Pa)
 
 # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
-generate_limit_stress_variation = True
+generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = "filename.pickle"
+    stress_limite_file_name = "input_files/random_stress_critical.pickle"
 
 
 # Geometry
@@ -39,7 +39,7 @@ strain_rate = 10.0**4  # (s-1)
 
 
 # Time
-time_simulation = 6.5 * 10**-7  # Total time of simulation (s)
+time_simulation = 4.0 * 10**-7  # Total time of simulation (s)
 
 
 # if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
