@@ -1,5 +1,5 @@
 # Input model 1D dynamic fragmentation of an expanding ring
-
+import subprocess
 
 # Method
 use_cohesive_elements = False
@@ -52,4 +52,5 @@ if continue_simulation_from_step == True:
 half_bar = False
 # if use symmetry we have to add the bc proper
 
+subprocess.Popen("mkdir output", shell=True)
 filepath_save_results = "output/"
