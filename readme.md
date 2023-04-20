@@ -29,4 +29,4 @@ See the `input_data.py` file to see the required inputs and the format for it.
 
 After settle the inputs just run the `main.py`.
 
-The outputs files for eacht time-step are going to be save in a pickle file. Use `verify_results.py` to read it.
+The outputs files for eacht time-step are going to be save in a pickle file. You can use `verify_results.py` to read it.
