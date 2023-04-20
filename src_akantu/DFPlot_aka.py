@@ -303,12 +303,12 @@ def addVtkFiles(n_steps_to_save):
 
 def saveResults(variable):
     variable_name = retrieveName(variable)[0]
-    with open(DFMesh.filepath + "aka_" + variable_name + ".pickle", "wb") as handle:
+    with open(DFMesh.filepath_save_results + "aka_" + variable_name + ".pickle", "wb") as handle:
         pickle.dump(variable, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def saveResultsCurrentStep(results, current_step):
 
     step_id = "step_" + str(current_step) + "_"
-    with open(DFMesh.filepath + "akantu_" + step_id + ".pickle", "wb") as handle:
+    with open(DFMesh.filepath_save_results + "akantu_" + step_id + ".pickle", "wb") as handle:
         pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)

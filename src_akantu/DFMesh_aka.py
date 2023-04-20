@@ -4,9 +4,9 @@ import akantu as aka
 import numpy as np
 
 # import input_files.input_data_aka as inputdata
-import input_files.input_2.input2_data_un_mesh_5000 as inputdata
+import input_files.input_data_aka as inputdata
 
-filepath = inputdata.filepath
+filepath_save_results = inputdata.filepath_save_results
 
 # Assign material properties
 young_modulus = inputdata.young_modulus
