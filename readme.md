@@ -13,7 +13,7 @@ The user has to source the setup file to install the required libraries and use 
 ```bash
 source setup.sh
 ```
-Note: To use Akantu, the user needs to download, build and install Akantu. For this, follow the step-by-step in this link https://gitlab.com/akantu/akantu. Then, update the path to the python environment of Akantu in the `source.sh`
+Note: To use Akantu, the user needs to download, build and install Akantu. For this, follow the step-by-step in this link https://gitlab.com/akantu/akantu. Then, update the path to the python environment of Akantu in the `setup.sh`
 
 ## Usage
 
