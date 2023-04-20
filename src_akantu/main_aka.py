@@ -75,31 +75,6 @@ def runSimulation(strain_rate):
 
     DFModel.endProgressBar(bar)
 
-    # Energy balance
-    # var_energies = DFPostProcess.computeVariationEnergy(energies)
-    # power = DFPostProcess.computePower(energies)
-
-    # Plots
-    # DFPlot.plotDamage(d)
-    # DFPlot.plotAverageStressBar(avg_stress_bar)
-    # DFPlot.plotNumberFragments(n_fragments)
-    # DFPlot.plotFragmentSizeHistogram(frag_lengths, 10)
-    # DFPlot.plotEnergies(energies)
-    # DFPlot.plotVarEnergies(var_energies)
-    # DFPlot.plotPower(power)
-    # # Save results
-    # DFPlot.saveResults(u)
-    # DFPlot.saveResults(v)
-    # DFPlot.saveResults(acel)
-    # DFPlot.saveResults(d)
-    # DFPlot.saveResults(damage_all_steps)
-    # DFPlot.saveResults(fraglen_all_steps)
-    # DFPlot.saveResults(n_fragments)
-    # DFPlot.saveResults(avg_frag_size)
-    # DFPlot.saveResults(avg_stress_bar)
-    # DFPlot.saveResults(energies)
-    # DFPlot.saveResults(var_energies)
-    # DFPlot.saveResults(power)
     time_data = [DFMesh.time_simulation, DFModel.dt, DFModel.n_steps]
     DFPlot.saveResults(time_data)
 
