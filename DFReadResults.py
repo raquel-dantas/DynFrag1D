@@ -194,8 +194,8 @@ def plotVarEnergiesCZM(var_energies, time, save_filename, title):
     plt.title(title)
     plt.xlabel(str("Time (s)"))
     plt.ylabel("Variation of energy ($ kJ/ {m^2} $)")
-    plt.ylim(-30,20)
-    plt.xlim(0, 3.5*10**-7)
+    # plt.ylim(-30,20)
+    # plt.xlim(0, 3.5*10**-7)
 
     x = time 
 
