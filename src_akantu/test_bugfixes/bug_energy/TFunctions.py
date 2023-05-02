@@ -31,12 +31,12 @@ def getEnergy(energies, energy_name):
 def computeVariationEnergy(energies, n_steps):
     """Returns the variation of energies between the current time step and the time step 0."""
 
-    energy_potential = np.zeros(n_steps)
-    energy_kinetic = np.zeros(n_steps)
-    energy_dissipated = np.zeros(n_steps)
-    energy_contact = np.zeros(n_steps)
-    energy_reversible = np.zeros(n_steps)
-    external_work = np.zeros(n_steps)
+    # energy_potential = np.zeros(n_steps)
+    # energy_kinetic = np.zeros(n_steps)
+    # energy_dissipated = np.zeros(n_steps)
+    # energy_contact = np.zeros(n_steps)
+    # energy_reversible = np.zeros(n_steps)
+    # external_work = np.zeros(n_steps)
     
     var_energy_potential = np.zeros(n_steps)
     var_energy_kinetic = np.zeros(n_steps)
@@ -46,14 +46,14 @@ def computeVariationEnergy(energies, n_steps):
     var_energy_total = np.zeros(n_steps)
     var_external_work = np.zeros(n_steps)
 
-    for i in range(n_steps):
+    # for i in range(n_steps):
 
-        energy_potential[i] = getEnergy(energies[i], "energy potential") 
-        energy_kinetic[i] = getEnergy(energies[i], "energy kinetic") 
-        energy_dissipated[i] = getEnergy(energies[i], "energy dissipated") 
-        energy_reversible[i] = getEnergy(energies[i], "energy reversible") 
-        energy_contact[i] = getEnergy(energies[i], "energy contact") 
-        external_work[i] = getEnergy(energies[i], "external work") 
+    energy_potential = getEnergy(energies, "energy potential") 
+    energy_kinetic = getEnergy(energies, "energy kinetic") 
+    energy_dissipated = getEnergy(energies, "energy dissipated") 
+    energy_reversible = getEnergy(energies, "energy reversible") 
+    energy_contact = getEnergy(energies, "energy contact") 
+    external_work = getEnergy(energies, "external work") 
 
     for n in range(1, n_steps):
         var_energy_potential[n] = energy_potential[n] - energy_potential[0]
@@ -86,12 +86,12 @@ def computeVariationEnergy(energies, n_steps):
 def computePower(energies, n_steps):
     """Returns the variation of energies between the current time step and the time step 0."""
 
-    energy_potential = np.zeros(n_steps)
-    energy_kinetic = np.zeros(n_steps)
-    energy_dissipated = np.zeros(n_steps)
-    energy_contact = np.zeros(n_steps)
-    energy_reversible = np.zeros(n_steps)
-    external_work = np.zeros(n_steps)
+    # energy_potential = np.zeros(n_steps)
+    # energy_kinetic = np.zeros(n_steps)
+    # energy_dissipated = np.zeros(n_steps)
+    # energy_contact = np.zeros(n_steps)
+    # energy_reversible = np.zeros(n_steps)
+    # external_work = np.zeros(n_steps)
     
     power_energy_potential = np.zeros(n_steps)
     power_energy_kinetic = np.zeros(n_steps)
@@ -101,14 +101,14 @@ def computePower(energies, n_steps):
     power_energy_total = np.zeros(n_steps)
     power_external_work = np.zeros(n_steps)
 
-    for i in range(n_steps):
+    # for i in range(n_steps):
 
-        energy_potential[i] = getEnergy(energies[i], "energy potential") 
-        energy_kinetic[i] = getEnergy(energies[i], "energy kinetic") 
-        energy_dissipated[i] = getEnergy(energies[i], "energy dissipated") 
-        energy_reversible[i] = getEnergy(energies[i], "energy reversible") 
-        energy_contact[i] = getEnergy(energies[i], "energy contact") 
-        external_work[i] = getEnergy(energies[i], "external work") 
+    energy_potential = getEnergy(energies, "energy potential") 
+    energy_kinetic = getEnergy(energies, "energy kinetic") 
+    energy_dissipated = getEnergy(energies, "energy dissipated") 
+    energy_reversible = getEnergy(energies, "energy reversible") 
+    energy_contact = getEnergy(energies, "energy contact") 
+    external_work = getEnergy(energies, "external work") 
 
     for n in range(1, n_steps):
         power_energy_potential[n] = energy_potential[n] - energy_potential[n-1]
@@ -143,21 +143,21 @@ def computePower(energies, n_steps):
 def plotEnergies(energies, time_simulation, n_steps):
 
 
-    energy_potential = np.zeros(n_steps)
-    energy_kinetic = np.zeros(n_steps)
-    energy_dissipated = np.zeros(n_steps)
-    energy_contact = np.zeros(n_steps)
-    energy_reversible = np.zeros(n_steps)
-    external_work = np.zeros(n_steps)
+    # energy_potential = np.zeros(n_steps)
+    # energy_kinetic = np.zeros(n_steps)
+    # energy_dissipated = np.zeros(n_steps)
+    # energy_contact = np.zeros(n_steps)
+    # energy_reversible = np.zeros(n_steps)
+    # external_work = np.zeros(n_steps)
     
-    for i in range(n_steps):
+    # for i in range(n_steps):
 
-        energy_potential[i] = getEnergy(energies[i], "energy potential") 
-        energy_kinetic[i] = getEnergy(energies[i], "energy kinetic") 
-        energy_dissipated[i] = getEnergy(energies[i], "energy dissipated") 
-        energy_reversible[i] = getEnergy(energies[i], "energy reversible") 
-        energy_contact[i] = getEnergy(energies[i], "energy contact") 
-        external_work[i] = getEnergy(energies[i], "external work") 
+    energy_potential = getEnergy(energies, "energy potential") 
+    energy_kinetic = getEnergy(energies, "energy kinetic") 
+    energy_dissipated = getEnergy(energies, "energy dissipated") 
+    energy_reversible = getEnergy(energies, "energy reversible") 
+    energy_contact = getEnergy(energies, "energy contact") 
+    external_work = getEnergy(energies, "external work") 
     
 
     fig, axes = plt.subplots()
