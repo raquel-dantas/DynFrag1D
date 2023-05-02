@@ -31,13 +31,6 @@ def getEnergy(energies, energy_name):
 def computeVariationEnergy(energies, n_steps):
     """Returns the variation of energies between the current time step and the time step 0."""
 
-    # energy_potential = np.zeros(n_steps)
-    # energy_kinetic = np.zeros(n_steps)
-    # energy_dissipated = np.zeros(n_steps)
-    # energy_contact = np.zeros(n_steps)
-    # energy_reversible = np.zeros(n_steps)
-    # external_work = np.zeros(n_steps)
-    
     var_energy_potential = np.zeros(n_steps)
     var_energy_kinetic = np.zeros(n_steps)
     var_energy_dissipated = np.zeros(n_steps)
@@ -86,13 +79,6 @@ def computeVariationEnergy(energies, n_steps):
 def computePower(energies, n_steps):
     """Returns the variation of energies between the current time step and the time step 0."""
 
-    # energy_potential = np.zeros(n_steps)
-    # energy_kinetic = np.zeros(n_steps)
-    # energy_dissipated = np.zeros(n_steps)
-    # energy_contact = np.zeros(n_steps)
-    # energy_reversible = np.zeros(n_steps)
-    # external_work = np.zeros(n_steps)
-    
     power_energy_potential = np.zeros(n_steps)
     power_energy_kinetic = np.zeros(n_steps)
     power_energy_dissipated = np.zeros(n_steps)
@@ -100,8 +86,6 @@ def computePower(energies, n_steps):
     power_energy_reversible = np.zeros(n_steps)
     power_energy_total = np.zeros(n_steps)
     power_external_work = np.zeros(n_steps)
-
-    # for i in range(n_steps):
 
     energy_potential = getEnergy(energies, "energy potential") 
     energy_kinetic = getEnergy(energies, "energy kinetic") 
@@ -142,15 +126,6 @@ def computePower(energies, n_steps):
 
 def plotEnergies(energies, time_simulation, n_steps):
 
-
-    # energy_potential = np.zeros(n_steps)
-    # energy_kinetic = np.zeros(n_steps)
-    # energy_dissipated = np.zeros(n_steps)
-    # energy_contact = np.zeros(n_steps)
-    # energy_reversible = np.zeros(n_steps)
-    # external_work = np.zeros(n_steps)
-    
-    # for i in range(n_steps):
 
     energy_potential = getEnergy(energies, "energy potential") 
     energy_kinetic = getEnergy(energies, "energy kinetic") 
