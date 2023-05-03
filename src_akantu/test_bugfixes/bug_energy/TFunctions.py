@@ -185,6 +185,7 @@ def plotVarEnergies(var_energies, time_simulation, n_steps):
     plt.plot(x, -var_external_work, label="-varWext")
     plt.plot(x, var_energy_total, label="varEtot")
     plt.legend()
+    plt.savefig("var_energy_200el_v04.svg")
     plt.show()
 
 
