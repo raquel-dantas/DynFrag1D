@@ -173,7 +173,7 @@ def computeVarEnergiesLipfield(energies, n_steps):
 
 
         
-def plotVarEnergiesCZM(var_energies, time, save_filename, title):
+def plotVarEnergiesCZM(var_energies, time, title):
     """Plot variation of energy from time t to t0."""
 
     var_energy_potential = getEnergy(var_energies, "var energy potential") / 10**3
@@ -239,5 +239,25 @@ def plotVarEnergiesLipfield(var_energies, time, save_filename, title):
     plt.plot(x, -var_external_work, label="-varWext", color='saddlebrown')
     plt.plot(x, var_energy_total, label="varEtot", color='orchid' )
     plt.legend()
-    # plt.savefig(save_filename)
+    plt.show()
+
+
+
+def plotFragmentSizeHistogram(fragment_sizes):
+    fig, axes = plt.subplots()
+    axes.grid(True, which="both")
+    axes.axhline(y=0, color="k")
+    plt.title("Fragment size distribution")
+    plt.xlabel("Fragment size (mm)")
+    plt.ylabel("Number of fragments")
+    plt.xlim(xmin=0, xmax = 1.4)
+    plt.ylim(ymin=0, ymax = 28)
+
+    plt.hist(
+        fragment_sizes * 10**3,
+        15,
+        histtype="stepfilled",
+        alpha=0.4,
+    )
+    plt.legend()
     plt.show()
