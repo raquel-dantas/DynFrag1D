@@ -57,7 +57,7 @@ def runSimulation(strain_rate):
 
         # Fragments size (assuming uniform mesh)
         frag_lengths = np.zeros(fragment_data.getNbFragment())
-        frag_lengths = fragment_data.getNbElementsPerFragment() 
+        frag_lengths = fragment_data.getNbElementsPerFragment() * DFMesh.h_uniform 
 
         if n%10 == 0:
             results = [

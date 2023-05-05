@@ -24,7 +24,7 @@ if generate_limit_stress_variation == False:
 bar_length = 50 * 10**-3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 5000 * 2 # Total number of triangular elements
+number_elements = 1000 * 2 # Total number of triangular elements
 area = 1.0  # Cross sectional area (m2) (Equal to element size )
 
 
