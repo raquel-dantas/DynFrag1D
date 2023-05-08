@@ -27,7 +27,7 @@ def runSimulation(strain_rate):
         # DFPlot.addVtkFiles(n)
 
         # Apply velocity at the boundaries
-        DFModel.applyVel(n)
+        DFModel.applyVel(n + 1)
 
         # Run simulation
         DFModel.dynfrag.checkCohesiveStress()
@@ -57,7 +57,7 @@ def runSimulation(strain_rate):
 
         # Fragments size (assuming uniform mesh)
         frag_lengths = np.zeros(fragment_data.getNbFragment())
-        frag_lengths = fragment_data.getNbElementsPerFragment() 
+        frag_lengths = fragment_data.getNbElementsPerFragment() * DFMesh.h_uniform 
 
         if n%10 == 0:
             results = [
@@ -75,6 +75,7 @@ def runSimulation(strain_rate):
 
     DFModel.endProgressBar(bar)
 
+    
     time_data = [DFMesh.time_simulation, DFModel.dt, DFModel.n_steps]
     DFPlot.saveResults(time_data)
 

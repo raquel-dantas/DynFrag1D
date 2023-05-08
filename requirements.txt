@@ -3,8 +3,9 @@ numpy
 matplotlib
 progressbar
 sortedcontainers
+scipy
 # Dependencies of Vscode extensions
 autopep8
 # Dependencies of akantu
-scipy
 mpi4py
+gmsh

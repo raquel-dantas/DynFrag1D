@@ -17,27 +17,6 @@ def getDamageParameter():
     return d
 
 
-# d
-# (facet, localNode) -> damage
-
-# def getDamagePerFacet(cohID, localNodeID):
-#     return d[cohID + localNodeID]
-
-# cohID -> facetID
-
-# coord -> ... -> damage
-
-# nodeindex -> damage
-
-# facetIndex -> globalNode (feito)
-# globalNode -> coord (feito)
-
-# facetIndex -> localNode
-
-
-# localNode -> coord     (feito)
-
-
 def computeEnergies(work_previous_step, fint_current_step):
 
     energy_potential = DFModel.dynfrag.getEnergy("potential")
