@@ -5,6 +5,7 @@ animation
 videos
 LOG
 output
+output_mesh_study
 paraview*
 *.txt
 *.svg
