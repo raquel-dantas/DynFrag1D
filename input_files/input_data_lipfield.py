@@ -23,14 +23,14 @@ stress_limit = 300e6  # (Pa)
 # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = "input_files/random_stress_files/random_stress_critical_625.pickle"
+    stress_limite_file_name = "input_files/random_stress_files/random_stress_critical_1250.pickle"
 
 
 # Geometry
 bar_length = 50e-3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 625
+number_elements = 1250
 area = 1.0  # Cross sectional area
 
 
@@ -46,10 +46,10 @@ time_simulation = 2e-7  # Total time of simulation (s)
 initial_step = 0
 continue_simulation_from_step = False
 if continue_simulation_from_step == True:
-    previous_simulation = "output/10to5/lipfield_uniform/filename.pickle"
+    previous_simulation = "output_mesh_study/10to5/lipfield_uniform/filename.pickle"
 
 
 # if use symmetry we have to add the bc proper
 half_bar = False
 
-filepath_save_results = "output/10to5/lipfield_uniform_625/"
+filepath_save_results = "output_mesh_study/10to5/lipfield_uniform_1250/"
