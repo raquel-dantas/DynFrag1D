@@ -79,6 +79,6 @@ def runSimulation(strain_rate):
 if __name__ == "__main__":
     start_time = time.time()
     runSimulation(DFMesh.strain_rate)
-    total_time = time.time() - start_time
+    computational_time = time.time() - start_time
     print("--- %s seconds ---" % (time.time() - start_time))
-    DFPlot.saveResults(total_time)
+    DFPlot.saveResults(computational_time)
