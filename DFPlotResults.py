@@ -7,7 +7,40 @@ import DFProcessResults
 # Plot functions
 
 
-def plotResults(results: list, label_x: str, label_y: str, save_plot: bool, save_filename: str):
+def plotResults(
+    results_variable,
+    x_values,
+    label_x: str,
+    label_y: str,
+    plot_title: str,
+    save_plot: bool,
+    save_filename: str,
+):
+    """Plot results values for a given variable
+    """
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which="both")
+    axes.axhline(y=0, color="k")
+    plt.title(plot_title)
+    plt.xlabel(label_x)
+    plt.ylabel(label_y)
+
+    plt.plot( x_values, results_variable)
+    plt.legend()
+    if save_plot == True:
+        plt.savefig(save_filename + ".svg")
+    plt.show()
+
+
+def plotResultsComparison(
+    results: list,
+    label_x: str,
+    label_y: str,
+    plot_title: str,
+    save_plot: bool,
+    save_filename: str,
+):
     """Plot results values in the following form: \n
     results = [label_simulation , x_values, y_values]
     """
@@ -15,16 +48,16 @@ def plotResults(results: list, label_x: str, label_y: str, save_plot: bool, save
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
     axes.axhline(y=0, color="k")
+    plt.title(plot_title)
     plt.xlabel(label_x)
     plt.ylabel(label_y)
 
     nb_simulations = len(results)
-    unit_convertion = 1e-6 # From Pa to MPa
 
     for i in range(nb_simulations):
         name_simulation = results[i][0]
         x_values = results[i][1]
-        y_values = results[i][2] * unit_convertion
+        y_values = results[i][2] 
         plt.plot(x_values, y_values, label=name_simulation)
     plt.legend()
     if save_plot == True:
@@ -131,8 +164,9 @@ def plotVarEnergiesLipfield(
     plt.show()
 
 
-def plotFragmentSizeHistogram(fragment_sizes, n_cols, plot_title: str, save_plot: bool, save_filename: str):
-
+def plotFragmentSizeHistogram(
+    fragment_sizes, n_cols, plot_title: str, save_plot: bool, save_filename: str
+):
     unit_convertion = 1e3  # From m to mm
 
     fig, axes = plt.subplots()
@@ -145,7 +179,7 @@ def plotFragmentSizeHistogram(fragment_sizes, n_cols, plot_title: str, save_plot
     plt.ylim(ymin=0, ymax=28)
 
     plt.hist(
-        fragment_sizes * unit_convertion ,
+        fragment_sizes * unit_convertion,
         n_cols,
         histtype="stepfilled",
         alpha=0.4,
@@ -156,7 +190,15 @@ def plotFragmentSizeHistogram(fragment_sizes, n_cols, plot_title: str, save_plot
     plt.show()
 
 
-def plotConvergence(results:list, meshes: list, plot_title: str, label_x, label_y, save_plot: bool, save_filename: str):
+def plotConvergence(
+    results: list,
+    meshes: list,
+    plot_title: str,
+    label_x,
+    label_y,
+    save_plot: bool,
+    save_filename: str,
+):
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
     axes.axhline(y=0, color="k")
