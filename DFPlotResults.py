@@ -192,7 +192,8 @@ def plotFragmentSizeHistogram(
 
 def plotConvergence(
     results: list,
-    meshes: list,
+    x: list,
+    label_x: str,
     label_y: str,
     plot_title: str,
     save_plot: bool,
@@ -202,7 +203,7 @@ def plotConvergence(
     axes.grid(True, which="both")
     axes.axhline(y=0, color="k")
     plt.title(plot_title)
-    plt.xlabel("Number of elements")
+    plt.xlabel(label_x)
     plt.ylabel(label_y)
 
     nb_simulations = len(results)
@@ -210,7 +211,7 @@ def plotConvergence(
     final_values = np.zeros(nb_simulations)
 
     for i in range(nb_simulations):
-        x_values[i] = meshes[i]
+        x_values[i] = x[i]
         final_values[i] = max(results[i][2])
     plt.plot(x_values, final_values, marker=".")
 
