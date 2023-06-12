@@ -66,6 +66,15 @@ def getEnergy(energies, energy_name):
             return energy
 
 
+def getDissipatedEnergyLipfield(energies, n_files):
+    
+    energy_dissipated = np.zeros(n_files)
+    for i in range(n_files):
+        energy_dissipated[i] = getEnergy(energies[i], "energy dissipated")
+    return energy_dissipated
+
+
+
 def getNumberFragments(damage):
     """Compute the number of fragments based on the damage field."""
 
@@ -146,27 +155,27 @@ def computeVarEnergiesCZM(energies, n_steps, n_elements):
     return var_energies
 
 
-def computeVarEnergiesLipfield(energies, n_steps):
+def computeVarEnergiesLipfield(energies, n_files):
     """Returns the variation of energies between the current time step and the time step 0."""
 
-    energy_potential = np.zeros(n_steps)
-    energy_kinetic = np.zeros(n_steps)
-    energy_dissipated = np.zeros(n_steps)
-    external_work = np.zeros(n_steps)
+    energy_potential = np.zeros(n_files)
+    energy_kinetic = np.zeros(n_files)
+    energy_dissipated = np.zeros(n_files)
+    external_work = np.zeros(n_files)
 
-    var_energy_potential = np.zeros(n_steps)
-    var_energy_kinetic = np.zeros(n_steps)
-    var_energy_dissipated = np.zeros(n_steps)
-    var_external_work = np.zeros(n_steps)
-    var_energy_total = np.zeros(n_steps)
+    var_energy_potential = np.zeros(n_files)
+    var_energy_kinetic = np.zeros(n_files)
+    var_energy_dissipated = np.zeros(n_files)
+    var_external_work = np.zeros(n_files)
+    var_energy_total = np.zeros(n_files)
 
-    for i in range(n_steps):
+    for i in range(n_files):
         energy_potential[i] = getEnergy(energies[i], "energy potential")
         energy_kinetic[i] = getEnergy(energies[i], "energy kinetic")
         energy_dissipated[i] = getEnergy(energies[i], "energy dissipated")
         external_work[i] = getEnergy(energies[i], "external work")
 
-    for n in range(1, n_steps):
+    for n in range(1, n_files):
         var_energy_potential[n] = energy_potential[n] - energy_potential[0]
         var_energy_kinetic[n] = energy_kinetic[n] - energy_kinetic[0]
         var_energy_dissipated[n] = energy_dissipated[n] - energy_dissipated[0]
