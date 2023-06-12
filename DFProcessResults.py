@@ -47,6 +47,15 @@ def getResultsAllSteps(file_path: str, n_files, n_steps):
     return avg_stress_bar, energies, n_fragments
 
 
+def getResultFinalStep(variable_name: str, file_path: str, n_steps):
+    
+    results = readResultsTimeStep(file_path + "step_" + str(n_steps) + "_.pickle")
+    variable = getResults(results, variable_name)
+
+    return variable
+
+
+
 def getTimeData(file_address: str):
     """Return the time data from a simulation in the followin form: \n
     time_data = [time_simulation, time_increment, number_time_steps]"""
