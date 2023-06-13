@@ -65,6 +65,80 @@ def plotResultsComparison(
     plt.show()
 
 
+def plotDamage(func, n_elements, label_x: str, label_y: str, plot_title: str, save_plot: bool,save_filename: str):
+    """Plot a vector of values that corresponds to each element of the mesh"""
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which="both")
+    axes.axhline(y=0, color="k")
+    plt.title(plot_title)
+    plt.xlabel(label_x)
+    plt.ylabel(label_y)
+
+
+    uniform_coord = np.linspace(-0.5*50, 0.5*50, n_elements + 1)
+    node_coord = uniform_coord
+    n_oneD_elements = n_elements
+
+    x = np.array(
+        [
+            [node_coord[el], node_coord[el + 1]]
+            for el in range(n_oneD_elements)
+        ]
+    )
+    x = x.flatten()
+    y = np.array([[func[el], func[el]] for el in range(n_oneD_elements)])
+    y = y.flatten()
+
+    plt.plot( x, y, linewidth=0.5)
+    plt.legend()
+    if save_plot == True:
+        plt.savefig(save_filename + ".svg")
+    plt.show()
+
+
+def plotDamageComparison(
+    results: list,
+    label_x: str,
+    label_y: str,
+    plot_title: str,
+    save_plot: bool,
+    save_filename: str,
+):
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which="both")
+    axes.axhline(y=0, color="k")
+    plt.title(plot_title)
+    plt.xlabel(label_x)
+    plt.ylabel(label_y)
+
+    nb_simulations = len(results)
+
+    for i in range(nb_simulations):
+        name_simulation = results[i][0]
+        n_elements = results[i][1]
+        func = results[i][2]
+
+        uniform_coord = np.linspace(-0.5 * 50, 0.5 * 50, n_elements + 1)
+        node_coord = uniform_coord
+        n_oneD_elements = n_elements
+
+        x = np.array(
+            [[node_coord[el], node_coord[el + 1]] for el in range(n_oneD_elements)]
+        )
+        x = x.flatten()
+        y = np.array([[func[el], func[el]] for el in range(n_oneD_elements)])
+        y = y.flatten()
+
+        plt.plot(x, y, label=name_simulation, linewidth=0.5)    
+
+    plt.legend()
+    if save_plot == True:
+        plt.savefig(save_filename + ".svg")
+    plt.show()
+
+
 def plotVarEnergiesCZM(
     var_energies, time_simulation, plot_title: str, save_plot: bool, save_filename: str
 ):
