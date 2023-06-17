@@ -320,3 +320,38 @@ def plotConvergenceComparison(
     plt.legend()
     plt.savefig(save_filename)
     plt.show()
+
+
+
+def plotCompareCZMLIP(results, title:str, label_x:str, label_y:str, save_plot: bool, save_filename: str):
+
+    fig, axes = plt.subplots()
+    axes.grid(True, which="both")
+    axes.axhline(y=0, color="k")
+    plt.title(title)
+    plt.xlabel(label_x)
+    plt.ylabel(label_y)
+    plt.rcParams.update({'font.size': 12})
+
+
+    name_simulation = results[0][0]
+    x_values = results[0][1]
+    y_values = results[0][2]
+    plt.plot(x_values, y_values, label=name_simulation, color='steelblue')
+    name_simulation = results[1][0]
+    x_values = results[1][1]
+    y_values = results[1][2]
+    plt.plot(x_values, y_values, label=name_simulation, color='steelblue',  linestyle = 'dotted')
+    name_simulation = results[2][0]
+    x_values = results[2][1]
+    y_values = results[2][2]
+    plt.plot(x_values, y_values, label=name_simulation, color='darkorange')
+    name_simulation = results[3][0]
+    x_values = results[3][1]
+    y_values = results[3][2]
+    plt.plot(x_values, y_values, label=name_simulation, color='darkorange',  linestyle = 'dotted')
+
+    plt.legend()
+    if save_plot == True:
+        plt.savefig(save_filename + ".svg")
+    plt.show()
