@@ -40,7 +40,7 @@ def runSimulation(strain_rate):
 
         # Fragmentation data
         n_fragments = DFFragmentation.getNumberFragments(d)
-        frag_lengths, avg_frag_size = DFFragmentation.getFragmentSizes(d)
+        # frag_lengths, avg_frag_size = DFFragmentation.getFragmentSizes(d)
 
         # Save results previous step at BC to compute external work
         data_bc = DFPostProcess.saveResultsAtBC(u, d)
@@ -61,7 +61,7 @@ def runSimulation(strain_rate):
                 ["avg_stress_bar", avg_stress_bar],
                 ["energies", energies],
                 ["n_fragments", n_fragments],
-                ["frag_lengths", frag_lengths],
+                # ["frag_lengths", frag_lengths],
             ]
             DFPlot.saveResultsCurrentStep(results, n)
 
