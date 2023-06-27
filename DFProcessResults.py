@@ -47,6 +47,25 @@ def getResultsAllSteps(file_path: str, n_files, n_steps):
     return avg_stress_bar, energies, n_fragments
 
 
+def getResultsAllStepsCZM_dumptype2(file_path: str, n_files, n_steps):
+    """Returns the results for all time-steps for average stress at the bar, energies values and number of fragments."""
+
+    damage = []
+    avg_stress_bar = np.zeros(n_files)
+    energies = []
+    n_fragments = np.zeros(n_files)
+
+    i = 0
+    for n in range(n_steps):
+        if n%20==0: 
+            results = readResultsTimeStep(file_path + "step_" + str(n) + "_.pickle")
+            avg_stress_bar[i] = getResults(results, "avg_stress_bar")
+            energies.append(getResults(results, "energies"))
+            n_fragments[i] = getResults(results, "n_fragments")
+            i += 1
+
+    return avg_stress_bar, energies, n_fragments
+
 def getResultsAllStepsCZM(file_path: str, n_files, n_steps):
     """Returns the results for all time-steps for average stress at the bar, energies values and number of fragments."""
 
