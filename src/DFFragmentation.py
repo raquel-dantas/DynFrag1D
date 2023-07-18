@@ -1,36 +1,14 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from itertools import groupby
-from operator import itemgetter
 
 import DFMesh
 import DFFem
+import DFPlot
+
 
 
 def getNumberFragments(damage):
-    """Returns the number of fragments based on the damage field. \n
-    For Lip-field consecutive elements with full damage are considered a sigle crack."""
-
-    if DFMesh.use_lipfield == True:
-        elements_full_damage = []
-
-        for el in range(len(damage)):
-            if damage[el] > 0.99:
-                elements_full_damage.append(el)
-
-            # Divide groups of consecutives elements with damage > 0.99
-            cracks_full_damage = []
-            for i, subgroup in groupby(
-                enumerate(elements_full_damage), lambda index: index[0] - index[1]
-            ):
-                cracks_full_damage.append(list(map(itemgetter(1), subgroup)))
-
-            n_fragments = 1 + len(cracks_full_damage)
-
-        return n_fragments
-
-    if DFMesh.use_cohesive_elements == True:
-        return 1 + sum(1 for D in damage if D > 0.99)
+    return 1 + sum(1 for D in damage if D > 0.99)
 
 
 def getFragmentSizes(damage):
@@ -44,9 +22,7 @@ def getFragmentSizes(damage):
     j = 0
     for i in range(DFMesh.n_elements - 1):
         if damage[i] > 0.99:
-            fragments_lengths[j] = (
-                coord[DFFem.getGlobalIndex(i, 0), 0] - previous_crack_coord
-            )
+            fragments_lengths[j] = coord[DFFem.getGlobalIndex(i, 0), 0] - previous_crack_coord
             previous_crack_coord = coord[DFFem.getGlobalIndex(i, 1), 0]
             j = j + 1
 
@@ -55,7 +31,7 @@ def getFragmentSizes(damage):
 
 def getFragSizeHistogramData(fragments_legths):
     hist_number_columns = 10
-    data_histogram = plt.hist(fragments_legths, hist_number_columns)
+    data_histogram = plt.hist(fragments_legths,hist_number_columns)
 
 
 # Analytical formulation for average fragment size
@@ -76,10 +52,7 @@ def GradyFragSize(strainrate):
         [
             epsilon
             / (
-                (
-                    (DFMesh.young_modulus / DFMesh.rho) ** 0.5
-                    * DFMesh.stress_critical**3
-                )
+                ((DFMesh.young_modulus / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
                 / (DFMesh.young_modulus**2 * DFMesh.Gc)
             )
             for epsilon in strainrate
@@ -101,10 +74,7 @@ def GlenChudnoviskFragSize(strainrate):
         [
             epsilon
             / (
-                (
-                    (DFMesh.young_modulus / DFMesh.rho) ** 0.5
-                    * DFMesh.stress_critical**3
-                )
+                ((DFMesh.young_modulus / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
                 / (DFMesh.young_modulus**2 * DFMesh.Gc)
             )
             for epsilon in strainrate
@@ -131,10 +101,7 @@ def ZhouMolinariRameshFragSize(strainrate):
         [
             epsilon
             / (
-                (
-                    (DFMesh.young_modulus / DFMesh.rho) ** 0.5
-                    * DFMesh.stress_critical**3
-                )
+                ((DFMesh.young_modulus / DFMesh.rho) ** 0.5 * DFMesh.stress_critical**3)
                 / (DFMesh.young_modulus**2 * DFMesh.Gc)
             )
             for epsilon in strainrate

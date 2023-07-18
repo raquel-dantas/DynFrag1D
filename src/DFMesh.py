@@ -4,7 +4,7 @@ import copy
 import pickle
 
 
-import input_files.input_data_lipfield as inputdata
+import input_files.input_data as inputdata
 
 
 # Import or set inputs
