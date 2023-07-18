@@ -7,50 +7,51 @@ use_lipfield = True
 
 
 # Type of mesh
-uniform_mesh = False
+uniform_mesh = True
 # if there is an mesh file for input set create_mesh = False
-create_mesh = False
+create_mesh = True
 if create_mesh == False:
-    mesh_file_name = "input_files/mesh_non_uniform.pickle"
+    mesh_file_name = "input_files/mesh_files/mesh_non_uniform_7500.pickle"
 
 
 # Material
-young_modulus = 275.0 * 10**9  # (Pa)
-density = 2750.0  # (kg/m3)
+young_modulus = 275e9  # (Pa)
+density = 2.75e3  # (kg/m3)
 fracture_energy = 100.0  # (N/m)
-stress_limit = 300.0 * 10**6  # (Pa)
+stress_limit = 300e6  # (Pa)
 
 # if there is already a file with the random values for limit stress set generate_limit_stress_variation = False
 generate_limit_stress_variation = False
 if generate_limit_stress_variation == False:
-    stress_limite_file_name = "input_files/random_stress_critical.pickle"
+    stress_limite_file_name = "input_files/random_stress_files/random_stress_critical_7500.pickle"
 
 
 # Geometry
-bar_length = 50 * 10**-3  # (m)
+bar_length = 50e-3  # (m)
 x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
-number_elements = 1250
+number_elements = 7500
 area = 1.0  # Cross sectional area
 
 
 # Load
-strain_rate = 10.0**4  # (s-1)
+strain_rate = 1e3  # (s-1)
 
 
 # Time
-time_simulation = 4.0 * 10**-7  # Total time of simulation (s)
+time_simulation = 1.5e-6  # Total time of simulation (s)
 
 
 # if there is previous data to continue the simulation set continue_simulation_from_step = True and give the time to start the simulation and the files path
-initial_step = 0
-continue_simulation_from_step = False
+initial_step = 20190
+continue_simulation_from_step = True
 if continue_simulation_from_step == True:
-    previous_simulation = "filename.pickle"
+    previous_simulation = "output_mesh_study/10to3/10to3_lipfield_uniform_7500/lipfield_step_20190_.pickle"
+    # previous_simulation = "output_mesh_study/reg_length/7500_10to4_uniform_new_functions_reg_length_10/lipfield_step_9990_.pickle"
 
 
-half_bar = False
 # if use symmetry we have to add the bc proper
+half_bar = False
 
-subprocess.Popen("mkdir output", shell=True)
-filepath_save_results = "output/"
+filepath_save_results = "output_mesh_study/10to3/10to3_lipfield_uniform_7500/"
+# filepath_save_results = "output_mesh_study/reg_length/7500_10to4_uniform_new_functions_reg_length_5/"
