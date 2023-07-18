@@ -14,10 +14,7 @@ import DFFem
 if DFMesh.use_lipfield == True:
 
     # Regularization inputs
-    # n_elements_regularization = 10
-    # regularization_length = n_elements_regularization * DFMesh.h_uniform
-    # regularization_length = 2.21 * 10**-6
-    regularization_length = 5 * DFMesh.bar_length/2500 # Considering at least 5 elements in a 2500 elements mesh
+    regularization_length = 5 * DFMesh.bar_length/2500   # Considering at least 5 elements in a 2500 elements mesh
     weight_quadrature = 2.0
     tolerance_opt = 10e-5
 
@@ -183,7 +180,7 @@ if DFMesh.use_lipfield == True:
         dp = np.clip(dp, damage_previous_step, 1.)
 
         n_interrupt = 0
-        n_max_interations = 500
+        n_max_interations = 100
         error = tolerance_opt
         norm_residual = np.linalg.norm(dp - d_previous) / np.sqrt(DFMesh.n_elements)
 
