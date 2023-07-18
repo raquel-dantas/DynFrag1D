@@ -16,8 +16,7 @@ def plotResults(
     save_plot: bool,
     save_filename: str,
 ):
-    """Plot results values for a given variable
-    """
+    """Plot results values for a given variable"""
 
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
@@ -26,7 +25,7 @@ def plotResults(
     plt.xlabel(label_x)
     plt.ylabel(label_y)
 
-    plt.plot( x_values, results_variable)
+    plt.plot(x_values, results_variable)
     plt.legend()
     if save_plot == True:
         plt.savefig(save_filename + ".svg")
@@ -57,7 +56,7 @@ def plotResultsComparison(
     for i in range(nb_simulations):
         name_simulation = results[i][0]
         x_values = results[i][1]
-        y_values = results[i][2] 
+        y_values = results[i][2]
         plt.plot(x_values, y_values, label=name_simulation)
     plt.legend()
     if save_plot == True:
@@ -65,7 +64,15 @@ def plotResultsComparison(
     plt.show()
 
 
-def plotDamage(func, n_elements, label_x: str, label_y: str, plot_title: str, save_plot: bool,save_filename: str):
+def plotDamage(
+    func,
+    n_elements,
+    label_x: str,
+    label_y: str,
+    plot_title: str,
+    save_plot: bool,
+    save_filename: str,
+):
     """Plot a vector of values that corresponds to each element of the mesh"""
 
     fig, axes = plt.subplots()
@@ -75,22 +82,18 @@ def plotDamage(func, n_elements, label_x: str, label_y: str, plot_title: str, sa
     plt.xlabel(label_x)
     plt.ylabel(label_y)
 
-
-    uniform_coord = np.linspace(-0.5*50, 0.5*50, n_elements + 1)
+    uniform_coord = np.linspace(-0.5 * 50, 0.5 * 50, n_elements + 1)
     node_coord = uniform_coord
     n_oneD_elements = n_elements
 
     x = np.array(
-        [
-            [node_coord[el], node_coord[el + 1]]
-            for el in range(n_oneD_elements)
-        ]
+        [[node_coord[el], node_coord[el + 1]] for el in range(n_oneD_elements)]
     )
     x = x.flatten()
     y = np.array([[func[el], func[el]] for el in range(n_oneD_elements)])
     y = y.flatten()
 
-    plt.plot( x, y, linewidth=0.5)
+    plt.plot(x, y, linewidth=0.5)
     plt.legend()
     if save_plot == True:
         plt.savefig(save_filename + ".svg")
@@ -105,7 +108,6 @@ def plotDamageComparison(
     save_plot: bool,
     save_filename: str,
 ):
-
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
     axes.axhline(y=0, color="k")
@@ -131,7 +133,7 @@ def plotDamageComparison(
         y = np.array([[func[el], func[el]] for el in range(n_oneD_elements)])
         y = y.flatten()
 
-        plt.plot(x, y, label=name_simulation, linewidth=0.5)    
+        plt.plot(x, y, label=name_simulation, linewidth=0.5)
 
     plt.legend()
     if save_plot == True:
@@ -322,34 +324,41 @@ def plotConvergenceComparison(
     plt.show()
 
 
-
-def plotCompareCZMLIP(results, title:str, label_x:str, label_y:str, save_plot: bool, save_filename: str):
-
+def plotCompareCZMLIP(
+    results, title: str, label_x: str, label_y: str, save_plot: bool, save_filename: str
+):
     fig, axes = plt.subplots()
     axes.grid(True, which="both")
     axes.axhline(y=0, color="k")
     plt.title(title)
     plt.xlabel(label_x)
     plt.ylabel(label_y)
-    plt.rcParams.update({'font.size': 12})
-
+    plt.rcParams.update({"font.size": 12})
 
     name_simulation = results[0][0]
     x_values = results[0][1]
     y_values = results[0][2]
-    plt.plot(x_values, y_values, label=name_simulation, color='steelblue')
+    plt.plot(x_values, y_values, label=name_simulation, color="steelblue")
     name_simulation = results[1][0]
     x_values = results[1][1]
     y_values = results[1][2]
-    plt.plot(x_values, y_values, label=name_simulation, color='steelblue',  linestyle = 'dotted')
+    plt.plot(
+        x_values, y_values, label=name_simulation, color="steelblue", linestyle="dotted"
+    )
     name_simulation = results[2][0]
     x_values = results[2][1]
     y_values = results[2][2]
-    plt.plot(x_values, y_values, label=name_simulation, color='darkorange')
+    plt.plot(x_values, y_values, label=name_simulation, color="darkorange")
     name_simulation = results[3][0]
     x_values = results[3][1]
     y_values = results[3][2]
-    plt.plot(x_values, y_values, label=name_simulation, color='darkorange',  linestyle = 'dotted')
+    plt.plot(
+        x_values,
+        y_values,
+        label=name_simulation,
+        color="darkorange",
+        linestyle="dotted",
+    )
 
     plt.legend()
     if save_plot == True:

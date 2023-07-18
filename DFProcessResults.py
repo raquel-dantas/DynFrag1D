@@ -36,7 +36,7 @@ def getResultsAllSteps(file_path: str, n_files, n_steps):
 
     i = 0
     for n in range(n_steps):
-        if n%10==0: 
+        if n % 10 == 0:
             results = readResultsTimeStep(file_path + "step_" + str(n) + "_.pickle")
             avg_stress_bar[i] = getResults(results, "avg_stress_bar")
             energies.append(getResults(results, "energies"))
@@ -57,7 +57,7 @@ def getResultsAllStepsCZM_dumptype2(file_path: str, n_files, n_steps):
 
     i = 0
     for n in range(n_steps):
-        if n%20==0: 
+        if n % 20 == 0:
             results = readResultsTimeStep(file_path + "step_" + str(n) + "_.pickle")
             avg_stress_bar[i] = getResults(results, "avg_stress_bar")
             energies.append(getResults(results, "energies"))
@@ -65,6 +65,7 @@ def getResultsAllStepsCZM_dumptype2(file_path: str, n_files, n_steps):
             i += 1
 
     return avg_stress_bar, energies, n_fragments
+
 
 def getResultsAllStepsCZM(file_path: str, n_files, n_steps):
     """Returns the results for all time-steps for average stress at the bar, energies values and number of fragments."""
@@ -76,7 +77,7 @@ def getResultsAllStepsCZM(file_path: str, n_files, n_steps):
 
     i = 0
     for n in range(n_steps):
-        if n%10==0: 
+        if n % 10 == 0:
             results = readResultsTimeStep(file_path + "step_" + str(n) + "_.pickle")
             avg_stress_bar[i] = getResults(results, "avg_stress_bar")
             energies.append(getResults(results, "energies"))
@@ -87,12 +88,10 @@ def getResultsAllStepsCZM(file_path: str, n_files, n_steps):
 
 
 def getResultFinalStep(variable_name: str, file_path: str, n_steps):
-    
     results = readResultsTimeStep(file_path + "step_" + str(n_steps) + "_.pickle")
     variable = getResults(results, variable_name)
 
     return variable
-
 
 
 def getTimeData(file_address: str):
@@ -115,14 +114,10 @@ def getEnergy(energies, energy_name):
 
 
 def getDissipatedEnergy(energies, n_files):
-    
     energy_dissipated = np.zeros(n_files)
     for i in range(n_files):
         energy_dissipated[i] = getEnergy(energies[i], "energy dissipated")
     return energy_dissipated
-
-
-
 
 
 def getNumberFragments(damage):
