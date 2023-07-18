@@ -14,7 +14,7 @@ import DFFem
 if DFMesh.use_lipfield == True:
 
     # Regularization inputs
-    regularization_length = 5 * DFMesh.bar_length/2500   # Considering at least 5 elements in a 2500 elements mesh
+    regularization_length = DFMesh.regularization_length
     weight_quadrature = 2.0
     tolerance_opt = 10e-5
 

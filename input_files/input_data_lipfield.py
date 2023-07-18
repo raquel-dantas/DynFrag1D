@@ -32,6 +32,7 @@ x0 = -0.5 * bar_length  # Left extremitiy x coordinate / 0-initial
 xf = 0.5 * bar_length  # Rigth extremitiy x coordinate / f-final
 number_elements = 5000
 area = 1.0  # Cross sectional area
+regularization_length = bar_length/2500 # Considering at least 5 elements in a 2500 elements mesh
 
 
 # Load

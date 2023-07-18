@@ -37,6 +37,7 @@ else:
 # Assign method
 use_cohesive_elements = inputdata.use_cohesive_elements
 use_lipfield = inputdata.use_lipfield
+regularization_length = inputdata.regularization_length
 
 # Assign mesh inputs
 uniform_mesh = inputdata.uniform_mesh
